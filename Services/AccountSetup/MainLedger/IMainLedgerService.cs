@@ -7,7 +7,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
     {
 
         // STRAT: ACCOUNT TYPE
-        Task<ResponseDto> CreateAccountTypeService(CreateAccountTypeDto createAccountTypeDto);
+        // Task<ResponseDto> CreateAccountTypeService(CreateAccountTypeDto createAccountTypeDto);
         Task<AccountTypeDto> GetAccountTypeByIdService(int id);
         Task<List<AccountTypeDto>> GetAccountTypesService();
 
@@ -16,45 +16,42 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
         //START: GROUP TYPE
 
         Task<ResponseDto> CreateGroupTypeService(CreateGroupTypeDto createGroupTypeDto);
-        Task<List<GroupTypeAccounTypeDetailsDto>> GetGroupTypesByAccountService(int accountTypeId);
-        Task<GroupTypeAccounTypeDetailsDto> GetGroupTypeByIdService(int id);
-        Task<List<GroupTypeAccounTypeDetailsDto>> GetGroupTypesService();
+        Task<ResponseDto> UpdateGroupTypeService(UpdateGroupTypeDto updateGroupTypeDto);
+        Task<List<GroupTypeDto>> GetGroupTypesByAccountService(int accountTypeId);
+        Task<GroupTypeDto> GetGroupTypeByIdService(int id);
+        Task<List<GroupTypeDto>> GetGroupTypesService();
 
         // END
-
-        // START: GROUP DETAILS
-        Task<ResponseDto> CreateGroupTypeDetailsService(CreateGroupTypeDetailsDto createGroupTypeDetailsDto);
-        Task<ResponseDto> EditGroupTypeDetailsService(GroupTypeDetailsDto groupTypeDetailsDto);
-        Task<List<GroupTypeDetailsMappingDetailsDto>> GetGroupTypeDetailsService();
-        Task<GroupTypeDetailsMappingDetailsDto> GetGroupTypeDetailsByIdService(int id);
-        Task<List<GroupTypeDetailsMappingDetailsDto>> GetGroupTypeDetailsByGroupType(int groupTypeId);
-        Task<List<GroupTypeDetailsMappingDetailsDto>> GetGroupTypeDetailsByAccountType(int accountTypeId);
 
         // START: LEDGER
-
         Task<ResponseDto> CreateLedgerService(CreateLedgerDto createLedgerDto);
-        Task<ResponseDto> EditLedgerService(LedgerDto ledgerDto);
-        Task<LedgerDetailsDto> GetLedgerByIdService(int id);
-        Task<List<LedgerDetailsDto>> GetLedgers();
-        Task<List<LedgerDetailsDto>> GetLedgerByAccountService(int accountTypeId);
-        Task<List<LedgerDetailsDto>> GetLedgerByGroupService(int groupTypeId);
+        Task<int> GetUniqueIdForLedgerService();
+        Task<ResponseDto> EditLedgerService(UpdateLedgerDto ledgerDto);
+        Task<LedgerDto> GetLedgerByIdService(int id);
+        Task<List<LedgerDto>> GetLedgers();
+        Task<List<LedgerDto>> GetLedgerByAccountService(int accountTypeId);
+        Task<List<LedgerDto>> GetLedgerByGroupService(int groupTypeId);
 
         // END
+
+        // START: BANK SETUP DETAILS
+        Task<ResponseDto> CreateBankSetupService(CreateBankSetupDto createBankSetupDto, string branchCode);
+        Task<ResponseDto> EditBankSetupService(UpdateBankSetup bankSetupDto);
+        Task<List<BankSetupDto>> GetBankSetupService();
+        Task<BankSetupDto> GetBankSetupByIdService(int id);
+        Task<List<BankSetupDto>> GetBankSetupByLedgerService(int ledgerId);
+
+        Task<List<BankTypeDto>> GetAllBankTypeService();
+        Task<BankTypeDto> GetBankTypeByIdService(int id);
 
         // START: SUB LEDGER
 
         // First check if entry exist and only then create ledger and map it
         Task<ResponseDto> CreateSubLedgerService(CreateSubLedgerDto createSubLedgerDto);
-        
-        Task<ResponseDto> EditSubLedgerService(SubLedgerDto subLedgerDto);
-        Task<List<SubLedgerDetailsDto>> GetSubLedgerByLedgerService(int ledgerId);
-        Task<SubLedgerDetailsDto> GetSubLedgerByIdService(int id);
-        Task<List<SubLedgerDetailsDto>> GetSubLedgersService();
-
-        // START: GROUPLEDGER MAP
-
-        // Task<GroupLedgerDto> GetAccountGroupLedgerMapsByIdService(int id);
-        // Task<List<GroupLedgerDto>> GetAccountGroupLedgerMapsService();
-        
+        Task<int> GetUniqueIdForSubLedgerService();
+        Task<ResponseDto> EditSubLedgerService(UpdateSubLedgerDto subLedgerDto);
+        Task<List<SubLedgerDto>> GetSubLedgerByLedgerService(int ledgerId);
+        Task<SubLedgerDto> GetSubLedgerByIdService(int id);
+        Task<List<SubLedgerDto>> GetSubLedgersService();
     }
 }

@@ -39,6 +39,89 @@ namespace MicroFinance.Migrations.Application
                     b.ToTable("AccountTypes");
                 });
 
+            modelBuilder.Entity("MicroFinance.Models.AccountSetup.BankSetup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BankBranch")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("BankTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BranchCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("InterestRate")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int>("LedgerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("NepaliName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalInterestBalance")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BankTypeId");
+
+                    b.HasIndex("LedgerId")
+                        .IsUnique();
+
+                    b.HasIndex("LedgerId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("BankSetups");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.AccountSetup.BankType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BankTypes");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.AccountSetup.DebitOrCredit", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DebitOrCredits");
+                });
+
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.GroupType", b =>
                 {
                     b.Property<int>("Id")
@@ -49,6 +132,10 @@ namespace MicroFinance.Migrations.Application
 
                     b.Property<int>("AccountTypeId")
                         .HasColumnType("int");
+
+                    b.Property<string>("CharKhataNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("EntryDate")
                         .HasColumnType("datetime2");
@@ -65,88 +152,22 @@ namespace MicroFinance.Migrations.Application
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CharKhataNumber")
+                        .IsUnique();
+
                     b.HasIndex("AccountTypeId", "Name")
                         .IsUnique();
 
                     b.ToTable("GroupTypes");
                 });
 
-            modelBuilder.Entity("MicroFinance.Models.AccountSetup.GroupTypeAndLedgerMap", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("GroupTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LedgerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LedgerId")
-                        .IsUnique();
-
-                    b.HasIndex("GroupTypeId", "LedgerId")
-                        .IsUnique();
-
-                    b.ToTable("GroupTypeAndLedgerMaps");
-                });
-
-            modelBuilder.Entity("MicroFinance.Models.AccountSetup.GroupTypeDetails", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AccountNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BankBranch")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BankType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Branch")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("GroupTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("InterestRate")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NepaliName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroupTypeId");
-
-                    b.ToTable("GroupTypeDetails");
-                });
-
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.Ledger", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<decimal?>("CurrentBalance")
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal?>("DepreciationRate")
                         .HasColumnType("decimal(5,2)");
@@ -154,20 +175,29 @@ namespace MicroFinance.Migrations.Application
                     b.Property<DateTime>("EntryDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("GroupTypeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("HisabNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsBank")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsSubLedgerActive")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("NepaliName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GroupTypeId", "Name")
+                        .IsUnique();
 
                     b.ToTable("Ledgers");
                 });
@@ -175,10 +205,7 @@ namespace MicroFinance.Migrations.Application
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.SubLedger", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -633,6 +660,70 @@ namespace MicroFinance.Migrations.Application
                     b.ToTable("ClientTypeInfos");
                 });
 
+            modelBuilder.Entity("MicroFinance.Models.CompanyProfile.Branch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BranchCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("BranchName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchCode")
+                        .IsUnique();
+
+                    b.ToTable("Branches");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.CompanyProfile.CompanyDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CompanyAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyEmailAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CompanyDetails");
+                });
+
             modelBuilder.Entity("MicroFinance.Models.DepositSetup.DepositAccount", b =>
                 {
                     b.Property<int>("Id")
@@ -876,6 +967,96 @@ namespace MicroFinance.Migrations.Application
                     b.ToTable("PostingSchemes");
                 });
 
+            modelBuilder.Entity("MicroFinance.Models.Transactions.DepositTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Employee")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Narration")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OpeningCharge")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PaymentType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalAmountAfterTransaction")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<int>("TransactionAmount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransactionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransactionId")
+                        .IsUnique();
+
+                    b.ToTable("DepositTransaction");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.Transactions.Transaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DepositAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepositAccountId");
+
+                    b.ToTable("Transaction");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.AccountSetup.BankSetup", b =>
+                {
+                    b.HasOne("MicroFinance.Models.AccountSetup.BankType", "BankType")
+                        .WithMany("BankSetup")
+                        .HasForeignKey("BankTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MicroFinance.Models.AccountSetup.Ledger", "Ledger")
+                        .WithOne("BankSetup")
+                        .HasForeignKey("MicroFinance.Models.AccountSetup.BankSetup", "LedgerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BankType");
+
+                    b.Navigation("Ledger");
+                });
+
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.GroupType", b =>
                 {
                     b.HasOne("MicroFinance.Models.AccountSetup.AccountType", "AccountType")
@@ -887,29 +1068,10 @@ namespace MicroFinance.Migrations.Application
                     b.Navigation("AccountType");
                 });
 
-            modelBuilder.Entity("MicroFinance.Models.AccountSetup.GroupTypeAndLedgerMap", b =>
+            modelBuilder.Entity("MicroFinance.Models.AccountSetup.Ledger", b =>
                 {
                     b.HasOne("MicroFinance.Models.AccountSetup.GroupType", "GroupType")
-                        .WithMany("GroupTypeAndLedgerMap")
-                        .HasForeignKey("GroupTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MicroFinance.Models.AccountSetup.Ledger", "Ledger")
-                        .WithOne("GroupTypeAndLedgerMap")
-                        .HasForeignKey("MicroFinance.Models.AccountSetup.GroupTypeAndLedgerMap", "LedgerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("GroupType");
-
-                    b.Navigation("Ledger");
-                });
-
-            modelBuilder.Entity("MicroFinance.Models.AccountSetup.GroupTypeDetails", b =>
-                {
-                    b.HasOne("MicroFinance.Models.AccountSetup.GroupType", "GroupType")
-                        .WithMany("GroupTypeDetails")
+                        .WithMany("Ledgers")
                         .HasForeignKey("GroupTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1021,21 +1183,43 @@ namespace MicroFinance.Migrations.Application
                     b.Navigation("DepositScheme");
                 });
 
+            modelBuilder.Entity("MicroFinance.Models.Transactions.DepositTransaction", b =>
+                {
+                    b.HasOne("MicroFinance.Models.Transactions.Transaction", "Transaction")
+                        .WithOne("DepositTransaction")
+                        .HasForeignKey("MicroFinance.Models.Transactions.DepositTransaction", "TransactionId")
+                        .IsRequired();
+
+                    b.Navigation("Transaction");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.Transactions.Transaction", b =>
+                {
+                    b.HasOne("MicroFinance.Models.DepositSetup.DepositAccount", "DepositAccount")
+                        .WithMany("Transactions")
+                        .HasForeignKey("DepositAccountId");
+
+                    b.Navigation("DepositAccount");
+                });
+
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.AccountType", b =>
                 {
                     b.Navigation("GroupType");
                 });
 
+            modelBuilder.Entity("MicroFinance.Models.AccountSetup.BankType", b =>
+                {
+                    b.Navigation("BankSetup");
+                });
+
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.GroupType", b =>
                 {
-                    b.Navigation("GroupTypeAndLedgerMap");
-
-                    b.Navigation("GroupTypeDetails");
+                    b.Navigation("Ledgers");
                 });
 
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.Ledger", b =>
                 {
-                    b.Navigation("GroupTypeAndLedgerMap")
+                    b.Navigation("BankSetup")
                         .IsRequired();
 
                     b.Navigation("InterestAccount")
@@ -1084,6 +1268,11 @@ namespace MicroFinance.Migrations.Application
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MicroFinance.Models.DepositSetup.DepositAccount", b =>
+                {
+                    b.Navigation("Transactions");
+                });
+
             modelBuilder.Entity("MicroFinance.Models.DepositSetup.DepositScheme", b =>
                 {
                     b.Navigation("DepositAccounts");
@@ -1094,6 +1283,12 @@ namespace MicroFinance.Migrations.Application
             modelBuilder.Entity("MicroFinance.Models.DepositSetup.PostingScheme", b =>
                 {
                     b.Navigation("DepositScheme");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.Transactions.Transaction", b =>
+                {
+                    b.Navigation("DepositTransaction")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

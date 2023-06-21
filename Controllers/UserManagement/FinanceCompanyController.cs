@@ -46,7 +46,8 @@ namespace MicroFinance.Controllers.UserManagement
             if (userRegisterDto.IsActive)
                 throw new UnAuthorizedExceptionHandler("You are not authorized to activate User");
 
-            return Ok(await _employeeService.RegisterService(userRegisterDto));
+            var claims = GetClaims();
+            return Ok(await _employeeService.RegisterService(userRegisterDto, claims["currentUserName"]));
 
         }
 
@@ -161,9 +162,6 @@ namespace MicroFinance.Controllers.UserManagement
 
         }
 
-
-
-
         // END // 
 
         // START: API for company Employee //
@@ -172,11 +170,10 @@ namespace MicroFinance.Controllers.UserManagement
         [HttpPost("create-employee")]
         public async Task<ActionResult<ResponseDto>> CreateEmployee(CreateEmployeeDto createEmployeeDto)
         {
-
-
-            var userCreate = await _employeeService.CreateEmployeeService(createEmployeeDto);
+            Dictionary<string, string> claims = GetClaims();
+            var userCreate = await _employeeService
+            .CreateEmployeeService(createEmployeeDto, claims["currentUserName"], claims["companyName"]);
             return Ok(userCreate);
-
         }
 
 
@@ -188,15 +185,15 @@ namespace MicroFinance.Controllers.UserManagement
         }
 
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpGet("getemployee/userName")]
-        public async Task<ActionResult<EmployeeDto>> GetEmployeeByUserName([FromQuery] string userName)
+        [HttpGet("getemployee/email")]
+        public async Task<ActionResult<EmployeeDto>> GetEmployeeByEmail([FromQuery] string email)
         {
-            var role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
-            var currentUserName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-            if (role != UserRole.Officer.ToString() && currentUserName != userName)
+            var claims = GetClaims();
+
+            if (claims["role"] != UserRole.Officer.ToString() && claims["email"] != email)
                 throw new UnAuthorizedExceptionHandler("Not Authorized to view");
 
-            var employee = await _employeeService.GetEmployeeByUserName(userName);
+            var employee = await _employeeService.GetEmployeeByEmail(email);
             if (employee.Message != "Success")
                 throw new NotFoundExceptionHandler(employee.Message);
             return Ok(employee);
@@ -216,7 +213,7 @@ namespace MicroFinance.Controllers.UserManagement
             if (employee.Message != "Success")
                 throw new NotFoundExceptionHandler(employee.Message);
 
-            var user = await _employeeService.GetUserByUserNameService(employee.UserName);
+            var user = await _employeeService.GetUserByEmailService(employee.Email);
 
             if (role != UserRole.Officer.ToString() && currentUserId != user.UserId)
                 throw new UnAuthorizedExceptionHandler("Not Authorized to view");
@@ -239,24 +236,28 @@ namespace MicroFinance.Controllers.UserManagement
             
         }
 
-        // [TypeFilter(typeof(IsUserOfficerFilter))]
-        // [HttpGet("deleteemployee")]
-        // public async Task<ActionResult<ResponseDto>> DeleteEmployee([FromQuery] string username)
-        // {
-        //     try
-        //     {
-        //         var currentUserName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-        //         if (currentUserName == username)
-        //             return Unauthorized(new ApiResponses(401, "You are authorized to remove yourself"));
-        //         var response = await _employeeService.DeleteEmployee(username);
-        //         return response;
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError($"{DateTime.Now} (FinanceCompany-DeleteUser) Exception: {ex.Message}");
-        //         return BadRequest(new ApiResponses(400, "Bad Request"));
-        //     }
-        // }
+       private Dictionary<string,string> GetClaims()
+       {
+            var currentUserName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
+            var currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
+            var isUserActive = HttpContext.User.FindFirst("IsActive").Value;
+            string branchCode = HttpContext.User.FindFirst("BranchCode").Value;
+            string companyName = HttpContext.User.FindFirst("CompanyName").Value;
+            string email = HttpContext.User.FindFirst(ClaimTypes.Email).Value;
+
+            Dictionary<string, string> claims = new Dictionary<string, string>
+            {
+                {"currentUserName",currentUserName},
+                {"currentUserId",currentUserId},
+                {"role",role},
+                {"isUserActive", isUserActive},
+                {"branchCode", branchCode},
+                {"companyName", companyName},
+                {"email", email}
+            };
+            return claims;
+       }
         // END
     }
 }

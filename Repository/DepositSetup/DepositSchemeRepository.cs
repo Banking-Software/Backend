@@ -66,8 +66,8 @@ namespace MicroFinance.Repository.DepositSetup
             foreach (var scheme in depositScheme)
             {
                 ResponseDepositScheme temp = _mapper.Map<ResponseDepositScheme>(scheme);
-                var ledgerAsInterest = await _mainLedgerRepository.GetLedgerById(scheme.LedgerAsInterestAccountId);
-                var ledgerAsLiability = await _mainLedgerRepository.GetLedgerById(scheme.LedgerAsLiabilityAccountId);
+                var ledgerAsInterest = await _mainLedgerRepository.GetLedger(scheme.LedgerAsInterestAccountId);
+                var ledgerAsLiability = await _mainLedgerRepository.GetLedger(scheme.LedgerAsLiabilityAccountId);
                 //await Task.WhenAll(ledgerAsInterest, ledgerAsLiability);
                 temp.InterestAccount = ledgerAsInterest;
                 temp.LiabilityAccount = ledgerAsLiability;
@@ -100,8 +100,8 @@ namespace MicroFinance.Repository.DepositSetup
             foreach (var scheme in depositSchemesByPostingScheme)
             {
                 ResponseDepositScheme temp = _mapper.Map<ResponseDepositScheme>(scheme);
-                var ledgerAsInterest = await _mainLedgerRepository.GetLedgerById(scheme.LedgerAsInterestAccountId);
-                var ledgerAsLiability = await _mainLedgerRepository.GetLedgerById(scheme.LedgerAsLiabilityAccountId);
+                var ledgerAsInterest = await _mainLedgerRepository.GetLedger(scheme.LedgerAsInterestAccountId);
+                var ledgerAsLiability = await _mainLedgerRepository.GetLedger(scheme.LedgerAsLiabilityAccountId);
                 //await Task.WhenAll(ledgerAsInterest, ledgerAsLiability);
                 temp.InterestAccount = ledgerAsInterest;
                 temp.LiabilityAccount = ledgerAsLiability;

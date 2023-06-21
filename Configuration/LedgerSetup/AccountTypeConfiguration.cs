@@ -17,6 +17,9 @@ namespace MicroFinance.Configuration.LedgerSetup
             .HasForeignKey(gt => gt.AccountTypeId)
             .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Property(at=>at.Name).HasConversion(name=>name.ToUpper(), name=>name);
+            
+
         }
     }
 }

@@ -12,6 +12,7 @@ namespace MicroFinance.Repository.UserManagement
         Task<IdentityResult> UpdateUserProfile(User user);
         Task<User> GetUserDetailsByUsername(string userName);
         Task<User> GetUserByUsername(string userName);
+        Task<User> GetUserByEmail(string email);
         Task<User> GetUserDetailsById(string id);
 
         Task<User> GetUserById(string id);
@@ -25,7 +26,7 @@ namespace MicroFinance.Repository.UserManagement
         // START: Employee
         Task<int> CreateEmployee(Employee employee);
         Task<int> EditEmployeeProfile(Employee employee);
-        Task<Employee> GetEmployeeByUsername(string userName);
+        Task<Employee> GetEmployeeByEmail(string email);
         Task<Employee> GetEmployeeById(int id);
         Task<List<Employee>> GetEmployees();
         Task<int> DeleteEmployee(Employee employee);

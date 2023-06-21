@@ -82,16 +82,20 @@ namespace MicroFinance.Services.DepositSetup
                     ledgerAsLiability.Name = depositLedgerAsLiability;
                     ledgerAsLiability.EntryDate = DateTime.Now;
                     ledgerAsLiability.IsSubLedgerActive = false;
+                    ledgerAsLiability.GroupType = groupTypeAsLiability;
+                    ledgerAsLiability.IsBank=false;
                     ledgerAsLiabilityStatus =
-                    await _mainLedgerRepository.CreateLedger(ledgerAsLiability, groupTypeAsLiability);
+                    await _mainLedgerRepository.CreateLedger(ledgerAsLiability);
                 }
                 if (ledgerAsInterest == null || ledgerAsInterest.Id <= 0)
                 {
                     ledgerAsInterest.Name = depositLedgerAsInterest;
                     ledgerAsInterest.EntryDate = DateTime.Now;
                     ledgerAsInterest.IsSubLedgerActive = false;
+                    ledgerAsInterest.GroupType=groupTypeAsInterest;
+                    ledgerAsInterest.IsBank=false;
                     ledgerAsInterestStatus =
-                    await _mainLedgerRepository.CreateLedger(ledgerAsInterest, groupTypeAsInterest);
+                    await _mainLedgerRepository.CreateLedger(ledgerAsInterest);
                 }
                 if (ledgerAsInterestStatus >= 1 && ledgerAsInterestStatus >= 1)
                 {
@@ -177,58 +181,8 @@ namespace MicroFinance.Services.DepositSetup
                 ModifiedBy = scheme.ModifiedBy,
                 CreatedOn = scheme.CreatedOn,
                 ModifiedOn = scheme.ModifiedOn,
-                LiabilityAccount = new LedgerDetailsDto()
-                {
-                    Ledger = new LedgerDto()
-                    {
-                        Id = scheme.LiabilityAccount.LedgerId,
-                        Name = scheme.LiabilityAccount.Ledger.Name,
-                        NepaliName = scheme.LiabilityAccount.Ledger.NepaliName,
-                        EntryDate = scheme.LiabilityAccount.Ledger.EntryDate,
-                        IsSubLedgerActive = scheme.LiabilityAccount.Ledger.IsSubLedgerActive,
-                        DepreciationRate = scheme.LiabilityAccount.Ledger.DepreciationRate,
-                        HisabNumber = scheme.LiabilityAccount.Ledger.HisabNumber
-                    },
-                    GroupType = new GroupTypeDto()
-                    {
-                        Id = scheme.LiabilityAccount.GroupTypeId,
-                        Name = scheme.LiabilityAccount.GroupType.Name,
-                        NepaliName = scheme.LiabilityAccount.GroupType.NepaliName,
-                        EntryDate = scheme.LiabilityAccount.GroupType.EntryDate,
-                        Schedule = scheme.LiabilityAccount.GroupType.Schedule
-                    },
-                    AccountType = new AccountTypeDto()
-                    {
-                        Id = scheme.LiabilityAccount.GroupType.AccountTypeId,
-                        Name = scheme.LiabilityAccount.GroupType.AccountType.Name
-                    }
-                },
-                InterestAccount = new LedgerDetailsDto()
-                {
-                    Ledger = new LedgerDto()
-                    {
-                        Id = scheme.InterestAccount.LedgerId,
-                        Name = scheme.InterestAccount.Ledger.Name,
-                        NepaliName = scheme.InterestAccount.Ledger.NepaliName,
-                        EntryDate = scheme.InterestAccount.Ledger.EntryDate,
-                        IsSubLedgerActive = scheme.InterestAccount.Ledger.IsSubLedgerActive,
-                        DepreciationRate = scheme.InterestAccount.Ledger.DepreciationRate,
-                        HisabNumber = scheme.InterestAccount.Ledger.HisabNumber
-                    },
-                    GroupType = new GroupTypeDto()
-                    {
-                        Id = scheme.InterestAccount.GroupTypeId,
-                        Name = scheme.InterestAccount.GroupType.Name,
-                        NepaliName = scheme.InterestAccount.GroupType.NepaliName,
-                        EntryDate = scheme.InterestAccount.GroupType.EntryDate,
-                        Schedule = scheme.InterestAccount.GroupType.Schedule
-                    },
-                    AccountType = new AccountTypeDto()
-                    {
-                        Id = scheme.InterestAccount.GroupType.AccountTypeId,
-                        Name = scheme.InterestAccount.GroupType.AccountType.Name
-                    }
-                }
+                LiabilityAccount = _mapper.Map<LedgerDto>(scheme.LiabilityAccount),
+                InterestAccount = _mapper.Map<LedgerDto>(scheme.InterestAccount)
             };
             return tempDepositSchemeDto;
         }
@@ -248,8 +202,8 @@ namespace MicroFinance.Services.DepositSetup
         {
             var scheme = await _depositSchemeRepository.GetDepositScheme(id);
             ResponseDepositScheme depositSchemeWithLedgerDetails = _mapper.Map<ResponseDepositScheme>(scheme);
-            var ledgerAsInterest = await _mainLedgerRepository.GetLedgerById(scheme.LedgerAsInterestAccountId);
-            var ledgerAsLiability = await _mainLedgerRepository.GetLedgerById(scheme.LedgerAsLiabilityAccountId);
+            var ledgerAsInterest = await _mainLedgerRepository.GetLedger(scheme.LedgerAsInterestAccountId);
+            var ledgerAsLiability = await _mainLedgerRepository.GetLedger(scheme.LedgerAsLiabilityAccountId);
             //await Task.WhenAll(ledgerAsInterest, ledgerAsLiability);
             depositSchemeWithLedgerDetails.LiabilityAccount = ledgerAsLiability;
             depositSchemeWithLedgerDetails.InterestAccount = ledgerAsInterest;
@@ -420,8 +374,8 @@ namespace MicroFinance.Services.DepositSetup
             depositAccountDto.Status = Enum.GetName(typeof(AccountStatusEnum), accountStatusEnum);
             // GET ALL DEPOSIT SCHEME DETAILS
             ResponseDepositScheme depositSchemeWithLedgerDetails = _mapper.Map<ResponseDepositScheme>(depositAccount.DepositScheme);
-            var ledgerAsInterest = await _mainLedgerRepository.GetLedgerById(depositAccount.DepositScheme.LedgerAsInterestAccountId);
-            var ledgerAsLiability = await _mainLedgerRepository.GetLedgerById(depositAccount.DepositScheme.LedgerAsLiabilityAccountId);
+            var ledgerAsInterest = await _mainLedgerRepository.GetLedger(depositAccount.DepositScheme.LedgerAsInterestAccountId);
+            var ledgerAsLiability = await _mainLedgerRepository.GetLedger(depositAccount.DepositScheme.LedgerAsLiabilityAccountId);
             depositSchemeWithLedgerDetails.LiabilityAccount = ledgerAsLiability;
             depositSchemeWithLedgerDetails.InterestAccount = ledgerAsInterest;
             depositAccountDto.DepositScheme = GetDepositSchemeDto(depositSchemeWithLedgerDetails);

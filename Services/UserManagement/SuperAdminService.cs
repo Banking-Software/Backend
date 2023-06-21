@@ -49,7 +49,10 @@ namespace MicroFinance.Services.UserManagement
                         UserName=superadmin.UserName,
                         UserId = superadmin.Id,
                         Role=await _superAdminRepo.GetRole(superadmin),
-                        IsActive = superadmin.IsActive.ToString()
+                        IsActive = superadmin.IsActive.ToString(),
+                        Email=superadmin.Email,
+                        CompanyName="Fintex",
+                        BranchCode="Fintex"
                     };
                     var token = _tokenService.CreateToken(tokenDto);
                     return new TokenResponseDto(){Token=token};
@@ -58,28 +61,6 @@ namespace MicroFinance.Services.UserManagement
 
             }
             throw new UnAuthorizedExceptionHandler("UnAuthorized");
-        }
-
-        public async Task<TokenResponseDto> RegisterService(SuperAdminRegisterDto superAdminRegisterDto)
-        {
-            var superAdminExist = await _superAdminRepo.GetSuperAdminByUserName(superAdminRegisterDto.UserName);
-            if(superAdminExist==null)
-            {
-                var superAdmin = _mapper.Map<SuperAdmin>(superAdminRegisterDto);
-                var result = await _superAdminRepo.Register
-                (superAdmin, superAdminRegisterDto.Password, superAdminRegisterDto.Role.ToString());
-                
-                var tokenDto = new TokenDto()
-                {
-                    UserName=result.UserName,
-                    UserId = result.Id,
-                    Role=superAdminRegisterDto.Role.ToString(),
-                    IsActive = result.IsActive.ToString()
-                };
-                var token = _tokenService.CreateToken(tokenDto);
-                return new TokenResponseDto(){Token=token};
-            }
-            throw new BadRequestExceptionHandler("Invalid Registration");
         }
 
         public async Task<SuperAdminDto> GetUserByIdService(string id)
@@ -125,18 +106,18 @@ namespace MicroFinance.Services.UserManagement
 
 
         // Handle MicroFinance
-        public async Task<ResponseDto> CreateAdminService(CreateAdminBySuperAdminDto createAdminBySuperAdminDto)
+        public async Task<ResponseDto> CreateAdminService(CreateAdminBySuperAdminDto createAdminBySuperAdminDto, string createdBy)
         {
             var responseDto = new ResponseDto();
             var userStaff = _mapper.Map<CreateEmployeeDto>(createAdminBySuperAdminDto);
-            if((await _employeeRepository.GetEmployeeByUsername(userStaff.UserName))==null)
-                responseDto = await _employeeService.CreateEmployeeService(userStaff);
+            string companyName = createAdminBySuperAdminDto.CompanyName;
+            responseDto = await _employeeService.CreateEmployeeService(userStaff, createdBy, companyName);
             
             // if (responseDto.Status)
             // {
             //     // Register the created staff
             var user = _mapper.Map<UserRegisterDto>(createAdminBySuperAdminDto);
-            responseDto = await _employeeService.RegisterService(user);
+            responseDto = await _employeeService.RegisterService(user, createdBy);
 
             //}
             return responseDto;

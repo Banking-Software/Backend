@@ -8,17 +8,15 @@ namespace MicroFinance.Configuration.LedgerSetup
     {
         public void Configure(EntityTypeBuilder<GroupType> builder)
         {
-             builder.HasIndex(gt => new { gt.AccountTypeId, gt.Name }).IsUnique();
+            builder.HasIndex(gt => new { gt.AccountTypeId, gt.Name }).IsUnique();
+            builder.HasIndex(gt=>gt.CharKhataNumber).IsUnique();
+            builder.Property(gt=>gt.Name).HasConversion(name=>name.ToUpper(), name=>name);
 
-            builder.HasMany(gt => gt.GroupTypeAndLedgerMap)
-            .WithOne(gtl => gtl.GroupType)
-            .HasForeignKey(gtl => gtl.GroupTypeId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasMany(gt => gt.GroupTypeDetails)
-            .WithOne(gtd => gtd.GroupType)
-            .HasForeignKey(gtd => gtd.GroupTypeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            //  builder.HasOne(gt=>gt.DebitOrCredit)
+            //  .WithMany(dc=>dc.GroupTypes)
+            //  .HasForeignKey(gt=>gt.DebitOrCreditId)
+            //  .IsRequired()
+            //  .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }

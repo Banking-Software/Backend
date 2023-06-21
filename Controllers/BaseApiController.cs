@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MicroFinance.Controllers
 {
-     [ApiController]
+    [ApiController]
     [Route("[controller]")]
     public class BaseApiController : ControllerBase
     {

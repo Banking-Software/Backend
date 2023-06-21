@@ -1,4 +1,5 @@
 using MicroFinance.DBContext;
+using MicroFinance.Dtos.AccountSetup.MainLedger;
 // using MicroFinance.DBContext.CompanyOperations;
 using MicroFinance.Models.AccountSetup;
 using Microsoft.EntityFrameworkCore;
@@ -10,20 +11,12 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<MainLedgerRepository> _logger;
 
-        public MainLedgerRepository(ApplicationDbContext dbContext, ILogger<MainLedgerRepository> logger)
+        public MainLedgerRepository(ApplicationDbContext dbContext,ILogger<MainLedgerRepository> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
         }
         // Operations Related to Account
-        public async Task<int> CreateAccountType(AccountType accountType)
-        {
-            _logger.LogInformation($"{DateTime.Now} (CreateAccountType) Creating...");
-            await _dbContext.AccountTypes.AddAsync(accountType);
-            return await _dbContext.SaveChangesAsync();
-        }
-
-
         public async Task<AccountType> GetAccountType(int id)
         {
             _logger.LogInformation($"{DateTime.Now} (GetAccountType) Returing...");
@@ -39,6 +32,12 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         // END
 
         // Operations Related to Group
+        public async Task<bool> CheckIfGroupNameExist(int accountTypeId, string groupName)
+        {
+            var group = await _dbContext.GroupTypes.Where(gt => gt.AccountTypeId == accountTypeId && gt.Name == groupName).FirstOrDefaultAsync();
+            if (group != null) return true;
+            return false;
+        }
         public async Task<int> CreateGroupType(GroupType groupType)
         {
             _logger.LogInformation($"{DateTime.Now} (CreateGroupType) Creating...");
@@ -46,169 +45,227 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             return await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<int> UpdateGroupType(UpdateGroupTypeDto groupTypeDto)
+        {
+            var existingGroup = await _dbContext.GroupTypes.FindAsync(groupTypeDto.Id);
+            existingGroup.NepaliName = groupTypeDto.NepaliName;
+            existingGroup.Name=groupTypeDto.Name;
+            existingGroup.Schedule=groupTypeDto.Schedule;
+            return await _dbContext.SaveChangesAsync();
+        }
+
         public async Task<GroupType> GetGroupTypeById(int id)
         {
-            _logger.LogInformation($"{DateTime.Now} (GetGroupTypeById) Returning...");
             return await _dbContext.GroupTypes
             .Include(gt => gt.AccountType)
+            // .Include(gt => gt.DebitOrCredit)
             .SingleOrDefaultAsync(gt => gt.Id == id);
         }
 
         public async Task<GroupType> GetGroupByName(string name, string accountTypeName)
         {
             var groupTypeForDepositScheme = await _dbContext.GroupTypes
-            .Where(gt => gt.Name == name && gt.AccountType.Name == accountTypeName)
+            .Where(gt => gt.Name == name.ToUpper() && gt.AccountType.Name == accountTypeName.ToUpper())
             .FirstOrDefaultAsync();
             return groupTypeForDepositScheme;
         }
 
         public async Task<List<GroupType>> GetGroupTypes()
         {
-            _logger.LogInformation($"{DateTime.Now} (GetGroupTypes) Returing...");
-            return await _dbContext.GroupTypes.Include(gt => gt.AccountType).ToListAsync();
+            return await _dbContext.GroupTypes.Include(gt => gt.AccountType)
+            // .Include(gt => gt.DebitOrCredit)
+            .ToListAsync();
         }
 
         public async Task<List<GroupType>> GetGroupTypesByAccountType(int accountTypeId)
         {
-            _logger.LogInformation($"{DateTime.Now} (GetGroupTypesByAccountType) Returing...");
             var groupTypes =
             await _dbContext.GroupTypes
             .Include(gt => gt.AccountType)
+            // .Include(gt => gt.DebitOrCredit)
             .Where(gt => gt.AccountTypeId == accountTypeId)
             .ToListAsync();
             return groupTypes;
 
         }
 
-        // Operations Related to Group Details
-        public async Task<int> CreateGroupTypeDetails(GroupTypeDetails groupTypeDetails)
-        {
-            await _dbContext.GroupTypeDetails.AddAsync(groupTypeDetails);
-            return await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task<int> EditGroupTypeDetails(GroupTypeDetails groupTypeDetails)
-        {
-            var existingGroupTypeDetails = await _dbContext.GroupTypeDetails.FindAsync(groupTypeDetails.Id);
-            var propertyBag = _dbContext.Entry(existingGroupTypeDetails).CurrentValues;
-            foreach (var property in propertyBag.Properties)
-            {
-                var newValue = groupTypeDetails.GetType().GetProperty(property.Name)?.GetValue(groupTypeDetails);
-                if (newValue != null && !Equals(propertyBag[property.Name], newValue))
-                {
-                    propertyBag[property.Name] = newValue;
-                }
-            }
-            return await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task<List<GroupTypeDetails>> GetGroupTypeDetails()
-        {
-            return await _dbContext.GroupTypeDetails
-            .Include(gtd => gtd.GroupType)
-            .ThenInclude(gt => gt.AccountType)
-            .ToListAsync();
-        }
-        public async Task<GroupTypeDetails> GetGroupTypeDetailsById(int id)
-        {
-            return await _dbContext.GroupTypeDetails
-            .Include(gtd => gtd.GroupType)
-            .ThenInclude(gt => gt.AccountType)
-            .SingleOrDefaultAsync(gtd => gtd.Id == id);
-        }
-        public async Task<List<GroupTypeDetails>> GetGroupTypeDetailsByGroupType(int groupTypeId)
-        {
-            return await _dbContext.GroupTypeDetails
-            .Where(gtd => gtd.GroupTypeId == groupTypeId)
-            .Include(gtd => gtd.GroupType)
-            .ThenInclude(gt => gt.AccountType)
-            .ToListAsync();
-        }
-
-        public async Task<List<GroupTypeDetails>> GetGroupTypeDetailsByAccountType(int accountTypeId)
-        {
-            return await _dbContext.GroupTypeDetails
-            .Where(gtd => gtd.GroupType.AccountTypeId == accountTypeId)
-            .Include(gtd => gtd.GroupType)
-            .ThenInclude(gt => gt.AccountType)
-            .ToListAsync();
-        }
 
         // Operations Related to Ledger
-        public async Task<int> CreateLedger(Ledger ledger, GroupType groupType)
+
+        public async Task<bool> CheckIfLedgerNameExist(int groupTypeId, string ledgerName)
         {
-            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
-            {
-                _logger.LogInformation($"{DateTime.Now} Creating Ledger...");
-                await _dbContext.Ledgers.AddAsync(ledger);
-                var groupTypeAndLedgerMap = new GroupTypeAndLedgerMap();
-                groupTypeAndLedgerMap.Ledger = ledger;
-                groupTypeAndLedgerMap.GroupType = groupType;
-                await _dbContext.AddAsync(groupTypeAndLedgerMap);
-                var mappingStatus = await _dbContext.SaveChangesAsync();
-                if (mappingStatus < 1)
-                {
-                    _logger.LogError($"{DateTime.Now} Unable to create ledger");
-                    await transaction.RollbackAsync();
-                    return 0;
-                }
-                await transaction.CommitAsync();
-
-                return 1;
-            }
-
+            var ledger = await _dbContext.Ledgers.Where(l => l.GroupTypeId == groupTypeId && l.Name == ledgerName).FirstOrDefaultAsync();
+            if (ledger != null) return true;
+            return false;
         }
-
-        public async Task<int> EditLedger(Ledger ledger)
+        public async Task<int> CreateLedger(Ledger ledger)
         {
-            var existingLedger = await _dbContext.Ledgers.FindAsync(ledger.Id);
-            ledger.Id = existingLedger.Id;
-            var propertyBag = _dbContext.Entry(existingLedger).CurrentValues;
-            foreach (var property in propertyBag.Properties)
-            {
-                var newValue = ledger.GetType().GetProperty(property.Name)?.GetValue(ledger);
-                if (newValue != null && !Equals(propertyBag[property.Name], newValue))
-                {
-                    propertyBag[property.Name] = newValue;
-                }
-            }
+            _logger.LogInformation($"{DateTime.Now} Creating Ledger...");
+            await _dbContext.Ledgers.AddAsync(ledger);
             return await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<GroupTypeAndLedgerMap> GetLedgerById(int id)
+        public async Task<int> GetUniqueIdForLedger()
         {
-            return await _dbContext.GroupTypeAndLedgerMaps
-            .Where(gtl => gtl.LedgerId == id)
-            .Include(gtl => gtl.Ledger)
-            .Include(gtl => gtl.GroupType)
-            .ThenInclude(gt => gt.AccountType)
-            .SingleOrDefaultAsync();
-            //return await _dbContext.Ledgers.FindAsync(id);
+            int numberOfLedgerEntry= await _dbContext.Ledgers.CountAsync();
+            var checkIfEntryExist = await _dbContext.Ledgers.FindAsync(numberOfLedgerEntry+1);
+            if(checkIfEntryExist==null)
+                return numberOfLedgerEntry+1;
+            
+            List<int> ids = await _dbContext.Ledgers.Select(l=>l.Id).ToListAsync();
+            int expectedId =0;
+            for (int i = 1; i < numberOfLedgerEntry+1; i++)
+            {
+                if(!ids.Contains(i))
+                {
+                    expectedId=i;
+                    break;
+                }
+            }
+            return expectedId;
         }
-        public async Task<Ledger> GetLedgerByGroupTypeAndLedgerName(GroupType groupType, string name)
+
+        public async Task<int> EditLedger(UpdateLedgerDto ledger)
         {
-            var ledgerDetails = await _dbContext.GroupTypeAndLedgerMaps
-            .Include(gtlm => gtlm.Ledger)
-            .Where(gtlm => gtlm.GroupTypeId == groupType.Id && gtlm.Ledger.Name == name)
-            .SingleOrDefaultAsync();
-            if (ledgerDetails != null)
-                return ledgerDetails.Ledger;
-            return new Ledger();
+            var existingLedger = await _dbContext.Ledgers.FindAsync(ledger.Id);
+            if (existingLedger == null) throw new NotImplementedException("No Ledger Found");
+            existingLedger.NepaliName = ledger.NepaliName;
+            existingLedger.IsSubLedgerActive = ledger.IsSubLedgerActive;
+            existingLedger.DepreciationRate = ledger.DepreciationRate;
+            existingLedger.HisabNumber = ledger.HisabNumber;
+            existingLedger.Name=ledger.Name;
+            return await _dbContext.SaveChangesAsync();
         }
+
 
         public async Task<Ledger> GetLedger(int id)
         {
-            return await _dbContext.Ledgers.FindAsync(id);
+            return await _dbContext.Ledgers
+            .Include(l => l.GroupType)
+            .ThenInclude(gt=>gt.AccountType)
+            .Where(l => l.Id == id)
+            .FirstOrDefaultAsync();
         }
-        public async Task<List<GroupTypeAndLedgerMap>> GetLedgers()
+        public async Task<List<Ledger>> GetLedgers()
         {
-            return await _dbContext.GroupTypeAndLedgerMaps
-            .Include(gtl => gtl.Ledger)
-            .Include(gtl => gtl.GroupType)
-            .ThenInclude(gt => gt.AccountType)
+            return await _dbContext.Ledgers.Include(l => l.GroupType).ThenInclude(gt=>gt.AccountType)
             .ToListAsync();
             //return await _dbContext.Ledgers.ToListAsync();
         }
+
+        public async Task<List<Ledger>> GetLedgersByAccountType(int accountTypeId)
+        {
+            var ledgers = await _dbContext.Ledgers
+            .Include(l => l.GroupType)
+            .ThenInclude(gt=>gt.AccountType)
+            .Where(l => l.GroupType.AccountTypeId == accountTypeId)
+            .ToListAsync();
+            return ledgers;
+        }
+
+        public async Task<List<Ledger>> GetLedgerByGroupType(int groupTypeId)
+        {
+            var ledgers = await _dbContext.Ledgers
+            .Include(l => l.GroupType)
+            .ThenInclude(gt=>gt.AccountType)
+            .Where(l => l.GroupTypeId == groupTypeId)
+            .ToListAsync();
+            return ledgers;
+        }
+
+        /// <summary>
+        /// Being Used by Deposit Scheme to create a Ledger
+        /// </summary>
+        /// <param name="groupType"></param>
+        /// <param name="ledgerName"></param>
+        /// <returns></returns>
+        public async Task<Ledger> GetLedgerByGroupTypeAndLedgerName(GroupType groupType, string ledgerName)
+        {
+            return await _dbContext.Ledgers.Where(l=>l.GroupTypeId==groupType.Id && l.Name==ledgerName.ToUpper()).FirstOrDefaultAsync();
+        }
+
+
+
+        // Operations Related to Bank Setup
+        public async Task<int> CreateBankSetup(BankSetup bankSetup)
+        {
+            var groupType = await _dbContext.GroupTypes.Where(gt => gt.CharKhataNumber == "90").FirstOrDefaultAsync();
+            Ledger ledger = await _dbContext.Ledgers.Where(l => l.GroupTypeId == groupType.Id && l.Name == bankSetup.Name.ToUpper()).FirstOrDefaultAsync();
+            if (ledger == null)
+            {
+                int ledgerId = await GetUniqueIdForLedger();
+                if(ledgerId<=0) throw new Exception("Unable to Create Ledger. No Unique Id found");
+                ledger = new Ledger(){
+                    Id = ledgerId,
+                    GroupType = groupType,
+                    Name = bankSetup.Name,
+                    NepaliName = bankSetup.NepaliName,
+                    EntryDate = DateTime.Now,
+                    IsSubLedgerActive = false,
+                    IsBank = true};
+                await _dbContext.Ledgers.AddAsync(ledger);
+                await _dbContext.SaveChangesAsync();
+            }
+
+                bankSetup.Ledger = ledger;
+                await _dbContext.BankSetups.AddAsync(bankSetup);
+                var bankId = await _dbContext.SaveChangesAsync();
+                if (bankId < 1)
+                {
+                    _dbContext.Ledgers.Remove(ledger);
+                    await _dbContext.SaveChangesAsync();
+                }
+            return bankId;
+
+
+        }
+
+        public async Task<int> EditBankSetup(UpdateBankSetup bankSetup)
+        {
+            var existingBankSetup = await _dbContext.BankSetups.FindAsync(bankSetup.Id);
+            existingBankSetup.NepaliName = bankSetup.NepaliName;
+            existingBankSetup.BankBranch = bankSetup.BankBranch;
+            if (existingBankSetup.BankTypeId != bankSetup.BankTypeId)
+                existingBankSetup.BankType = await _dbContext.BankTypes.FindAsync(bankSetup.BankTypeId);
+            existingBankSetup.InterestRate = bankSetup.InterestRate;
+
+            var existingLedger = await _dbContext.Ledgers.FindAsync(existingBankSetup.LedgerId);
+            existingLedger.NepaliName=bankSetup.NepaliName;
+            return await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<BankSetup>> GetBankSetup()
+        {
+            return await _dbContext.BankSetups
+            .Include(bs => bs.Ledger)
+            .Include(bs => bs.BankType)
+            .ToListAsync();
+        }
+        public async Task<BankSetup> GetBankSetupById(int id)
+        {
+            return await _dbContext.BankSetups
+            .Include(bs => bs.Ledger)
+            .Include(bs => bs.BankType)
+            .SingleOrDefaultAsync(gtd => gtd.Id == id);
+        }
+        public async Task<List<BankSetup>> GetBankSetupByLedger(int ledgerId)
+        {
+            return await _dbContext.BankSetups
+            .Where(bs => bs.LedgerId == ledgerId)
+            .Include(bs => bs.Ledger)
+            .Include(bs => bs.BankType)
+            .ToListAsync();
+        }
+
+        public async Task<List<BankType>> GetAllBankType()
+        {
+            return await _dbContext.BankTypes.ToListAsync();
+        }
+        public async Task<BankType> GetBankTypeById(int id)
+        {
+            return await _dbContext.BankTypes.FindAsync(id);
+        }
+
 
         // Operation related to Subledger
 
@@ -233,162 +290,84 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             return await _dbContext.SaveChangesAsync();
         }
 
-
         public async Task<SubLedger> GetSubLedger(int id)
         {
-            return await _dbContext.SubLedgers.FindAsync(id);
-        }
-        public async Task<GroupSubLedger> GetSubLedgerById(int id)
-        {
-
-            var results = await (from subledger in _dbContext.SubLedgers
-                                 where subledger.Id == id
-                                 join groupTypeAndLedgerMap in _dbContext.GroupTypeAndLedgerMaps on subledger.LedgerId equals groupTypeAndLedgerMap.LedgerId
-                                 join groupType in _dbContext.GroupTypes on groupTypeAndLedgerMap.GroupTypeId equals groupType.Id
-                                 select new GroupSubLedger
-                                 {
-                                     SubLedger = new SubLedger
-                                     {
-                                         Id = subledger.Id,
-                                         Name = subledger.Name,
-                                         Description = subledger.Description,
-                                         Ledger = subledger.Ledger,
-                                         LedgerId = subledger.LedgerId
-                                     },
-                                     GroupType = new GroupType
-                                     {
-                                         Id = groupType.Id,
-                                         Name = groupType.Name,
-                                         NepaliName = groupType.NepaliName,
-                                         EntryDate = groupType.EntryDate,
-                                         Schedule = groupType.Schedule,
-                                         AccountType = groupType.AccountType,
-                                         AccountTypeId = groupType.AccountTypeId
-                                     }
-
-                                 }).SingleOrDefaultAsync();
-            return results;
-
-        }
-
-        public async Task<List<GroupSubLedger>> GetSubLedgers()
-        {
-            var results = await (from subledger in _dbContext.SubLedgers
-                                 join groupTypeAndLedgerMap in _dbContext.GroupTypeAndLedgerMaps on subledger.LedgerId equals groupTypeAndLedgerMap.LedgerId
-                                 join groupType in _dbContext.GroupTypes on groupTypeAndLedgerMap.GroupTypeId equals groupType.Id
-
-                                 select new GroupSubLedger
-                                 {
-                                     SubLedger = new SubLedger
-                                     {
-                                         Id = subledger.Id,
-                                         Name = subledger.Name,
-                                         Description = subledger.Description,
-                                         Ledger = subledger.Ledger,
-                                         LedgerId = subledger.LedgerId
-                                     },
-                                     GroupType = new GroupType
-                                     {
-                                         Id = groupType.Id,
-                                         Name = groupType.Name,
-                                         NepaliName = groupType.NepaliName,
-                                         EntryDate = groupType.EntryDate,
-                                         Schedule = groupType.Schedule,
-                                         AccountType = groupType.AccountType,
-                                         AccountTypeId = groupType.AccountTypeId
-                                     }
-                                 })
-                     .ToListAsync();
-            return results;
-        }
-
-        public async Task<List<GroupSubLedger>> GetSubLedgersByLedger(int ledgerId)
-        {
-
-            var results = await (from subledger in _dbContext.SubLedgers
-                                 where subledger.LedgerId == ledgerId
-                                 join groupTypeAndLedgerMap in _dbContext.GroupTypeAndLedgerMaps on subledger.LedgerId equals groupTypeAndLedgerMap.LedgerId
-                                 join groupType in _dbContext.GroupTypes on groupTypeAndLedgerMap.GroupTypeId equals groupType.Id
-
-                                 select new GroupSubLedger
-                                 {
-                                     SubLedger = new SubLedger
-                                     {
-                                         Id = subledger.Id,
-                                         Name = subledger.Name,
-                                         Description = subledger.Description,
-                                         Ledger = subledger.Ledger,
-                                         LedgerId = subledger.LedgerId
-                                     },
-                                     GroupType = new GroupType
-                                     {
-                                         Id = groupType.Id,
-                                         Name = groupType.Name,
-                                         NepaliName = groupType.NepaliName,
-                                         EntryDate = groupType.EntryDate,
-                                         Schedule = groupType.Schedule,
-                                         AccountType = groupType.AccountType,
-                                         AccountTypeId = groupType.AccountTypeId
-                                     }
-                                 })
-                     .ToListAsync();
-            return results;
-        }
-
-        // Related to GroupTypeLedgerMap
-        public async Task<bool> CheckIfLedgerAndGroupNameExist(int grouptypeId, string ledgerName)
-        {
-            var entry = await _dbContext.GroupTypeAndLedgerMaps
-            .Where(gtl => gtl.GroupTypeId == grouptypeId && gtl.Ledger.Name == ledgerName)
-            .ToListAsync();
-            if (entry != null && entry.Count >= 1) return true;
-            return false;
-        }
-
-        public async Task<int> CreateGroupTypeAndLedgerMap(GroupTypeAndLedgerMap groupTypeAndLedgerMap)
-        {
-            await _dbContext.GroupTypeAndLedgerMaps.AddAsync(groupTypeAndLedgerMap);
-            return await _dbContext.SaveChangesAsync();
-
-        }
-
-        public async Task<List<GroupTypeAndLedgerMap>> GetGroupTypeAndLedgerMaps()
-        {
-            return await _dbContext.GroupTypeAndLedgerMaps
-            .Include(gtl => gtl.GroupType)
+            return await _dbContext.SubLedgers
+            .Include(sl => sl.Ledger)
+            .ThenInclude(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
-            .Include(gtl => gtl.Ledger)
+            .Where(sl => sl.Id == id).FirstOrDefaultAsync();
+        }
+        public async Task<SubLedger> GetSubLedgerById(int id)
+        {
+            return await _dbContext.SubLedgers.Include(sl => sl.Ledger).Where(sl => sl.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<SubLedger>> GetSubLedgers()
+        {
+            return await _dbContext.SubLedgers
+            .Include(sl => sl.Ledger)
+            .ThenInclude(l => l.GroupType)
+            .ThenInclude(gt => gt.AccountType)
             .ToListAsync();
         }
 
-        public async Task<GroupTypeAndLedgerMap> GetGroupTypeAndLedgerMapById(int id)
+        public async Task<List<SubLedger>> GetSubLedgersByLedger(int ledgerId)
         {
-            return await _dbContext.GroupTypeAndLedgerMaps
-            .Include(gtl => gtl.GroupType)
+            return await _dbContext.SubLedgers
+            .Include(sl => sl.Ledger)
+            .ThenInclude(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
-            .Include(gtl => gtl.Ledger)
-            .SingleOrDefaultAsync(gtl => gtl.Id == id);
-        }
-
-        public async Task<List<GroupTypeAndLedgerMap>> GetGroupTypeAndLedgerMapByAccountType(int accountTypeId)
-        {
-            return await _dbContext.GroupTypeAndLedgerMaps
-
-            .Where(gtl => gtl.GroupType.AccountTypeId == accountTypeId)
-            .Include(gtl => gtl.GroupType)
-            .ThenInclude(gt => gt.AccountType)
-            .Include(gtl => gtl.Ledger)
+            .Where(sl => sl.LedgerId == ledgerId)
             .ToListAsync();
         }
 
-        public async Task<List<GroupTypeAndLedgerMap>> GetGroupTypeAndLedgerMapByGroupType(int groupTypeId)
+         public async Task<List<SubLedger>> GetSubLedgersByAccountType(int accountTypeId)
         {
-            return await _dbContext.GroupTypeAndLedgerMaps
-            .Where(gtl => gtl.GroupTypeId == groupTypeId)
-            .Include(gtl => gtl.GroupType)
+            return await _dbContext.SubLedgers
+            .Include(sl => sl.Ledger)
+            .ThenInclude(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
-            .Include(gtl => gtl.Ledger)
+            .Where(sl => sl.Ledger.GroupType.AccountTypeId==accountTypeId)
             .ToListAsync();
+        }
+
+        public async Task<List<SubLedger>> GetSubLedgersByGroupType(int groupTypeId)
+        {
+            return await _dbContext.SubLedgers
+            .Include(sl => sl.Ledger)
+            .ThenInclude(l => l.GroupType)
+            .ThenInclude(gt => gt.AccountType)
+            .Where(sl => sl.Ledger.GroupTypeId==groupTypeId)
+            .ToListAsync();
+        }
+        // DEBIT CREDIT
+        public async Task<DebitOrCredit> GetDebitOrCreditById(int id)
+        {
+            return await _dbContext.DebitOrCredits.FindAsync(id);
+        }
+        public async Task<List<DebitOrCredit>> GetDebitOrCredits()
+        {
+            return await _dbContext.DebitOrCredits.ToListAsync();
+        }
+
+        public async Task<int> GetUniqueIdForSubLedger()
+        {
+            int numberOfSubLedgerEntry = await _dbContext.SubLedgers.CountAsync();
+            var subLedgerExistForNewId = await _dbContext.SubLedgers.FindAsync(numberOfSubLedgerEntry+1);
+            if(subLedgerExistForNewId==null) return numberOfSubLedgerEntry+1;
+
+            List<int> ids = await _dbContext.SubLedgers.Select(sl=>sl.Id).ToListAsync();
+            int expectedId =0;
+            for (int i = 1; i < numberOfSubLedgerEntry+1; i++)
+            {
+                if(!ids.Contains(i))
+                {
+                    expectedId=i;
+                    break;
+                }
+            }
+            return expectedId;
         }
     }
 }

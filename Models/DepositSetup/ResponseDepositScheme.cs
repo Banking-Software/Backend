@@ -18,8 +18,8 @@ namespace MicroFinance.Models.DepositSetup
         public int? ClosingCharge { get; set; }
         public string Calculation { get; set; }
         public string PostingScheme { get; set; }
-        public GroupTypeAndLedgerMap LiabilityAccount { get; set; }
-        public GroupTypeAndLedgerMap InterestAccount { get; set; }
+        public Ledger LiabilityAccount { get; set; }
+        public Ledger InterestAccount { get; set; }
         public string CreatedBy { get; set; }
         public string? ModifiedBy { get; set; }
         public DateTime CreatedOn { get; set; }

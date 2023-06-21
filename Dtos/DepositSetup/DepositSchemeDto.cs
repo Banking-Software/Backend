@@ -18,8 +18,8 @@ namespace MicroFinance.Dtos.DepositSetup
         public int? FineAmount { get; set; }
         public int? ClosingCharge { get; set; }
         public string PostingScheme { get; set; }
-        public LedgerDetailsDto LiabilityAccount { get; set; }
-        public LedgerDetailsDto InterestAccount { get; set; }
+        public LedgerDto LiabilityAccount { get; set; }
+        public LedgerDto InterestAccount { get; set; }
         public string? CreatedBy { get; set; }
         public string? ModifiedBy { get; set; }
         public DateTime? CreatedOn { get; set; }

@@ -38,6 +38,8 @@ namespace MicroFinance.Repository.UserManagement
         {
             using var transaction = await _userDbContext.Database.BeginTransactionAsync();
             var userCreate = await _userManager.CreateAsync(user, password);
+            string errorDescription="Not able to Create User";
+            string errorCode = "Invalid";
             if (userCreate.Succeeded)
             {
                 var roleAssign = await _userManager.AddToRoleAsync(user, role);
@@ -45,16 +47,20 @@ namespace MicroFinance.Repository.UserManagement
                 {
                     await transaction.RollbackAsync();
                     await DeleteUser(user);
-                    _logger.LogError($"{DateTime.Now}: {roleAssign.Errors}");
-                    throw new NotImplementedExceptionHandler($"{roleAssign.Errors}");
+                    errorDescription = roleAssign.Errors.FirstOrDefault()?.Description;
+                    errorCode = roleAssign.Errors.FirstOrDefault()?.Code;
+                    _logger.LogError($"{DateTime.Now}: {errorCode}. {errorDescription}");
+                    throw new NotImplementedExceptionHandler($"{errorCode}. {errorDescription}");
                 }
                 _logger.LogInformation($"{DateTime.Now}: {user.UserName} is created");
                 await transaction.CommitAsync();
                 return user;
             }
             await transaction.RollbackAsync();
-            _logger.LogError($"{DateTime.Now}: {userCreate.Errors}");
-            throw new NotImplementedExceptionHandler($"{userCreate.Errors}");
+            errorDescription = userCreate.Errors.FirstOrDefault()?.Description;
+            errorCode = userCreate.Errors.FirstOrDefault()?.Code;
+            _logger.LogError($"{DateTime.Now}: {errorCode}. {errorDescription}");
+            throw new NotImplementedExceptionHandler($"{errorCode}. {errorDescription}");
         }
 
         public async Task<bool> UpdatePassword(User user, string oldPassword, string newPassword)
@@ -65,7 +71,7 @@ namespace MicroFinance.Repository.UserManagement
                 _logger.LogInformation($"{DateTime.Now}: {user.UserName} 's Password Updated ");
                 return true;
             }
-            _logger.LogError($"{DateTime.Now}: Password Update Failed for {user.UserName} due to {result.Errors}");
+            _logger.LogError($"{DateTime.Now}: Password Update Failed for {user.UserName} due to {result.Errors}. {result.Errors.FirstOrDefault()?.Description}");
 
             return false;
         }
@@ -114,7 +120,16 @@ namespace MicroFinance.Repository.UserManagement
         }
         public async Task<User> GetUserByUsername(string userName)
         {
-            return await _userManager.FindByNameAsync(userName);
+            //return await _userManager.FindByNameAsync(userName);
+            return await _userManager.Users
+            .Include(usr=>usr.Employee)
+            .Where(usr=>usr.UserName==userName)
+            .FirstOrDefaultAsync();
+        }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            return await _userManager.FindByEmailAsync(email);
         }
 
         public async Task<IdentityResult> AssignRole(User user, string role)
@@ -138,7 +153,7 @@ namespace MicroFinance.Repository.UserManagement
         public async Task<int> EditEmployeeProfile(Employee employee)
         {
             var existingEmployee =
-            await _userDbContext.Employees.FirstOrDefaultAsync(u => u.UserName == employee.UserName);
+            await _userDbContext.Employees.FirstOrDefaultAsync(u => u.Email == employee.Email);
             if (existingEmployee != null)
             {
                 employee.Id = existingEmployee.Id;
@@ -165,10 +180,10 @@ namespace MicroFinance.Repository.UserManagement
             return await _userDbContext.Employees.FindAsync(id);
         }
 
-        public async Task<Employee> GetEmployeeByUsername(string userName)
+        public async Task<Employee> GetEmployeeByEmail(string email)
         {
             var employee = await _userDbContext.Employees
-                    .FirstOrDefaultAsync(u => u.UserName == userName);
+                    .FirstOrDefaultAsync(u => u.Email == email);
 
             return employee;
         }

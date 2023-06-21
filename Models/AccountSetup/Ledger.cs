@@ -7,8 +7,9 @@ namespace MicroFinance.Models.AccountSetup
     public class Ledger
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+        public virtual GroupType GroupType { get; set; }
+        public int GroupTypeId { get; set; }
         [Required]
         public string Name { get; set; }
         public string? NepaliName { get; set; }
@@ -20,10 +21,14 @@ namespace MicroFinance.Models.AccountSetup
         public decimal? DepreciationRate { get; set; }
         public string? HisabNumber { get; set; }
         [Required]
-        public bool IsSubLedgerActive { get; set; } // If True then allow to create Sub Ledger        
-        public virtual GroupTypeAndLedgerMap GroupTypeAndLedgerMap { get; set; }
+        public bool IsSubLedgerActive { get; set; } // If True then allow to create Sub Ledger
+        [Column(TypeName ="decimal(18,4)")]
+        public decimal? CurrentBalance { get; set; }        
+        [Required]
+        public bool IsBank { get; set; }
+        
+        public virtual BankSetup BankSetup{ get; set; }
         public virtual ICollection<SubLedger> SubLedger { get; set; } 
-
         public virtual DepositScheme LiabilityAccount { get; set; }
         public virtual DepositScheme InterestAccount { get; set; }
     }

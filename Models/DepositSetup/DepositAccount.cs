@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using MicroFinance.Models.ClientSetup;
+using MicroFinance.Models.Transactions;
 
 namespace MicroFinance.Models.DepositSetup
 {
@@ -61,6 +62,8 @@ namespace MicroFinance.Models.DepositSetup
         public DateTime CreatedOn { get; set; }
         public string? ModifiedBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
+
+        public virtual ICollection<Transaction> Transactions { get; set; }
         
 
     }

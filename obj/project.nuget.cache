@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "sQsikVdvKLa0YduR25TRm0HhJY0E4TWOv8+mwrrWsFyySRrI88FqlO8Y63GzR513llIIyJJPqwL2bLBn9W6b2w==",
+  "dgSpecHash": "GRl4vcigw8VvE0TdR8ckr81qDwOjkprNgN/2chfEwVKoPli1P8/gbpIvLg9AqyEmdgRgAHjRnQP3Acl0dH855Q==",
   "success": true,
-  "projectFilePath": "/media/ashish/New Volume/FinTechProject/Backend-Dotnet/MicroFinance/MicroFinance.csproj",
+  "projectFilePath": "/media/ashish/New Volume1/FinTechProject/MicroFinance/MicroFinance.csproj",
   "expectedPackageFiles": [
     "/home/ashish/.nuget/packages/automapper/12.0.1/automapper.12.0.1.nupkg.sha512",
     "/home/ashish/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/12.0.1/automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",

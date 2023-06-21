@@ -19,9 +19,7 @@ namespace MicroFinance.DBContext.UserManagement
             
            
             base.OnModelCreating(builder);
-            builder.Entity<Employee>()
-            .HasIndex(u=> new {u.Email, u.UserName})
-            .IsUnique();
+            builder.Entity<Employee>().HasIndex(u=> u.Email).IsUnique();
 
             builder.Entity<User>()
             .HasOne(a=>a.Employee)

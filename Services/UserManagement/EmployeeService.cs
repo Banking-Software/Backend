@@ -4,6 +4,7 @@ using MicroFinance.Dtos.UserManagement;
 using MicroFinance.Exceptions;
 using MicroFinance.Models.UserManagement;
 using MicroFinance.Repository.UserManagement;
+using MicroFinance.Services.CompanyProfile;
 using MicroFinance.Token;
 using Microsoft.AspNetCore.Identity;
 
@@ -15,19 +16,22 @@ namespace MicroFinance.Services.UserManagement
         private readonly ILogger<EmployeeService> _logger;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
+        private readonly ICompanyProfileService _companyProfile;
 
         public EmployeeService
         (
             IEmployeeRepository employeeRepo,
             ILogger<EmployeeService> logger,
             IMapper mapper,
-            ITokenService tokenService
+            ITokenService tokenService,
+            ICompanyProfileService companyProfile
         )
         {
             _employeeRepo = employeeRepo;
             _logger = logger;
             _mapper = mapper;
             _tokenService = tokenService;
+            _companyProfile=companyProfile;
         }
 
         // START: Authorized User Service
@@ -46,7 +50,10 @@ namespace MicroFinance.Services.UserManagement
                         UserName = user.UserName,
                         UserId = user.Id,
                         Role = await _employeeRepo.GetRole(user),
-                        IsActive = user.IsActive.ToString()
+                        IsActive = user.IsActive.ToString(),
+                        Email=user.Email,
+                        CompanyName=user.Employee.CompanyName,
+                        BranchCode=user.Employee.BranchCode
                     };
                     var token = _tokenService.CreateToken(tokenData);
                     return new TokenResponseDto() { Token = token };
@@ -57,14 +64,15 @@ namespace MicroFinance.Services.UserManagement
             throw new UnAuthorizedExceptionHandler("UnAuthorized");
         }
 
-        public async Task<ResponseDto> RegisterService(UserRegisterDto userRegisterDto)
+        public async Task<ResponseDto> RegisterService(UserRegisterDto userRegisterDto, string createdBy)
         {
-            var employee = await _employeeRepo.GetEmployeeByUsername(userRegisterDto.UserName);
+            var employee = await _employeeRepo.GetEmployeeByEmail(userRegisterDto.Email);
             if (employee == null)
                 throw new NotImplementedExceptionHandler("Create Employee before creating login credentials");
-                
+
             var user = _mapper.Map<User>(userRegisterDto);
             user.Employee = employee;
+            user.CreatedBy=createdBy;
             var userCredentials =
             await _employeeRepo.Register(user, userRegisterDto.Password, userRegisterDto.Role.ToString());
             _logger.LogInformation($"{DateTime.Now}: User Login Credentails Created > {userRegisterDto.UserName}");
@@ -129,32 +137,6 @@ namespace MicroFinance.Services.UserManagement
             throw new UnAuthorizedExceptionHandler("UnAuthorized");
         }
 
-        public async Task<ResponseDto> DeleteUser(string userName)
-        {
-            var user = await _employeeRepo.GetUserByUsername(userName);
-            if (user != null)
-            {
-                var response = await _employeeRepo.DeleteUser(user);
-                if (response.Succeeded)
-                {
-                    return new ResponseDto()
-                    {
-                        Message = "User Removed",
-                        StatusCode = "200",
-                        Status = true,
-                    };
-                }
-                return new ResponseDto()
-                {
-                    Message = $"User Removed failed: {response.Errors}",
-                    StatusCode = "200",
-                    Status = false,
-                };
-            }
-            throw new ApplicationException("User Doesnot Exist");
-        }
-
-
         // User with Credentials every mapped data
         public async Task<UserDetailsDto> GetUserDetailsByIdService(string id)
         {
@@ -162,7 +144,7 @@ namespace MicroFinance.Services.UserManagement
             if (user == null)
             {
                 _logger.LogError($"{DateTime.Now}: Attempting to acces unknown user with id > {id}");
-               throw new UnAuthorizedExceptionHandler("UnAuthorized");
+                throw new UnAuthorizedExceptionHandler("UnAuthorized");
             }
             var userDto = _mapper.Map<UserDto>(user);
             Employee employee = user.Employee;
@@ -184,7 +166,7 @@ namespace MicroFinance.Services.UserManagement
             if (user == null)
             {
                 _logger.LogError($"{DateTime.Now}: Attempting to acces unknown user > {userName}");
-               throw new UnAuthorizedExceptionHandler("UnAuthorized");
+                throw new UnAuthorizedExceptionHandler("UnAuthorized");
             }
             var userDto = _mapper.Map<UserDto>(user);
             Employee employee = user.Employee;
@@ -201,6 +183,28 @@ namespace MicroFinance.Services.UserManagement
 
         }
 
+        public async Task<UserDetailsDto> GetUserDetailsByEmailService(string email)
+        {
+            var user = await _employeeRepo.GetUserByEmail(email);
+            if (user == null)
+            {
+                _logger.LogError($"{DateTime.Now}: Attempting to acces unknown user > {email}");
+                throw new UnAuthorizedExceptionHandler("UnAuthorized");
+            }
+            var userDto = _mapper.Map<UserDto>(user);
+            Employee employee = user.Employee;
+            EmployeeDto employeeDto = _mapper.Map<EmployeeDto>(employee);
+            var userRole = await _employeeRepo.GetRole(user);
+            userDto.Role = userRole;
+            UserDetailsDto userDetailsDto = new UserDetailsDto()
+            {
+                Message = "Success",
+                EmployeeData = employeeDto,
+                UserData = userDto
+            };
+            return userDetailsDto;
+        }
+
         // Only details related to user credentials
         public async Task<UserDto> GetUserByIdService(string id)
         {
@@ -208,7 +212,7 @@ namespace MicroFinance.Services.UserManagement
             if (user == null)
             {
                 _logger.LogError($"{DateTime.Now}: Attempting to acces unknown user with id > {id}");
-               throw new UnAuthorizedExceptionHandler("UnAuthorized");
+                throw new UnAuthorizedExceptionHandler("UnAuthorized");
             }
             var userDto = _mapper.Map<UserDto>(user);
             userDto.Message = "Success";
@@ -222,7 +226,19 @@ namespace MicroFinance.Services.UserManagement
             if (user == null)
             {
                 _logger.LogError($"{DateTime.Now}: Attempting to acces unknown user> {userName}");
-               throw new UnAuthorizedExceptionHandler("UnAuthorized");
+                throw new UnAuthorizedExceptionHandler("UnAuthorized");
+            }
+            var userDto = _mapper.Map<UserDto>(user);
+            userDto.Message = "Success";
+            return userDto;
+        }
+        public async Task<UserDto> GetUserByEmailService(string email)
+        {
+            var user = await _employeeRepo.GetUserByEmail(email);
+            if (user == null)
+            {
+                _logger.LogError($"{DateTime.Now}: Attempting to acces unknown user> {email}");
+                throw new UnAuthorizedExceptionHandler("UnAuthorized");
             }
             var userDto = _mapper.Map<UserDto>(user);
             userDto.Message = "Success";
@@ -259,7 +275,7 @@ namespace MicroFinance.Services.UserManagement
             }
             return userDetailsDtos;
         }
-        
+
         public async Task<ResponseDto> AssignRoleService(string userName, string role)
         {
             var user = await _employeeRepo.GetUserByUsername(userName);
@@ -296,17 +312,20 @@ namespace MicroFinance.Services.UserManagement
 
 
         // START: Employee Service
-        public async Task<ResponseDto> CreateEmployeeService(CreateEmployeeDto createEmployeeDto)
+        public async Task<ResponseDto> CreateEmployeeService(CreateEmployeeDto createEmployeeDto, string createdBy, string companyName)
         {
-            var userStaff = await _employeeRepo.GetEmployeeByUsername(createEmployeeDto.UserName);
+            var userStaff = await _employeeRepo.GetEmployeeByEmail(createEmployeeDto.Email);
             if (userStaff != null)
                 throw new BadRequestExceptionHandler("Employee Already Exist");
-
+            var branch = await _companyProfile.GetBranchServiceByBranchCodeService(createEmployeeDto.BranchCode);
+            if(!branch.IsActive) throw new Exception("Branch is not active");
             var employee = _mapper.Map<Employee>(createEmployeeDto);
+            employee.CreatedBy = createdBy;
+            employee.CompanyName = companyName;
             var newUserStaff = await _employeeRepo.CreateEmployee(employee);
             if (newUserStaff >= 1)
             {
-                _logger.LogInformation($"{DateTime.Now} New Employee Created > {createEmployeeDto.UserName}");
+                _logger.LogInformation($"{DateTime.Now} New Employee Created > {createEmployeeDto.Email}");
                 return new ResponseDto()
                 {
                     Message = "Employee Created",
@@ -314,20 +333,20 @@ namespace MicroFinance.Services.UserManagement
                     Status = true,
                 };
             }
-            _logger.LogError($"{DateTime.Now} New Employee Creation failed> {createEmployeeDto.UserName}");
+            _logger.LogError($"{DateTime.Now} New Employee Creation failed> {createEmployeeDto.Email}");
             throw new BadRequestExceptionHandler("Employee Creation Failed");
 
         }
 
         public async Task<ResponseDto> EditProfileService(CreateEmployeeDto createEmployeeDto)
         {
-            
+
             var employee = _mapper.Map<Employee>(createEmployeeDto);
             var editStatus = await _employeeRepo.EditEmployeeProfile(employee);
             if (editStatus >= 1)
             {
                 var responseDto = new ResponseDto();
-                _logger.LogInformation($"{DateTime.Now} Employee Profile Updated: {createEmployeeDto.UserName}");
+                _logger.LogInformation($"{DateTime.Now} Employee Profile Updated: {createEmployeeDto.Email}");
                 responseDto.Message = "Update Successfull";
                 responseDto.StatusCode = "200";
                 responseDto.Status = true;
@@ -340,7 +359,7 @@ namespace MicroFinance.Services.UserManagement
         public async Task<EmployeeDto> GetEmployeeById(int id)
         {
             var employee = await _employeeRepo.GetEmployeeById(id);
-            if (employee == null) 
+            if (employee == null)
                 throw new UnAuthorizedExceptionHandler("UnAuthorized");
 
             var employeeDto = _mapper.Map<EmployeeDto>(employee);
@@ -348,10 +367,10 @@ namespace MicroFinance.Services.UserManagement
             return employeeDto;
         }
 
-        public async Task<EmployeeDto> GetEmployeeByUserName(string userName)
+        public async Task<EmployeeDto> GetEmployeeByEmail(string email)
         {
-            var employee = await _employeeRepo.GetEmployeeByUsername(userName);
-            if (employee == null) 
+            var employee = await _employeeRepo.GetEmployeeByEmail(email);
+            if (employee == null)
                 throw new UnAuthorizedExceptionHandler("UnAuthorized");
             var employeeDto = _mapper.Map<EmployeeDto>(employee);
             employeeDto.Message = "Success";
@@ -375,39 +394,6 @@ namespace MicroFinance.Services.UserManagement
         }
 
 
-        public async Task<ResponseDto> DeleteEmployee(string userName)
-        {
-            var user = await _employeeRepo.GetUserByUsername(userName);
-            if (user == null)
-            {
-                var employee = await _employeeRepo.GetEmployeeByUsername(userName);
-                if (employee != null)
-                {
-                    var response = await _employeeRepo.DeleteEmployee(employee);
-                    if (response >= 1)
-                    {
-                        return new ResponseDto()
-                        {
-                            Message = "Employee Deleted",
-                            StatusCode = "200",
-                            Status = true
-                        };
-                    }
-                }
-                return new ResponseDto()
-                {
-                    Message = "Employee Delete Failed.",
-                    StatusCode = "500",
-                    Status = false
-                };
-            }
-            return new ResponseDto()
-            {
-                Message = "First Remove User Credentials before deleting Employee",
-                StatusCode = "403",
-                Status = false
-            };
-        }
 
 
         // END

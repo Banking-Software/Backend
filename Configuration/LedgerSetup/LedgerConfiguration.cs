@@ -8,9 +8,14 @@ namespace MicroFinance.Configuration.LedgerSetup
     {
         public void Configure(EntityTypeBuilder<Ledger> builder)
         {
-            builder.HasOne(l => l.GroupTypeAndLedgerMap)
-             .WithOne(gtl => gtl.Ledger)
-             .HasForeignKey<GroupTypeAndLedgerMap>(gtl => gtl.LedgerId)
+            builder.Property(at=>at.Id).ValueGeneratedNever();
+            
+            builder.HasIndex(l => new { l.GroupTypeId, l.Name }).IsUnique();
+            builder.Property(l=>l.Name).HasConversion(name=>name.ToUpper(), name=>name);
+
+            builder.HasOne(l => l.GroupType)
+             .WithMany(gt => gt.Ledgers)
+             .HasForeignKey(l=>l.GroupTypeId)
              .IsRequired()
              .OnDelete(DeleteBehavior.Cascade);
 

@@ -38,7 +38,7 @@ namespace MicroFinance.Controllers.AccountSetup
 
         // GET ALL THE GROUP-TYPE EXISTED WITH ALL THE RELEVENT DATA ASSOCIATED WITH IT
         [HttpGet("grouptypes")]
-        public async Task<ActionResult<List<GroupTypeAccounTypeDetailsDto>>> GetGroupTypes()
+        public async Task<ActionResult<List<GroupTypeDto>>> GetGroupTypes()
         {
 
             var groupTypes = await _mainLedgerService.GetGroupTypesService();
@@ -48,7 +48,7 @@ namespace MicroFinance.Controllers.AccountSetup
 
         // GET ALL THE GROUP-TYPE DATA WITH RESPECT TO ACCOUNT TYPE 
         [HttpGet("grouptypes/accounttype")]
-        public async Task<ActionResult<List<GroupTypeAccounTypeDetailsDto>>> GetGroupTypes([FromQuery] int accountTypeId)
+        public async Task<ActionResult<List<GroupTypeDto>>> GetGroupTypes([FromQuery] int accountTypeId)
         {
 
             var groupTypes = await _mainLedgerService.GetGroupTypesByAccountService(accountTypeId);
@@ -68,67 +68,87 @@ namespace MicroFinance.Controllers.AccountSetup
 
         }
 
-        // GROUP TYPE DETAILS
-
-        // GET ALL THE DATA RELATED TO GROUP-TYPE-DETAILS
-        // THIS TABLE STORES THE INFORMATION THAT IS RELATED TO BANKS
-
-        [HttpGet("grouptypedetails")]
-        public async Task<ActionResult<List<GroupTypeDetailsMappingDetailsDto>>> GetGroupTypeDetails()
+        [HttpPut("update-grouptype")]
+        public async Task<ActionResult<ResponseDto>> UpdateGroupType(UpdateGroupTypeDto updateGroupTypeDto)
         {
 
-            var groupTypesDetails = await _mainLedgerService.GetGroupTypeDetailsService();
+            var response = await _mainLedgerService.UpdateGroupTypeService(updateGroupTypeDto);
+            return Ok(response);
+
+        }
+
+        // BANK SETUP
+
+        // GET ALL THE DATA RELATED TO BANK SETUP
+        // THIS TABLE STORES THE INFORMATION THAT IS RELATED TO BANKS
+
+        [HttpGet("banksetups")]
+        public async Task<ActionResult<List<BankSetupDetailsDto>>> GetAllBankSetup()
+        {
+
+            var groupTypesDetails = await _mainLedgerService.GetBankSetupService();
             return Ok(groupTypesDetails);
 
         }
 
-        // GET GROUP-TYPE-DETAILS WITH RESPECT TO ITS ID
-
-        [HttpGet("grouptypedetail")]
-        public async Task<ActionResult<GroupTypeDetailsMappingDetailsDto>> GetGroupTypeDetail([FromQuery] int id)
+        [HttpGet("banksetup")]
+        public async Task<ActionResult<BankSetupDetailsDto>> GetBankSetupById([FromQuery] int id)
         {
 
-            var groupTypesDetail = await _mainLedgerService.GetGroupTypeDetailsByIdService(id);
+            var groupTypesDetail = await _mainLedgerService.GetBankSetupByIdService(id);
             return Ok(groupTypesDetail);
 
         }
 
         // GET ALL THE GROUP-TYPE-DETAILS WITH RESPECT TO ACCOUNT-TYPE 
-        [HttpGet("grouptypedetails/accounttype")]
-        public async Task<ActionResult<List<GroupTypeDetailsMappingDetailsDto>>> GetGroupTypeDetailsByAccountType([FromQuery] int accountTypeId)
-        {
+        // [HttpGet("grouptypedetails/accounttype")]
+        // public async Task<ActionResult<List<BankSetupDetailsDto>>> GetBankSetupByAccountType([FromQuery] int accountTypeId)
+        // {
 
-            var groupTypesDetails = await _mainLedgerService.GetGroupTypeDetailsByAccountType(accountTypeId);
-            return Ok(groupTypesDetails);
+        //     var groupTypesDetails = await _mainLedgerService.GetBankSetupByAccountType(accountTypeId);
+        //     return Ok(groupTypesDetails);
 
-        }
+        // }
 
         // GET ALL THE GROUP-TYPE-DETAILS WITH RESPECT TO GROUP-TYPE 
-        [HttpGet("grouptypedetails/grouptype")]
-        public async Task<ActionResult<List<GroupTypeDetailsMappingDetailsDto>>> GetGroupTypeDetailsByGroupType([FromQuery] int groupTypeId)
+        // [HttpGet("grouptypedetails/grouptype")]
+        // public async Task<ActionResult<List<BankSetupDetailsDto>>> GetBankSetupByGroupType([FromQuery] int groupTypeId)
+        // {
+
+        //     var groupTypesDetails = await _mainLedgerService.GetBankSetupByGroupType(groupTypeId);
+        //     return Ok(groupTypesDetails);
+
+        // }
+
+        [HttpGet("banksetup/ledger")]
+        public async Task<ActionResult<List<BankSetupDetailsDto>>> GetBankSetupByLedger([FromQuery] int ledgerId)
         {
 
-            var groupTypesDetails = await _mainLedgerService.GetGroupTypeDetailsByGroupType(groupTypeId);
+            var groupTypesDetails = await _mainLedgerService.GetBankSetupByLedgerService(ledgerId);
             return Ok(groupTypesDetails);
 
         }
 
-
-        // CREATE GROUP-TYPE-DETAILS
-        [HttpPost("grouptypedetails")]
-        public async Task<ActionResult<ResponseDto>> CreateGroupTypeDetails(CreateGroupTypeDetailsDto createGroupTypeDetailsDto)
+        [HttpGet("banktypes")]
+        public async Task<ActionResult<List<BankTypeDto>>> GetAllBankTypes()
         {
+            return await _mainLedgerService.GetAllBankTypeService();
+        }
 
-            var response = await _mainLedgerService.CreateGroupTypeDetailsService(createGroupTypeDetailsDto);
+        [HttpPost("banksetup")]
+        public async Task<ActionResult<ResponseDto>> CreateBankSetup(CreateBankSetupDto createBankSetupDto)
+        {
+            string branchCode = HttpContext.User.FindFirst("BranchCode").Value;
+            var response = await _mainLedgerService.CreateBankSetupService(createBankSetupDto, branchCode);
             return Ok(response);
 
         }
-        // EDIT GROUP-TYPE-DETAILS 
-        [HttpPut("grouptypedetails")]
-        public async Task<ActionResult<ResponseDto>> EditGroupTypeDetails(GroupTypeDetailsDto groupTypeDetailsDto)
+
+        [HttpPut("update-banksetup")]
+        public async Task<ActionResult<ResponseDto>> EditBankSetup(UpdateBankSetup bankSetupDto)
         {
 
-            var response = await _mainLedgerService.EditGroupTypeDetailsService(groupTypeDetailsDto);
+            var response = await _mainLedgerService.EditBankSetupService(bankSetupDto);
             return Ok(response);
 
         }
@@ -137,7 +157,7 @@ namespace MicroFinance.Controllers.AccountSetup
         // LEDGER
 
         [HttpGet("ledgers")]
-        public async Task<ActionResult<List<LedgerDetailsDto>>> GetLedgerDetails()
+        public async Task<ActionResult<List<LedgerDto>>> GetLedgers()
         {
 
             var ledgerDetails = await _mainLedgerService.GetLedgers();
@@ -145,8 +165,15 @@ namespace MicroFinance.Controllers.AccountSetup
 
         }
 
+        [HttpGet("unique-ledgerId")]
+        public async Task<ActionResult<int>> GetUniqueIdForLedger()
+        {
+            int id = await _mainLedgerService.GetUniqueIdForLedgerService();
+            return id;
+        }
+
         [HttpGet("ledger")]
-        public async Task<ActionResult<LedgerDetailsDto>> GetLedgerDetail([FromQuery] int id)
+        public async Task<ActionResult<LedgerDto>> GetLedgerById([FromQuery] int id)
         {
 
             var ledgerDetail = await _mainLedgerService.GetLedgerByIdService(id);
@@ -155,7 +182,7 @@ namespace MicroFinance.Controllers.AccountSetup
         }
 
         [HttpGet("ledgers/accounttype")]
-        public async Task<ActionResult<List<LedgerDetailsDto>>> GetLedgerDetailsByAccountType([FromQuery] int accountTypeId)
+        public async Task<ActionResult<List<LedgerDto>>> GetLedgersByAccountType([FromQuery] int accountTypeId)
         {
 
             var ledgerDetails = await _mainLedgerService.GetLedgerByAccountService(accountTypeId);
@@ -165,7 +192,7 @@ namespace MicroFinance.Controllers.AccountSetup
 
 
         [HttpGet("ledgers/grouptype")]
-        public async Task<ActionResult<List<LedgerDetailsDto>>> GetLedgerDetailsByGroupType([FromQuery] int groupTypeId)
+        public async Task<ActionResult<List<LedgerDetailsDto>>> GetLedgersByGroupType([FromQuery] int groupTypeId)
         {
 
             var ledgerDetails = await _mainLedgerService.GetLedgerByGroupService(groupTypeId);
@@ -183,7 +210,7 @@ namespace MicroFinance.Controllers.AccountSetup
         }
 
         [HttpPut("ledger")]
-        public async Task<ActionResult<ResponseDto>> EditLedger(LedgerDto ledgerDto)
+        public async Task<ActionResult<ResponseDto>> EditLedger(UpdateLedgerDto ledgerDto)
         {
 
             var response = await _mainLedgerService.EditLedgerService(ledgerDto);
@@ -194,7 +221,7 @@ namespace MicroFinance.Controllers.AccountSetup
         //SUB LEDGER
 
         [HttpGet("subledgers")]
-        public async Task<ActionResult<List<SubLedgerDetailsDto>>> GetSubLedgers()
+        public async Task<ActionResult<List<SubLedgerDto>>> GetSubLedgers()
         {
 
             var subLedgerDetails = await _mainLedgerService.GetSubLedgersService();
@@ -203,7 +230,7 @@ namespace MicroFinance.Controllers.AccountSetup
         }
 
         [HttpGet("subledger")]
-        public async Task<ActionResult<SubLedgerDetailsDto>> GetSubLedger([FromQuery] int id)
+        public async Task<ActionResult<SubLedgerDto>> GetSubLedger([FromQuery] int id)
         {
 
             var subLedgerDetail = await _mainLedgerService.GetSubLedgerByIdService(id);
@@ -212,7 +239,7 @@ namespace MicroFinance.Controllers.AccountSetup
         }
 
         [HttpGet("subledgers/ledger")]
-        public async Task<ActionResult<List<LedgerDetailsDto>>> GetSubLedgerDetailsByLedger([FromQuery] int ledgerId)
+        public async Task<ActionResult<List<SubLedgerDto>>> GetSubLedgerDetailsByLedger([FromQuery] int ledgerId)
         {
 
             var subLedgerDetails = await _mainLedgerService.GetSubLedgerByLedgerService(ledgerId);
@@ -230,12 +257,19 @@ namespace MicroFinance.Controllers.AccountSetup
         }
 
         [HttpPut("subledger")]
-        public async Task<ActionResult<ResponseDto>> EditSubLedger(SubLedgerDto subLedgerDto)
+        public async Task<ActionResult<ResponseDto>> EditSubLedger(UpdateSubLedgerDto subLedgerDto)
         {
 
             var response = await _mainLedgerService.EditSubLedgerService(subLedgerDto);
             return Ok(response);
 
+        }
+
+        [HttpGet("unique-subledgerId")]
+        public async Task<ActionResult<int>> GetUniqueIdForSubLedger()
+        {
+            int id = await _mainLedgerService.GetUniqueIdForSubLedgerService();
+            return id;
         }
     }
 }

@@ -8,6 +8,8 @@ namespace MicroFinance.Configuration.LedgerSetup
     {
         public void Configure(EntityTypeBuilder<SubLedger> builder)
         {
+            builder.Property(at=>at.Id).ValueGeneratedNever();
+            builder.Property(sl=>sl.Name).HasConversion(name=>name.ToUpper(), name=>name);
             builder.HasIndex(sl => new {sl.Name, sl.LedgerId}).IsUnique();
         }
     }

@@ -80,28 +80,41 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var loggerFactory = services.GetRequiredService<ILoggerFactory>();
-    try
+    int retryLimit = 3;
+    int currentRetry = 0;
+    bool success = false;
+    while (!success && currentRetry <= retryLimit)
     {
-        var superAdminDbContext = services.GetRequiredService<SuperAdminDbContext>();
-        await superAdminDbContext.Database.MigrateAsync();
-        var superAdminUserManager = services.GetRequiredService<UserManager<SuperAdmin>>();
-        await UserDbContextSeed.SeedSuperAdminRoleAsync(superAdminDbContext, superAdminUserManager);
+        try
+        {
 
-        var userDbContext = services.GetRequiredService<UserDbContext>();
-        await userDbContext.Database.MigrateAsync();
+            var superAdminDbContext = services.GetRequiredService<SuperAdminDbContext>();
+            await superAdminDbContext.Database.MigrateAsync();
 
-        var dbContext = services.GetRequiredService<ApplicationDbContext>();
-        await dbContext.Database.MigrateAsync();
-        await LedgerDbContextSeed.SeedGroupTypeAsync(dbContext);
-        await DepositDbContextSeed.SeedPostSchemeAsync(dbContext);
-        await ClientDbContextSeed.SeedClientInfoAsync(dbContext);
+            var superAdminUserManager = services.GetRequiredService<UserManager<SuperAdmin>>();
+            await UserDbContextSeed.SeedSuperAdminRoleAsync(superAdminDbContext, superAdminUserManager);
 
+            var userDbContext = services.GetRequiredService<UserDbContext>();
+            await userDbContext.Database.MigrateAsync();
+
+            var dbContext = services.GetRequiredService<ApplicationDbContext>();
+            await dbContext.Database.MigrateAsync();
+
+            await LedgerDbContextSeed.SeedGroupTypeAsync(dbContext);
+            //await DepositDbContextSeed.SeedPostSchemeAsync(dbContext);
+            //await ClientDbContextSeed.SeedClientInfoAsync(dbContext);
+            success=true;
+            currentRetry=4;
+
+        }
+        catch (Exception ex)
+        {
+            var logger = loggerFactory.CreateLogger<Program>();
+            logger.LogError($"{DateTime.Now}: {ex}");
+            currentRetry++;
+        }
     }
-    catch (Exception ex)
-    {
-        var logger = loggerFactory.CreateLogger<Program>();
-        logger.LogError($"{DateTime.Now}: {ex}");
-    }
+
 }
 
 // Configure the HTTP request pipeline.
@@ -115,7 +128,7 @@ app.UseSwaggerUI(c =>
 // }
 app.UseCors("allowCors");
 // app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

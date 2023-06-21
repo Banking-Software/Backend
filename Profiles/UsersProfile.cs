@@ -12,7 +12,6 @@ namespace MicroFinance.Profiles
         public UsersProfile()
         {
             // START: SuperAdmin Mapping Part
-            CreateMap<SuperAdminRegisterDto, SuperAdmin>();
             CreateMap<SuperAdmin, SuperAdminDto>();
             CreateMap<SuperAdminLoginDto, SuperAdmin>();
             // END

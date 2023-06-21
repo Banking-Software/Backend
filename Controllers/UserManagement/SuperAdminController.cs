@@ -4,6 +4,7 @@ using System.Security.Claims;
 using AutoMapper;
 using MicroFinance.DBContext.UserManagement;
 using MicroFinance.Dtos;
+using MicroFinance.Dtos.CompanyProfile;
 using MicroFinance.Dtos.UserManagement;
 using MicroFinance.ErrorManage;
 using MicroFinance.Exceptions;
@@ -11,6 +12,7 @@ using MicroFinance.Models.UserManagement;
 using MicroFinance.Repository.UserManagement;
 using MicroFinance.Role;
 using MicroFinance.Services;
+using MicroFinance.Services.CompanyProfile;
 using MicroFinance.Services.UserManagement;
 using MicroFinance.Token;
 using Microsoft.AspNetCore.Authorization;
@@ -24,26 +26,20 @@ namespace MicroFinance.Controllers.UserManagement
         private readonly ILogger<SuperAdminController> _logger;
         private readonly IMapper _mapper;
         private readonly ISuperAdminService _superAdminService;
+        private readonly ICompanyProfileService _companyProfile;
 
         public SuperAdminController
         (
             ILogger<SuperAdminController> logger,
             ISuperAdminService superAdminService,
-            IMapper mapper
+            IMapper mapper,
+            ICompanyProfileService companyProfile
         )
         {
             _logger = logger;
             _mapper = mapper;
             _superAdminService = superAdminService;
-        }
-
-        [AllowAnonymous]
-        [HttpPost("register")]
-        public async Task<ActionResult<TokenResponseDto>> Register(SuperAdminRegisterDto superAdminRegisterDto)
-        {
-            var superadmin = _mapper.Map<SuperAdmin>(superAdminRegisterDto);
-            var result = await _superAdminService.RegisterService(superAdminRegisterDto);
-            return Ok(result);
+            _companyProfile=companyProfile;
         }
 
         [AllowAnonymous]
@@ -71,10 +67,11 @@ namespace MicroFinance.Controllers.UserManagement
         [HttpPost("create-admin")]
         public async Task<ActionResult<ResponseDto>> CreateAdmin(CreateAdminBySuperAdminDto createAdmin)
         {
+            string currentUser = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
 
             if (createAdmin.Role != UserRole.Officer)
                 throw new UnAuthorizedExceptionHandler("You are only authorized to create 'Officer'");
-            var userCreate = await _superAdminService.CreateAdminService(createAdmin);
+            var userCreate = await _superAdminService.CreateAdminService(createAdmin, currentUser);
             return Ok(userCreate);
 
         }
@@ -115,6 +112,7 @@ namespace MicroFinance.Controllers.UserManagement
            
         }
 
+        
 
         // [HttpGet("approve-user/{userName}")]
         // public async Task<ActionResult<AuthorizedUser>> ApproveUser(string userName)

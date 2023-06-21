@@ -5,13 +5,10 @@ namespace MicroFinance.Dtos.UserManagement
     public class CreateEmployeeDto
     {
         // START: Required Fields
-        public string CreatedBy { get; set; } // Stores authorized user ID whosoever created this KYC
         public string Name { get; set; } // Name of Employee
         public string Email { get; set; } // Email of Employee
-        public string UserName { get; set; } // Unique Identifier for the Employee
-        public string CompanyName { get; set; } // Company name where employee work
-        public string BranchName { get; set; } // Branch where employee work
         public string PhoneNumber { get; set; } // Employee Cell Number
+        public string BranchCode { get; set; }
 
         // END
 

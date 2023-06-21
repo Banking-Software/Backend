@@ -18,11 +18,9 @@ namespace MicroFinance.Models.UserManagement
         [Required]
         public string PhoneNumber { get; set; }
         [Required]
-        public string UserName { get; set; }
-        [Required]
         public string CompanyName { get; set; }
         [Required]
-        public string BranchName { get; set; }
+        public string BranchCode { get; set; }
         [DataType(DataType.Date)]
         public DateTime? DateOfJoining { get; set; }
         public string? Designation { get; set; }

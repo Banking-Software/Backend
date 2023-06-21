@@ -30,7 +30,7 @@ namespace MicroFinance.Migrations.UserManagement.User
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BranchName")
+                    b.Property<string>("BranchCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -90,13 +90,9 @@ namespace MicroFinance.Migrations.UserManagement.User
                     b.Property<float?>("Tax")
                         .HasColumnType("real");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("Email", "UserName")
+                    b.HasIndex("Email")
                         .IsUnique();
 
                     b.ToTable("Employees");
@@ -216,29 +212,29 @@ namespace MicroFinance.Migrations.UserManagement.User
                     b.HasData(
                         new
                         {
-                            Id = "a4189ffb-0bd3-4197-9477-e048614b56d5",
-                            ConcurrencyStamp = "709e09da-090e-477c-be3e-f563cd718639",
+                            Id = "20554286-92ea-465b-9b5d-9fa45b58ff5a",
+                            ConcurrencyStamp = "0797bf4f-5cea-4a87-8e70-9d705c3e809b",
                             Name = "Marketing",
                             NormalizedName = "MARKETING"
                         },
                         new
                         {
-                            Id = "d83f2b56-cdfb-4f3b-885e-6c9ac3e85cba",
-                            ConcurrencyStamp = "cce3e022-42c6-4ec3-b44f-102052d4f000",
+                            Id = "ab816b48-d75e-4d5e-9e8a-04965ba7ae98",
+                            ConcurrencyStamp = "1ac75e17-6bb0-48e9-85f6-0e5e6e3e9d82",
                             Name = "Assistant",
                             NormalizedName = "ASSISTANT"
                         },
                         new
                         {
-                            Id = "35e8b459-9cd5-45b3-8423-1f7cd65c8b9a",
-                            ConcurrencyStamp = "091465df-e960-4f06-9677-6291279130d6",
+                            Id = "d2b29253-dea1-4f10-9641-417999503b1f",
+                            ConcurrencyStamp = "977ef8eb-3c9c-4bc6-8582-6e702c05da5d",
                             Name = "SeniorAssistant",
                             NormalizedName = "SENIORASSISTANT"
                         },
                         new
                         {
-                            Id = "37227856-855a-47cc-98a2-486ebdc855d3",
-                            ConcurrencyStamp = "8e66014d-1d44-4508-8225-bdd66a44249a",
+                            Id = "cd531b10-a769-4399-9602-1f07593f4e94",
+                            ConcurrencyStamp = "f788f571-c0e4-47ee-9879-cdd25167b88d",
                             Name = "Officer",
                             NormalizedName = "OFFICER"
                         });

@@ -8,7 +8,9 @@ namespace MicroFinance.Models.AccountSetup
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
+        [ForeignKey("AccountType")]
+        public int AccountTypeId { get; set; }
+        public virtual AccountType AccountType { get; set; }
         [Required]
         public string Name { get; set; }
 
@@ -17,13 +19,13 @@ namespace MicroFinance.Models.AccountSetup
         [Required]
         [DataType(DataType.Date)]
         public DateTime EntryDate { get; set; }
-
         public int? Schedule { get; set; }
         [Required]
-        [ForeignKey("AccountType")]
-        public int AccountTypeId { get; set; }
-        public virtual AccountType AccountType { get; set; }
-        public virtual ICollection<GroupTypeDetails> GroupTypeDetails { get; set; }
-        public virtual ICollection<GroupTypeAndLedgerMap> GroupTypeAndLedgerMap { get; set; }
+        public string CharKhataNumber { get; set; }
+        // [Required]
+        // public virtual DebitOrCredit DebitOrCredit { get; set; }
+        // public int DebitOrCreditId { get; set; }
+        public virtual ICollection<Ledger> Ledgers { get; set; }
+        
     }
 }

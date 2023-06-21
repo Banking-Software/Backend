@@ -11,8 +11,7 @@ namespace MicroFinance.Dtos.UserManagement
         [Compare("Password")]
         public string ConfirmPassword { get; set; }
         public string Email { get; set; }
-        public string CreatedBy { get; set; }
-        public bool IsActive { get; set; } =false;
+         public bool IsActive { get; set; } =false;
         public UserRole Role { get; set; }
 
         // END: Optional Field
