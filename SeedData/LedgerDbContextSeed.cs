@@ -337,26 +337,8 @@ namespace MicroFinance.SeedData
             return 1;
         }
 
-        public static async Task SeedGroupTypeAsync(ApplicationDbContext context)
+        public static async Task SeedMainLedgerAsync(ApplicationDbContext context)
         {
-
-            //if (!context.GroupTypes.Any() || !context.AccountTypes.Any() || !context.DebitOrCredits.Any())
-            //{
-                // int debitOrCredit = await SeedDebitOrCreditData(context);
-                // int accountStatus = await SeedAccountTypeAsync(context);
-                // if(accountStatus>=1)
-                // {
-                //     int groupTypeStatus = await SeedGroupTypeData(context);
-                //     if(groupTypeStatus>=1)
-                //     {
-                //         int ledgerTypeStatus = await SeedLedgerData(context);
-                //         if(ledgerTypeStatus>=1)
-                //         {
-                //             await SeedSubLedgerData(context);
-                //         }
-                //     }
-                // }
-
                 bool updateStatus=
                 await SeedDebitOrCreditData(context)>=1
                 &&await SeedAccountTypeAsync(context)>=1 

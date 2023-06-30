@@ -3,12 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MicroFinance.Models.ClientSetup
 {
-    public class ClientTypeInfo
+    public class ClientType
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
         public string Type { get; set; }
+
+        public virtual ICollection<Client> Clients { get; set; }
     }
 }

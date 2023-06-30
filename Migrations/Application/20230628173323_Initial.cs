@@ -46,9 +46,9 @@ namespace MicroFinance.Migrations.Application
                     BranchName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -56,178 +56,67 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "ClientAccountTypeInfos",
+                name: "Casts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Casts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ClientGroups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClientGroups", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ClientKYMTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClientAccountTypeInfos", x => x.Id);
+                    table.PrimaryKey("PK_ClientKYMTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ClientAddressInfos",
+                name: "ClientTypes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PermanentVdcMunicipality = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PermanentVdcMunicipalityNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PermanentToleVillage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PermanentToleVillageNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PermanentWardNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PermanentWardNumberNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PermanentDistrict = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PermanentDistrictNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PermanentState = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TemporaryVdcMunicipality = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TemporaryVdcMunicipalityNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TemporaryToleVillage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TemporaryToleVillageNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TemporaryWardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TemporaryWardNumberNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TemporaryDistrict = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TemporaryDistrictNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TemporaryState = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClientAddressInfos", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ClientContactInfos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MobileNumber1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MobileNumber2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TelephoneNumber1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TelephoneNumber2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Website = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClientContactInfos", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ClientFamilyInfos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MotherName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MotherNameNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FatherName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FatherNameNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GrandFatherName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    GrandFatherNameNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SpouseName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SpouseOccupation = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NameOfSons = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NameOfDaughters = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FatherInLaw = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MotherInLaw = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClientFamilyInfos", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ClientInfos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MiddleName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NepaliName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Cast = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Occupation = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CitizenshipNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IssueDistrict = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IssueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Nationality = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PanNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EducationStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MaritalStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NationalityIdStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VotingId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OtherInfo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OtherInfo2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IncomeSource = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AccountPurposeNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IfMemberOfOtherParty = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClientInfos", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ClientKYMTypeInfos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClientKYMTypeInfos", x => x.Id);
+                    table.PrimaryKey("PK_ClientTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ClientNomineeInfos",
+                name: "ClientUnits",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NepaliName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Relation = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NepaliRelation = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IntroducedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Code = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClientNomineeInfos", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ClientShareTypeInfos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Type = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClientShareTypeInfos", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ClientTypeInfos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Type = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClientTypeInfos", x => x.Id);
+                    table.PrimaryKey("PK_ClientUnits", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -258,6 +147,48 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "Districts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Districts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Genders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Genders", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MaritalStatuses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MaritalStatuses", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PostingSchemes",
                 columns: table => new
                 {
@@ -267,6 +198,20 @@ namespace MicroFinance.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PostingSchemes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "States",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_States", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -280,7 +225,7 @@ namespace MicroFinance.Migrations.Application
                     NepaliName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EntryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Schedule = table.Column<int>(type: "int", nullable: true),
-                    CharKhataNumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CharKhataNumber = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -291,65 +236,6 @@ namespace MicroFinance.Migrations.Application
                         principalTable: "AccountTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Clients",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsModified = table.Column<bool>(type: "bit", nullable: true),
-                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModificationCount = table.Column<int>(type: "int", nullable: true),
-                    ClientInfoId = table.Column<int>(type: "int", nullable: false),
-                    ClientAddressInfoId = table.Column<int>(type: "int", nullable: false),
-                    ClientFamilyInfoId = table.Column<int>(type: "int", nullable: false),
-                    ClientContactInfoId = table.Column<int>(type: "int", nullable: true),
-                    ClientNomineeInfoId = table.Column<int>(type: "int", nullable: true),
-                    ClientKYMTypeInfoId = table.Column<int>(type: "int", nullable: true),
-                    ClientAccountTypeInfoId = table.Column<int>(type: "int", nullable: false),
-                    ClientTypeInfoId = table.Column<int>(type: "int", nullable: false),
-                    ClientShareTypeInfoId = table.Column<int>(type: "int", nullable: true),
-                    IsKYMUpdated = table.Column<bool>(type: "bit", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Clients", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Clients_ClientAddressInfos_ClientAddressInfoId",
-                        column: x => x.ClientAddressInfoId,
-                        principalTable: "ClientAddressInfos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Clients_ClientContactInfos_ClientContactInfoId",
-                        column: x => x.ClientContactInfoId,
-                        principalTable: "ClientContactInfos",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Clients_ClientFamilyInfos_ClientFamilyInfoId",
-                        column: x => x.ClientFamilyInfoId,
-                        principalTable: "ClientFamilyInfos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Clients_ClientInfos_ClientInfoId",
-                        column: x => x.ClientInfoId,
-                        principalTable: "ClientInfos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Clients_ClientNomineeInfos_ClientNomineeInfoId",
-                        column: x => x.ClientNomineeInfoId,
-                        principalTable: "ClientNomineeInfos",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -409,6 +295,135 @@ namespace MicroFinance.Migrations.Application
                         principalTable: "Ledgers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Clients",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IsKYMUpdated = table.Column<bool>(type: "bit", nullable: false),
+                    IsShareAllowed = table.Column<bool>(type: "bit", nullable: false),
+                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PermanentVdcMunicipality = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PermanentVdcMunicipalityNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PermanentToleVillage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PermanentToleVillageNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PermanentWardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PermanentWardNumberNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PermanentDistrict = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PermanentDistrictCode = table.Column<int>(type: "int", nullable: true),
+                    PermanentDistrictNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PermanentState = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PermanentStateCode = table.Column<int>(type: "int", nullable: true),
+                    TemporaryVdcMunicipality = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TemporaryVdcMunicipalityNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TemporaryToleVillage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TemporaryToleVillageNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TemporaryWardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TemporaryWardNumberNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TemporaryDistrict = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TemporaryDistrictCode = table.Column<int>(type: "int", nullable: true),
+                    TemporaryDistrictNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TemporaryState = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TemporaryStateCode = table.Column<int>(type: "int", nullable: true),
+                    ClientMobileNumber1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientMobileNumber2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientTelephoneNumber1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientTelephoneNumber2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientWebsite = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientMotherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientMotherNameNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientFatherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientFatherNameNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientGrandFatherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientGrandFatherNameNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientSpouseName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientSpouseOccupation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientNameOfSons = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientNameOfDaughters = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientFatherInLaw = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientMotherInLaw = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientFirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClientMiddleName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientLastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClientNepaliName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientCast = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientCastCode = table.Column<int>(type: "int", nullable: true),
+                    ClientGender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientGenderCode = table.Column<int>(type: "int", nullable: true),
+                    ClientDateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ClientOccupation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientCitizenshipNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientCitizenShipIssueDistrict = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientCitizenShipIssueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ClientNationality = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientPanNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientEducationStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientMaritalStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientMartialStatusCode = table.Column<int>(type: "int", nullable: true),
+                    ClientNationalityIdStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientVotingId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientOtherInfo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientOtherInfo2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientIncomeSource = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientAccountPurposeNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientIfMemberOfOtherParty = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NomineeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NomineeNepaliName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NomineeRelation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NomineeNepaliRelation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NomineeIntroducedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NomineeAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NomineeCitizenshipNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NomineeContactNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientTypeId = table.Column<int>(type: "int", nullable: false),
+                    ClientShareTypeInfoId = table.Column<int>(type: "int", nullable: true),
+                    ClientGroupId = table.Column<int>(type: "int", nullable: true),
+                    ClientUnitId = table.Column<int>(type: "int", nullable: true),
+                    KYMTypeId = table.Column<int>(type: "int", nullable: true),
+                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatorBranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsModified = table.Column<bool>(type: "bit", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifierId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModificationCount = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Clients", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Clients_ClientGroups_ClientGroupId",
+                        column: x => x.ClientGroupId,
+                        principalTable: "ClientGroups",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Clients_ClientKYMTypes_KYMTypeId",
+                        column: x => x.KYMTypeId,
+                        principalTable: "ClientKYMTypes",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Clients_ClientTypes_ClientTypeId",
+                        column: x => x.ClientTypeId,
+                        principalTable: "ClientTypes",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Clients_ClientUnits_ClientUnitId",
+                        column: x => x.ClientUnitId,
+                        principalTable: "ClientUnits",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Clients_Ledgers_ClientShareTypeInfoId",
+                        column: x => x.ClientShareTypeInfoId,
+                        principalTable: "Ledgers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -630,59 +645,58 @@ namespace MicroFinance.Migrations.Application
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClientAccountTypeInfos_Type",
-                table: "ClientAccountTypeInfos",
+                name: "IX_ClientGroups_Code",
+                table: "ClientGroups",
+                column: "Code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClientKYMTypes_Type",
+                table: "ClientKYMTypes",
                 column: "Type",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClientKYMTypeInfos_Type",
-                table: "ClientKYMTypeInfos",
+                name: "IX_Clients_ClientGroupId",
+                table: "Clients",
+                column: "ClientGroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Clients_ClientId",
+                table: "Clients",
+                column: "ClientId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Clients_ClientShareTypeInfoId",
+                table: "Clients",
+                column: "ClientShareTypeInfoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Clients_ClientTypeId",
+                table: "Clients",
+                column: "ClientTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Clients_ClientUnitId",
+                table: "Clients",
+                column: "ClientUnitId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Clients_KYMTypeId",
+                table: "Clients",
+                column: "KYMTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClientTypes_Type",
+                table: "ClientTypes",
                 column: "Type",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Clients_ClientAddressInfoId",
-                table: "Clients",
-                column: "ClientAddressInfoId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Clients_ClientContactInfoId",
-                table: "Clients",
-                column: "ClientContactInfoId",
-                unique: true,
-                filter: "[ClientContactInfoId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Clients_ClientFamilyInfoId",
-                table: "Clients",
-                column: "ClientFamilyInfoId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Clients_ClientInfoId",
-                table: "Clients",
-                column: "ClientInfoId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Clients_ClientNomineeInfoId",
-                table: "Clients",
-                column: "ClientNomineeInfoId",
-                unique: true,
-                filter: "[ClientNomineeInfoId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ClientShareTypeInfos_Type",
-                table: "ClientShareTypeInfos",
-                column: "Type",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ClientTypeInfos_Type",
-                table: "ClientTypeInfos",
-                column: "Type",
+                name: "IX_ClientUnits_Code",
+                table: "ClientUnits",
+                column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -747,6 +761,12 @@ namespace MicroFinance.Migrations.Application
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_GroupTypes_CharKhataNumber",
+                table: "GroupTypes",
+                column: "CharKhataNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Ledgers_GroupTypeId_Name",
                 table: "Ledgers",
                 columns: new[] { "GroupTypeId", "Name" },
@@ -785,16 +805,7 @@ namespace MicroFinance.Migrations.Application
                 name: "Branches");
 
             migrationBuilder.DropTable(
-                name: "ClientAccountTypeInfos");
-
-            migrationBuilder.DropTable(
-                name: "ClientKYMTypeInfos");
-
-            migrationBuilder.DropTable(
-                name: "ClientShareTypeInfos");
-
-            migrationBuilder.DropTable(
-                name: "ClientTypeInfos");
+                name: "Casts");
 
             migrationBuilder.DropTable(
                 name: "CompanyDetails");
@@ -806,7 +817,19 @@ namespace MicroFinance.Migrations.Application
                 name: "DepositTransaction");
 
             migrationBuilder.DropTable(
+                name: "Districts");
+
+            migrationBuilder.DropTable(
                 name: "FlexibleInterestRates");
+
+            migrationBuilder.DropTable(
+                name: "Genders");
+
+            migrationBuilder.DropTable(
+                name: "MaritalStatuses");
+
+            migrationBuilder.DropTable(
+                name: "States");
 
             migrationBuilder.DropTable(
                 name: "SubLedgers");
@@ -827,19 +850,16 @@ namespace MicroFinance.Migrations.Application
                 name: "DepositSchemes");
 
             migrationBuilder.DropTable(
-                name: "ClientAddressInfos");
+                name: "ClientGroups");
 
             migrationBuilder.DropTable(
-                name: "ClientContactInfos");
+                name: "ClientKYMTypes");
 
             migrationBuilder.DropTable(
-                name: "ClientFamilyInfos");
+                name: "ClientTypes");
 
             migrationBuilder.DropTable(
-                name: "ClientInfos");
-
-            migrationBuilder.DropTable(
-                name: "ClientNomineeInfos");
+                name: "ClientUnits");
 
             migrationBuilder.DropTable(
                 name: "Ledgers");

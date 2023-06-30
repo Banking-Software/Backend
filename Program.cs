@@ -22,6 +22,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // DB CONTEXT REGISTRY
+
 builder.Services.AddDbServiceExtension(builder.Configuration);
 
 // Identity Service /////////////////////////////////////////////////////
@@ -71,8 +72,8 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-
 var app = builder.Build();
+
 
 // ADD IMPORTANT DATA
 
@@ -100,9 +101,12 @@ using (var scope = app.Services.CreateScope())
             var dbContext = services.GetRequiredService<ApplicationDbContext>();
             await dbContext.Database.MigrateAsync();
 
-            await LedgerDbContextSeed.SeedGroupTypeAsync(dbContext);
+            await LedgerDbContextSeed.SeedMainLedgerAsync(dbContext);
+            await ClientDbContextSeed.SeedClientInfoAsync(dbContext);
+            await RecordsWithCode.SeedRecordsWithCode(dbContext);
+
             //await DepositDbContextSeed.SeedPostSchemeAsync(dbContext);
-            //await ClientDbContextSeed.SeedClientInfoAsync(dbContext);
+            
             success=true;
             currentRetry=4;
 

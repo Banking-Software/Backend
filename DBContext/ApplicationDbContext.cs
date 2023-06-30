@@ -3,6 +3,8 @@ using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.ClientSetup;
 using MicroFinance.Models.CompanyProfile;
 using MicroFinance.Models.DepositSetup;
+using MicroFinance.Models.RecordsWithCode;
+using MicroFinance.Models.Share;
 using MicroFinance.Models.Transactions;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,17 +24,12 @@ namespace MicroFinance.DBContext
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             
             //Start: Client Setup
-            modelBuilder.Entity<ClientAccountTypeInfo>()
-            .HasIndex(at => at.Type).IsUnique();
 
-            modelBuilder.Entity<ClientTypeInfo>()
-            .HasIndex(ct => ct.Type).IsUnique();
+            modelBuilder.Entity<ClientGroup>()
+            .HasIndex(g => g.Code).IsUnique();
 
-            modelBuilder.Entity<ClientShareTypeInfo>()
-            .HasIndex(st => st.Type).IsUnique();
-
-            modelBuilder.Entity<ClientKYMTypeInfo>()
-            .HasIndex(kt => kt.Type).IsUnique();
+            modelBuilder.Entity<ClientUnit>()
+            .HasIndex(u => u.Code).IsUnique();
 
             // Flexible Interest Rate
             modelBuilder.Entity<FlexibleInterestRate>()
@@ -54,17 +51,23 @@ namespace MicroFinance.DBContext
         //START: Company Details
         public DbSet<Branch> Branches { get; set; }
         public DbSet<CompanyDetails> CompanyDetails { get; set; }
+
+        // START: RecordsWithCode
+        public DbSet<Cast> Casts { get; set; }
+        public DbSet<Gender> Genders { get; set; }
+        public DbSet<MaritalStatus> MaritalStatuses { get; set; }
+        public DbSet<District> Districts { get; set; }
+        public DbSet<State> States { get; set; }
         // START: ClientRegistration
         public DbSet<Client> Clients { get; set; }
-        public DbSet<ClientKYMTypeInfo> ClientKYMTypeInfos { get; set; }
-        public DbSet<ClientInfo> ClientInfos { get; set; }
-        public DbSet<ClientAccountTypeInfo> ClientAccountTypeInfos { get; set; }
-        public DbSet<ClientTypeInfo> ClientTypeInfos { get; set; }
-        public DbSet<ClientContactInfo> ClientContactInfos { get; set; }
-        public DbSet<ClientAddressInfo> ClientAddressInfos { get; set; }
-        public DbSet<ClientFamilyInfo> ClientFamilyInfos { get; set; }
-        public DbSet<ClientNomineeInfo> ClientNomineeInfos { get; set; }
-        public DbSet<ClientShareTypeInfo> ClientShareTypeInfos { get; set; }
+        public DbSet<ClientKYMType> ClientKYMTypes { get; set; }
+        public DbSet<ClientType> ClientTypes { get; set; }
+        public DbSet<ClientGroup> ClientGroups { get; set; }
+        public DbSet<ClientUnit> ClientUnits { get; set; }
+        
+
+        // START: SHARE
+        // public DbSet<ShareType> ShareTypes { get; set; }
 
 
         // START: Deposit

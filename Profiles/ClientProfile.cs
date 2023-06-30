@@ -8,20 +8,20 @@ namespace MicroFinance.Profiles
     {
         public ClientProfile()
         {
-            CreateMap<ClientNomineeDto, ClientNomineeInfo>().ReverseMap();
-            CreateMap<ClientInfoDto, ClientInfo>().ReverseMap();
-            CreateMap<ClientFamilyDto, ClientFamilyInfo>().ReverseMap();
-            CreateMap<ClientContactDto, ClientContactInfo>().ReverseMap();
-            CreateMap<ClientAddressDto, ClientAddressInfo>().ReverseMap();
-            CreateMap<Client, ClientResponse>();
-            CreateMap<ClientResponse,ClientDto >()
-            .ForMember(dest=>dest.ClientAddress, opt=>opt.MapFrom(src=>src.ClientAddressInfo))
-            .ForMember(dest=>dest.ClientFamily, opt=>opt.MapFrom(src=>src.ClientFamilyInfo))
-            .ForMember(dest=>dest.ClientInfo, opt=>opt.MapFrom(src=>src.ClientInfo))
-            .ForMember(dest=>dest.ClientContact, opt=>opt.MapFrom(src=>src.ClientContactInfo))
-            .ForMember(dest=>dest.ClientNominee, opt=>opt.MapFrom(src=>src.ClientNomineeInfo))
-            .ForMember(dest=>dest.CreatedOn, opt=>opt.MapFrom(src=>src.CreateOn))
-            .ForMember(dest=>dest.EndedOn, opt=>opt.MapFrom(src=>src.EndedOn));
+            CreateMap<CreateClientDto, Client>()
+            .ForMember(dest=>dest.Id, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientId, opt=>opt.Ignore());
+            
+            CreateMap<Client, ClientDto>()
+            .ForMember(dest=>dest.ClientType, opt=>opt.MapFrom(src=>src.ClientType.Type))
+            .ForMember(dest=>dest.ShareType, opt=>opt.MapFrom(src=>src.ShareType.Name))
+            .ForMember(dest=>dest.ClientGroup, opt=>opt.MapFrom(src=>src.ClientGroup.Code))
+            .ForMember(dest=>dest.ClientUnit, opt=>opt.MapFrom(src=>src.ClientUnit.Code))
+            .ForMember(dest=>dest.KYMType, opt=>opt.MapFrom(src=>src.KYMType.Type));
+
+            CreateMap<UpdateClientDto, Client>();
+
+           
 
             // CreateMap<ClientDto, Client>()
             // .ForMember(dest=> dest.ClientInfo, opt=>opt.MapFrom(src=>src.ClientInfo))

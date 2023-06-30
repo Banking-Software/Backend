@@ -1,14 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MicroFinance.Models.ClientSetup   
+namespace MicroFinance.Models.ClientSetup
 {
-    public class ClientAccountTypeInfo
+    public class ClientGroup
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [Required]
-        public string Type { get; set; }
+        public string Code { get; set; }
+        public virtual  ICollection<Client> Clients { get; set; }
     }
 }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MicroFinance.Migrations.UserManagement.Superadmin
 {
     [DbContext(typeof(SuperAdminDbContext))]
-    [Migration("20230620125258_Initial")]
+    [Migration("20230628172941_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -126,8 +126,8 @@ namespace MicroFinance.Migrations.UserManagement.Superadmin
                     b.HasData(
                         new
                         {
-                            Id = "58de8439-be3a-4f90-938e-2dd13687c7c6",
-                            ConcurrencyStamp = "db3f466f-a146-4196-beca-75daf969ba60",
+                            Id = "932e3076-2f98-44d4-9155-11589ae29457",
+                            ConcurrencyStamp = "e5a38943-9fa6-4fcb-bcf4-85857711812c",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         });

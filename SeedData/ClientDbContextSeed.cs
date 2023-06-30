@@ -7,48 +7,48 @@ namespace MicroFinance.SeedData
     {
         public static async Task SeedClientInfoAsync(ApplicationDbContext context)
         {
-            if (!context.ClientAccountTypeInfos.Any())
+            
+            if (!context.ClientTypes.Any())
             {
-                await context.ClientAccountTypeInfos.AddRangeAsync(new List<ClientAccountTypeInfo>
+                await context.ClientTypes.AddRangeAsync(new List<ClientType>
                 {
-                        new ClientAccountTypeInfo {Type="Share Holder"},
-                        new ClientAccountTypeInfo {Type="Ideal Share Holder"}
+                        new ClientType {Id=1, Type="Indivisual"},
+                        new ClientType {Id=2, Type="Organization"},
+                        new ClientType {Id=3, Type="Minor"}
                 });
                 await context.SaveChangesAsync();
             }
 
-            if (!context.ClientTypeInfos.Any())
+            if (!context.ClientKYMTypes.Any())
             {
-                await context.ClientTypeInfos.AddRangeAsync(new List<ClientTypeInfo>
+                await context.ClientKYMTypes.AddRangeAsync(new List<ClientKYMType>
                 {
-                        new ClientTypeInfo {Type="Indivisual"},
-                        new ClientTypeInfo {Type="Organization"},
-                        new ClientTypeInfo {Type="Minor"}
+                        new ClientKYMType {Id=1 ,Type="High Risk"},
+                        new ClientKYMType {Id=2 ,Type="Medium Risk"},
+                        new ClientKYMType {Id=3, Type="Low Risk"}
                 });
                 await context.SaveChangesAsync();
             }
-
-            if (!context.ClientKYMTypeInfos.Any())
+            if(!context.ClientUnits.Any())
             {
-                await context.ClientKYMTypeInfos.AddRangeAsync(new List<ClientKYMTypeInfo>
+                List<ClientUnit> clientUnits = new List<ClientUnit>();
+                for (int i = 1; i < 31; i++)
                 {
-                        new ClientKYMTypeInfo {Type="High Risk"},
-                        new ClientKYMTypeInfo {Type="Medium Risk"},
-                        new ClientKYMTypeInfo {Type="Low Risk"}
-                });
-                await context.SaveChangesAsync();
+                    ClientUnit clientUnit = new ClientUnit(){Code =i};
+                    clientUnits.Add(clientUnit);
+                }
+                await context.ClientUnits.AddRangeAsync(clientUnits);
             }
-
-            if (!context.ClientShareTypeInfos.Any())
+            if(!context.ClientGroups.Any())
             {
-                await context.ClientShareTypeInfos.AddRangeAsync(new List<ClientShareTypeInfo>
+                List<ClientGroup> clientGroups = new List<ClientGroup>();
+                for (int i = 65; i <= 90; i++)
                 {
-                        new ClientShareTypeInfo {Type="Ordinary Share"},
-                        new ClientShareTypeInfo {Type="Promoter Share"}
-                });
-                await context.SaveChangesAsync();
+                    ClientGroup clientGroup = new ClientGroup(){Code=((char)i).ToString()};
+                    clientGroups.Add(clientGroup);
+                }
+                await  context.ClientGroups.AddRangeAsync(clientGroups);
             }
-
         }
     }
 }

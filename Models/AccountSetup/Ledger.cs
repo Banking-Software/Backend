@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MicroFinance.Models.ClientSetup;
 using MicroFinance.Models.DepositSetup;
 
 namespace MicroFinance.Models.AccountSetup
@@ -31,5 +32,6 @@ namespace MicroFinance.Models.AccountSetup
         public virtual ICollection<SubLedger> SubLedger { get; set; } 
         public virtual DepositScheme LiabilityAccount { get; set; }
         public virtual DepositScheme InterestAccount { get; set; }
+        public virtual ICollection<Client> Client {get; set;}
     }
 }

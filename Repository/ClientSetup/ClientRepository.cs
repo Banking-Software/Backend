@@ -1,6 +1,8 @@
 using System.Data;
 using AutoMapper;
 using MicroFinance.DBContext;
+using MicroFinance.Dtos.ClientSetup;
+using MicroFinance.Models.AccountSetup;
 // using MicroFinance.DBContext.CompanyOperations;
 using MicroFinance.Models.ClientSetup;
 using Microsoft.EntityFrameworkCore;
@@ -22,36 +24,18 @@ namespace MicroFinance.Repository.ClientSetup
             _logger = logger;
             _mapper = mapper;
         }
-        public async Task<int> CreateClientProfile(Client client)
+
+
+
+        public async Task<string> CreateClient(Client client)
         {
-            using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
-            {
-                _logger.LogInformation($"{DateTime.Now} Creating Client...");
-                await _dbContext.ClientInfos.AddAsync(client.ClientInfo);
-                if (client.ClientContactInfo != null)
-                    await _dbContext.ClientContactInfos.AddAsync(client.ClientContactInfo);
-
-                await _dbContext.ClientFamilyInfos.AddAsync(client.ClientFamilyInfo);
-                await _dbContext.ClientAddressInfos.AddAsync(client.ClientAddressInfo);
-
-                if (client.ClientNomineeInfo != null)
-                    await _dbContext.ClientNomineeInfos.AddAsync(client.ClientNomineeInfo);
-
-                await _dbContext.Clients.AddAsync(client);
-                int result = await _dbContext.SaveChangesAsync();
-                if (result <= 0)
-                {
-                    _logger.LogError($"{DateTime.Now} Failed to create Client");
-                    await transaction.RollbackAsync();
-                    return result;
-                }
-                _logger.LogInformation($"{DateTime.Now} Client Created");
-                await transaction.CommitAsync();
-                return result;
-            }
+            _logger.LogInformation($"{DateTime.Now} Creating Client...");
+            client.ClientId = client.Id.ToString().PadLeft(5, '0');
+            await _dbContext.Clients.AddAsync(client);
+            int result = await _dbContext.SaveChangesAsync();
+            if (result >= 1) return client.ClientId;
+            throw new Exception("Unable to Create a Client");
         }
-
-
 
         private void UpdatePropertyBag<TEntity>(PropertyValues propertyBag, TEntity updatedEntity)
         {
@@ -60,181 +44,192 @@ namespace MicroFinance.Repository.ClientSetup
             {
                 var updatedValue = updatedEntity.GetType().GetProperty(prop.Name)?.GetValue(updatedEntity);
                 var existingValue = propertyBag[prop.Name];
-                if (!Equals(existingValue, updatedValue))
+                var keyName = prop.Name;
+                if (!Equals(existingValue, updatedValue) && prop.Name != "Id" && prop.Name != "ClientId")
                 {
                     propertyBag[prop.Name] = updatedValue;
                 }
             }
         }
-        public async Task<int> EditClientProfile(Client client)
+
+        private async Task<Client> CheckConditionAndUpdate(Client existingClient, Client updatingClient)
         {
-            using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
-            {
-                var existingClient = await _dbContext.Clients.FindAsync(client.Id);
+            if (updatingClient.ClientTypeId != existingClient.ClientTypeId)
+                existingClient.ClientType = await _dbContext.ClientTypes.FindAsync(updatingClient.ClientTypeId);
+            if (updatingClient.KYMTypeId != null && updatingClient.KYMTypeId != existingClient.KYMTypeId)
+                existingClient.KYMType = await _dbContext.ClientKYMTypes.FindAsync(updatingClient.KYMTypeId);
 
-                // START: DATA EXIST MANDATORY
-                // Client Info
-                var existingClientInfo = await _dbContext.ClientInfos.FindAsync(existingClient.ClientInfoId);
-                var propertyBagClientInfo = _dbContext.Entry(existingClientInfo).CurrentValues;
-                UpdatePropertyBag(propertyBagClientInfo, client.ClientInfo);
-                // Family
-                var existingFamilyInfo = await _dbContext.ClientFamilyInfos.FindAsync(existingClient.ClientFamilyInfoId);
-                var propertyBagFamilyInfo = _dbContext.Entry(existingFamilyInfo).CurrentValues;
-                UpdatePropertyBag(propertyBagFamilyInfo, client.ClientFamilyInfo);
-                // Address
-                var existingAddressInfo = await _dbContext.ClientAddressInfos.FindAsync(existingClient.ClientAddressInfoId);
-                var propertyBagAddressInfo = _dbContext.Entry(existingAddressInfo).CurrentValues;
-                UpdatePropertyBag(propertyBagAddressInfo, client.ClientAddressInfo);
-                // END
+            if (updatingClient.ClientShareTypeInfoId != null && updatingClient.ClientShareTypeInfoId != existingClient.ClientShareTypeInfoId)
+                existingClient.ShareType = await _dbContext.Ledgers.FindAsync(updatingClient.ClientShareTypeInfoId);
+            else
+                existingClient.ShareType = null;
 
-                // START: DATA EXIST OPTIONAL
-                // Contact
-                if (existingClient.ClientContactInfo != null || client.ClientContactInfo != null)
-                {
-                    var existingContactInfo = await _dbContext.ClientContactInfos.FindAsync(existingClient.ClientContactInfoId);
-                    if (existingContactInfo != null && client.ClientContactInfo != null)
-                    {
-                        var propertyBagContactInfo = _dbContext.Entry(existingContactInfo).CurrentValues;
-                        UpdatePropertyBag(propertyBagContactInfo, client.ClientContactInfo);
-                    }
-                    else if (existingContactInfo != null && client.ClientContactInfo == null)
-                        _dbContext.ClientContactInfos.Remove(existingContactInfo);
+            if (updatingClient.ClientGroupId != null && updatingClient.ClientGroupId != existingClient.ClientGroupId)
+                existingClient.ClientGroup = await _dbContext.ClientGroups.FindAsync(updatingClient.ClientGroupId);
+            if (updatingClient.ClientUnitId != null && updatingClient.ClientUnitId != existingClient.ClientUnitId)
+                existingClient.ClientUnit = await _dbContext.ClientUnits.FindAsync(updatingClient.ClientUnitId);
 
-                    else if (existingContactInfo == null && client.ClientContactInfo != null)
-                    {
-                        await _dbContext.ClientContactInfos.AddAsync(client.ClientContactInfo);
-                        existingClient.ClientContactInfo = client.ClientContactInfo;
-                    }
-                }
+            return existingClient;
+        }
 
-                // Nominee
-                if (existingClient.ClientNomineeInfo != null || client.ClientNomineeInfo != null)
-                {
-                    var existingNomineeInfo = await _dbContext.ClientNomineeInfos.FindAsync(existingClient.ClientNomineeInfoId);
-                    if (existingNomineeInfo != null && client.ClientNomineeInfo != null)
-                    {
-                        var propertyBagNomineeInfo = _dbContext.Entry(existingNomineeInfo).CurrentValues;
-                        UpdatePropertyBag(propertyBagNomineeInfo, client.ClientNomineeInfo);
-                    }
-                    else if (existingNomineeInfo != null && client.ClientNomineeInfo == null)
-                        _dbContext.ClientNomineeInfos.Remove(existingNomineeInfo);
-                    else if (existingNomineeInfo == null && client.ClientNomineeInfo != null)
-                    {
-                        await _dbContext.ClientNomineeInfos.AddAsync(client.ClientNomineeInfo);
-                        existingClient.ClientNomineeInfo = client.ClientNomineeInfo;
-                    }
-                }
-                // END
-                existingClient.ClientAccountTypeInfoId = client.ClientAccountTypeInfoId;
-                existingClient.ClientKYMTypeInfoId = client.ClientKYMTypeInfoId;
-                existingClient.ClientShareTypeInfoId = client.ClientShareTypeInfoId;
-                existingClient.ClientTypeInfoId = client.ClientTypeInfoId;
-                existingClient.RegistrationDate = client.RegistrationDate;
-                existingClient.IsKYMUpdated = client.IsKYMUpdated;
-                if (client.IsActive == false && existingClient.IsActive == true)
-                    existingClient.EndedOn = DateTime.Now;
 
-                existingClient.IsActive = client.IsActive;
-                existingClient.IsModified = true;
-                existingClient.ModifiedBy = client.ModifiedBy;
-                existingClient.ModifiedOn = DateTime.Now;
-                existingClient.ModificationCount ??= 0;
-                existingClient.ModificationCount++;
-                //_dbContext.Entry(existingClient).State = EntityState.Modified;
-                int result = await _dbContext.SaveChangesAsync();
-                if (result >= 1)
-                {
-                    await transaction.CommitAsync();
-                    return result;
-                }
-                _logger.LogError($"{DateTime.Now} Failed to Update Clients Information");
-                await transaction.RollbackAsync();
-                return result;
+        public async Task<int> UpdateClient(UpdateClientDto updateClientDto, Dictionary<string, string> modifierDetails)
+        {
+            var existingClient = await _dbContext.Clients.FindAsync(updateClientDto.Id);
+            Client updateClient = _mapper.Map<Client>(updateClientDto);
+            if (existingClient.ClientTypeId != (int)updateClientDto.ClientType)
+                updateClient.ClientType = await GetClientTypeById((int)updateClientDto.ClientType);
+            if (updateClientDto.KYMType != null && (int)updateClientDto.KYMType != existingClient.KYMTypeId)
+                updateClient.KYMType = await GetClientKYMTypeById((int)updateClientDto.KYMType);
+
+            if (updateClientDto.IsShareAllowed && (int)updateClientDto.ShareType != existingClient.ClientShareTypeInfoId)
+                updateClient.ShareType = await GetShareTypeById((int)updateClientDto.ShareType);
+            else
+                updateClient.ShareType = null;
+                
+            if (updateClientDto.ClientGroupId != null && existingClient.ClientGroupId != updateClientDto.ClientGroupId)
+                updateClient.ClientGroup = await GetClientGroupById((int)updateClientDto.ClientGroupId);
+
+            if (updateClientDto.ClientUnitId != null && updateClientDto.ClientUnitId != existingClient.ClientUnitId)
+                updateClient.ClientUnit = await GetClientUnitById((int)updateClientDto.ClientUnitId);
+
+            updateClient.ModifiedBy = modifierDetails["currentUserName"];
+            updateClient.ModifierId = modifierDetails["currentUserId"];
+            updateClient.ModifiedOn = DateTime.Now;
+            existingClient.ModificationCount ??= 0;
+            existingClient.ModificationCount++;
+            int result = await _dbContext.SaveChangesAsync();
+            return result;
+        }
+
+
+        public async Task<Client> GetClientByClientId(string clientId)
+        {
+            Client clientByClientId = await _dbContext.Clients
+            .Include(c => c.ShareType)
+            .Include(c => c.ClientType)
+            .Include(c => c.ClientGroup)
+            .Include(c => c.ClientUnit)
+            .Where(c => c.ClientId == clientId).FirstOrDefaultAsync();
+            return clientByClientId;
+        }
+        public async Task<Client> GetClientById(int id)
+        {
+            return await _dbContext.Clients.FindAsync(id);
+        }
+
+        public async Task<List<Client>> GetAllClients()
+        {
+            List<Client> clients = await _dbContext.Clients
+            .Include(c => c.ShareType)
+            .Include(c => c.ClientType)
+            .Include(c => c.ClientGroup)
+            .Include(c => c.ClientUnit)
+            .ToListAsync();
+            return clients;
+        }
+        public async Task<List<Client>> GetClientsByGroup(int groupId)
+        {
+            List<Client> clientByGroupId = await _dbContext.Clients
+            .Include(c => c.ShareType)
+            .Include(c => c.ClientType)
+            .Include(c => c.ClientGroup)
+            .Include(c => c.ClientUnit)
+            .Where(c => c.ClientGroupId == groupId).ToListAsync();
+            return clientByGroupId;
+        }
+
+        public async Task<List<Client>> GetClientByUnit(int unitId)
+        {
+            List<Client> clientByUnitId = await _dbContext.Clients
+            .Include(c => c.ShareType)
+            .Include(c => c.ClientType)
+            .Include(c => c.ClientGroup)
+            .Include(c => c.ClientUnit)
+            .Where(c => c.ClientUnitId == unitId).ToListAsync();
+            return clientByUnitId;
+        }
+
+        public async Task<List<Client>> GetClientByGroupAndUnit(int groupId, int unitId)
+        {
+            List<Client> clientByGroupIdAndUnitId = await _dbContext.Clients
+            .Include(c => c.ShareType)
+            .Include(c => c.ClientType)
+            .Include(c => c.ClientGroup)
+            .Include(c => c.ClientUnit)
+            .Where(c => c.ClientUnitId == unitId && c.ClientGroupId == groupId).ToListAsync();
+            return clientByGroupIdAndUnitId;
+        }
+
+        public async Task<List<Client>> GetClientByAssignedShareType(int shareTypeId)
+        {
+            List<Client> clientByShareId = await _dbContext.Clients
+            .Include(c => c.ShareType)
+            .Include(c => c.ClientType)
+            .Include(c => c.ClientGroup)
+            .Include(c => c.ClientUnit)
+            .Where(c => c.ClientShareTypeInfoId == shareTypeId).ToListAsync();
+            return clientByShareId;
+        }
+
+        public async Task<List<ClientType>> GetClientTypes()
+        {
+            List<ClientType> clientTypes = await _dbContext.ClientTypes.ToListAsync();
+            return clientTypes;
+        }
+
+        public async Task<ClientType> GetClientTypeById(int id)
+        {
+            ClientType clientTypeById = await _dbContext.ClientTypes.FindAsync(id);
+            return clientTypeById;
+        }
+
+        public async Task<List<ClientKYMType>> GetClientKYMTypes()
+        {
+            List<ClientKYMType> clientKYMTypes = await _dbContext.ClientKYMTypes.ToListAsync();
+            return clientKYMTypes;
+        }
+
+        public async Task<ClientKYMType> GetClientKYMTypeById(int id)
+        {
+            ClientKYMType clientKYMTypeById = await _dbContext.ClientKYMTypes.FindAsync(id);
+            return clientKYMTypeById;
+        }
+
+        public async Task<List<Ledger>> GetShareTypes()
+        {
+            List<Ledger> shareTypes = await _dbContext.Ledgers.Where(l => l.Id == 16 || l.Id == 17).ToListAsync();
+            return shareTypes;
+        }
+
+        public async Task<Ledger> GetShareTypeById(int id)
+        {
+            Ledger shareType = await _dbContext.Ledgers.FindAsync(id);
+            return shareType;
+        }
+
+        public async Task<List<ClientGroup>> GetClientGroups()
+        {
+            List<ClientGroup> clientGroups = await _dbContext.ClientGroups.ToListAsync();
+            return clientGroups;
+        }
+
+        public async Task<ClientGroup> GetClientGroupById(int id)
+        {
+            ClientGroup clientGroupById = await _dbContext.ClientGroups.FindAsync(id);
+            return clientGroupById;
+        }
+
+        public async Task<List<ClientUnit>> GetClientUnits()
+        {
+            List<ClientUnit> clientUnits = await _dbContext.ClientUnits.ToListAsync();
+            return clientUnits;
+        }
+
+        public async Task<ClientUnit> GetClientUnitById(int id)
+        {
+            ClientUnit clientUnitById = await _dbContext.ClientUnits.FindAsync(id);
+            return clientUnitById;
         }
     }
-
-    public async Task<ClientAccountTypeInfo> GetAccountTypeInfo(string type)
-    {
-        return await _dbContext.ClientAccountTypeInfos
-        .Where(at => at.Type == type)
-        .SingleOrDefaultAsync();
-    }
-
-    public async Task<ClientResponse> GetClient(int id)
-    {
-        var client = await _dbContext.Clients
-        .Where(c => c.Id == id)
-        .Include(c => c.ClientInfo)
-        .Include(c => c.ClientFamilyInfo)
-        .Include(c => c.ClientContactInfo)
-        .Include(c => c.ClientAddressInfo)
-        .Include(c => c.ClientNomineeInfo)
-        .SingleOrDefaultAsync();
-        var accountType = await _dbContext.ClientAccountTypeInfos.FindAsync(client.ClientAccountTypeInfoId);
-        var clientType = await _dbContext.ClientTypeInfos.FindAsync(client.ClientTypeInfoId);
-        var kymType = await _dbContext.ClientKYMTypeInfos.FindAsync(client.ClientKYMTypeInfoId);
-        var shareType = await _dbContext.ClientShareTypeInfos.FindAsync(client.ClientShareTypeInfoId);
-        var clientResponse = _mapper.Map<ClientResponse>(client);
-        clientResponse.AccountType = accountType.Type;
-        clientResponse.ClientType = clientType.Type;
-        clientResponse.ShareType = shareType != null ? shareType.Type : null;
-        clientResponse.KYMType = kymType != null ? kymType.Type : null;
-        return clientResponse;
-
-    }
-
-    public async Task<Client> GetClientById(int id)
-    {
-        return await _dbContext.Clients.FindAsync(id);
-    }
-
-    public async Task<ClientKYMTypeInfo> GetClientKYMTypeInfo(string type)
-    {
-        return await _dbContext.ClientKYMTypeInfos
-        .Where(kym => kym.Type == type)
-        .SingleOrDefaultAsync();
-    }
-
-    public async Task<List<ClientResponse>> GetClients()
-    {
-
-        var clients = await _dbContext.Clients
-        .Include(c => c.ClientInfo)
-        .Include(c => c.ClientFamilyInfo)
-        .Include(c => c.ClientContactInfo)
-        .Include(c => c.ClientAddressInfo)
-        .Include(c => c.ClientNomineeInfo)
-        .ToListAsync();
-        var clientResponses = new List<ClientResponse>();
-        foreach (var client in clients)
-        {
-            var clientResponse = _mapper.Map<ClientResponse>(client);
-            var accountType = await _dbContext.ClientAccountTypeInfos.FindAsync(client.ClientAccountTypeInfoId);
-            var clientType = await _dbContext.ClientTypeInfos.FindAsync(client.ClientTypeInfoId);
-            var kymType = await _dbContext.ClientKYMTypeInfos.FindAsync(client.ClientKYMTypeInfoId);
-            var shareType = await _dbContext.ClientShareTypeInfos.FindAsync(client.ClientShareTypeInfoId);
-            clientResponse.AccountType = accountType.Type;
-            clientResponse.ClientType = clientType.Type;
-            clientResponse.ShareType = shareType != null ? shareType.Type : null;
-            clientResponse.KYMType = kymType != null ? kymType.Type : null;
-            clientResponses.Add(clientResponse);
-        }
-        return clientResponses;
-
-    }
-
-    public async Task<ClientTypeInfo> GetClientTypeInfo(string type)
-    {
-        return await _dbContext.ClientTypeInfos
-        .Where(ct => ct.Type == type)
-        .SingleOrDefaultAsync();
-    }
-
-    public async Task<ClientShareTypeInfo> GetShareTypeInfo(string type)
-    {
-        return await _dbContext.ClientShareTypeInfos
-        .Where(st => st.Type == type)
-        .SingleOrDefaultAsync();
-    }
-}
 }

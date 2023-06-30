@@ -380,10 +380,10 @@ namespace MicroFinance.Services.DepositSetup
             depositSchemeWithLedgerDetails.InterestAccount = ledgerAsInterest;
             depositAccountDto.DepositScheme = GetDepositSchemeDto(depositSchemeWithLedgerDetails);
             //////////////////////////////////////////////////
-            depositAccountDto.Client = _mapper.Map<ClientDto>(await _clientRepo.GetClient(depositAccount.ClientId));
+            depositAccountDto.Client = _mapper.Map<ClientDto>(await _clientRepo.GetClientById(depositAccount.ClientId));
             if (depositAccount.JointClientId >= 1)
             {
-                depositAccountDto.JointClient = _mapper.Map<ClientDto>(await _clientRepo.GetClient((int)depositAccount.JointClientId));
+                depositAccountDto.JointClient = _mapper.Map<ClientDto>(await _clientRepo.GetClientById((int)depositAccount.JointClientId));
             }
 
             return depositAccountDto;

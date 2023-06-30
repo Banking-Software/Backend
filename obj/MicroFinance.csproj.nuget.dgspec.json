@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/media/ashish/New Volume1/FinTechProject/MicroFinance/MicroFinance.csproj": {}
+    "/media/ashish/New Volume/FinTechProject/MicroFinance/MicroFinance.csproj": {}
   },
   "projects": {
-    "/media/ashish/New Volume1/FinTechProject/MicroFinance/MicroFinance.csproj": {
+    "/media/ashish/New Volume/FinTechProject/MicroFinance/MicroFinance.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/media/ashish/New Volume1/FinTechProject/MicroFinance/MicroFinance.csproj",
+        "projectUniqueName": "/media/ashish/New Volume/FinTechProject/MicroFinance/MicroFinance.csproj",
         "projectName": "MicroFinance",
-        "projectPath": "/media/ashish/New Volume1/FinTechProject/MicroFinance/MicroFinance.csproj",
+        "projectPath": "/media/ashish/New Volume/FinTechProject/MicroFinance/MicroFinance.csproj",
         "packagesPath": "/home/ashish/.nuget/packages/",
-        "outputPath": "/media/ashish/New Volume1/FinTechProject/MicroFinance/obj/",
+        "outputPath": "/media/ashish/New Volume/FinTechProject/MicroFinance/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/ashish/.nuget/NuGet/NuGet.Config"
@@ -50,6 +50,10 @@
               "target": "Package",
               "version": "[6.0.0, )"
             },
+            "Microsoft.AspNetCore.Hosting": {
+              "target": "Package",
+              "version": "[2.2.7, )"
+            },
             "Microsoft.AspNetCore.Identity": {
               "target": "Package",
               "version": "[2.2.0, )"
@@ -77,6 +81,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[7.0.4, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[7.0.0, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
@@ -122,7 +130,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.410/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.411/RuntimeIdentifierGraph.json"
         }
       }
     }

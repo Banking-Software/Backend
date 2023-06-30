@@ -212,29 +212,29 @@ namespace MicroFinance.Migrations.UserManagement.User
                     b.HasData(
                         new
                         {
-                            Id = "20554286-92ea-465b-9b5d-9fa45b58ff5a",
-                            ConcurrencyStamp = "0797bf4f-5cea-4a87-8e70-9d705c3e809b",
+                            Id = "d8eaaee5-4fe4-456e-8167-b44b9046d3f5",
+                            ConcurrencyStamp = "acae2e68-e52e-458d-81a3-da8a09e6353a",
                             Name = "Marketing",
                             NormalizedName = "MARKETING"
                         },
                         new
                         {
-                            Id = "ab816b48-d75e-4d5e-9e8a-04965ba7ae98",
-                            ConcurrencyStamp = "1ac75e17-6bb0-48e9-85f6-0e5e6e3e9d82",
+                            Id = "774a90eb-228c-4ca7-af4c-21082b9dc149",
+                            ConcurrencyStamp = "d24cfa8d-fb47-4e52-ba55-88bfd381353f",
                             Name = "Assistant",
                             NormalizedName = "ASSISTANT"
                         },
                         new
                         {
-                            Id = "d2b29253-dea1-4f10-9641-417999503b1f",
-                            ConcurrencyStamp = "977ef8eb-3c9c-4bc6-8582-6e702c05da5d",
+                            Id = "76086980-a967-4e0c-bf05-334055ee7d91",
+                            ConcurrencyStamp = "ddf45810-067f-4d83-812d-6d5969118ecb",
                             Name = "SeniorAssistant",
                             NormalizedName = "SENIORASSISTANT"
                         },
                         new
                         {
-                            Id = "cd531b10-a769-4399-9602-1f07593f4e94",
-                            ConcurrencyStamp = "f788f571-c0e4-47ee-9879-cdd25167b88d",
+                            Id = "38f1d103-eb77-40b7-8395-f16d7f6cd0cc",
+                            ConcurrencyStamp = "8aaf3d1c-c165-47b5-878a-68cabaeb2a2c",
                             Name = "Officer",
                             NormalizedName = "OFFICER"
                         });

@@ -1,19 +1,34 @@
+using MicroFinance.Dtos.ClientSetup;
+using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.ClientSetup;
+using MicroFinance.Models.Share;
 
 namespace MicroFinance.Repository.ClientSetup
 {
     public interface IClientRepository
     {
-        Task<int> CreateClientProfile(Client client);
-        Task<int> EditClientProfile(Client client);
-        Task<List<ClientResponse>> GetClients();
-        Task<ClientResponse> GetClient(int id);
-        Task<Client> GetClientById(int id); 
+        Task<string> CreateClient(Client client);
+        Task<int> UpdateClient(UpdateClientDto updateClientDto, Dictionary<string, string> modifierDetails);
+        Task<Client> GetClientByClientId(string clientId);
+        Task<Client> GetClientById(int id);
+        Task<List<Client>> GetAllClients();
+        Task<List<Client>> GetClientsByGroup(int groupId);
+        Task<List<Client>> GetClientByUnit(int unitId);
+        Task<List<Client>> GetClientByGroupAndUnit(int groupId, int unitId);
+        Task<List<Client>> GetClientByAssignedShareType(int shareTypeId);
 
-        Task<ClientAccountTypeInfo> GetAccountTypeInfo(string type);
-        Task<ClientTypeInfo> GetClientTypeInfo(string type);
-        Task<ClientShareTypeInfo> GetShareTypeInfo(string type);
-        Task<ClientKYMTypeInfo> GetClientKYMTypeInfo(string type);
+        Task<List<ClientType>> GetClientTypes();
+        Task<ClientType> GetClientTypeById(int id);
+        Task<List<ClientKYMType>> GetClientKYMTypes();
+        Task<ClientKYMType> GetClientKYMTypeById(int id);
+        Task<List<Ledger>> GetShareTypes();
+        Task<Ledger> GetShareTypeById(int id);
+
+        Task<List<ClientGroup>> GetClientGroups();
+        Task<ClientGroup> GetClientGroupById(int id);
+        Task<List<ClientUnit>> GetClientUnits();
+        Task<ClientUnit> GetClientUnitById(int id);
+
 
     }
 }
