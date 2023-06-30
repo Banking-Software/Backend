@@ -30,7 +30,8 @@ namespace MicroFinance.Repository.ClientSetup
         public async Task<string> CreateClient(Client client)
         {
             _logger.LogInformation($"{DateTime.Now} Creating Client...");
-            client.ClientId = client.Id.ToString().PadLeft(5, '0');
+            var highestClientId = await _dbContext.Clients.OrderByDescending(c=>c.ClientId).FirstOrDefaultAsync();
+            client.ClientId = highestClientId==null?"1".PadLeft(5,'0'):(Convert.ToInt32(highestClientId.ClientId)+1).ToString().PadLeft(5,'0');
             await _dbContext.Clients.AddAsync(client);
             int result = await _dbContext.SaveChangesAsync();
             if (result >= 1) return client.ClientId;
@@ -78,24 +79,24 @@ namespace MicroFinance.Repository.ClientSetup
             var existingClient = await _dbContext.Clients.FindAsync(updateClientDto.Id);
             Client updateClient = _mapper.Map<Client>(updateClientDto);
             if (existingClient.ClientTypeId != (int)updateClientDto.ClientType)
-                updateClient.ClientType = await GetClientTypeById((int)updateClientDto.ClientType);
+                existingClient.ClientType = await GetClientTypeById((int)updateClientDto.ClientType);
             if (updateClientDto.KYMType != null && (int)updateClientDto.KYMType != existingClient.KYMTypeId)
-                updateClient.KYMType = await GetClientKYMTypeById((int)updateClientDto.KYMType);
+                existingClient.KYMType = await GetClientKYMTypeById((int)updateClientDto.KYMType);
 
             if (updateClientDto.IsShareAllowed && (int)updateClientDto.ShareType != existingClient.ClientShareTypeInfoId)
-                updateClient.ShareType = await GetShareTypeById((int)updateClientDto.ShareType);
+                existingClient.ShareType = await GetShareTypeById((int)updateClientDto.ShareType);
             else
-                updateClient.ShareType = null;
+                existingClient.ShareType = null;
                 
             if (updateClientDto.ClientGroupId != null && existingClient.ClientGroupId != updateClientDto.ClientGroupId)
-                updateClient.ClientGroup = await GetClientGroupById((int)updateClientDto.ClientGroupId);
+                existingClient.ClientGroup = await GetClientGroupById((int)updateClientDto.ClientGroupId);
 
             if (updateClientDto.ClientUnitId != null && updateClientDto.ClientUnitId != existingClient.ClientUnitId)
-                updateClient.ClientUnit = await GetClientUnitById((int)updateClientDto.ClientUnitId);
+                existingClient.ClientUnit = await GetClientUnitById((int)updateClientDto.ClientUnitId);
 
-            updateClient.ModifiedBy = modifierDetails["currentUserName"];
-            updateClient.ModifierId = modifierDetails["currentUserId"];
-            updateClient.ModifiedOn = DateTime.Now;
+            existingClient.ModifiedBy = modifierDetails["currentUserName"];
+            existingClient.ModifierId = modifierDetails["currentUserId"];
+            existingClient.ModifiedOn = DateTime.Now;
             existingClient.ModificationCount ??= 0;
             existingClient.ModificationCount++;
             int result = await _dbContext.SaveChangesAsync();
@@ -125,6 +126,7 @@ namespace MicroFinance.Repository.ClientSetup
             .Include(c => c.ClientType)
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
+            .Include(c=>c.KYMType)
             .ToListAsync();
             return clients;
         }
@@ -135,6 +137,7 @@ namespace MicroFinance.Repository.ClientSetup
             .Include(c => c.ClientType)
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
+            .Include(c=>c.KYMType)
             .Where(c => c.ClientGroupId == groupId).ToListAsync();
             return clientByGroupId;
         }
@@ -146,6 +149,7 @@ namespace MicroFinance.Repository.ClientSetup
             .Include(c => c.ClientType)
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
+            .Include(c=>c.KYMType)
             .Where(c => c.ClientUnitId == unitId).ToListAsync();
             return clientByUnitId;
         }
@@ -157,6 +161,7 @@ namespace MicroFinance.Repository.ClientSetup
             .Include(c => c.ClientType)
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
+            .Include(c=>c.KYMType)
             .Where(c => c.ClientUnitId == unitId && c.ClientGroupId == groupId).ToListAsync();
             return clientByGroupIdAndUnitId;
         }
@@ -168,6 +173,7 @@ namespace MicroFinance.Repository.ClientSetup
             .Include(c => c.ClientType)
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
+            .Include(c=>c.KYMType)
             .Where(c => c.ClientShareTypeInfoId == shareTypeId).ToListAsync();
             return clientByShareId;
         }

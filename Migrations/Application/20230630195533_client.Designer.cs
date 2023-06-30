@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MicroFinance.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230628173323_Initial")]
-    partial class Initial
+    [Migration("20230630195533_client")]
+    partial class client
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -295,6 +295,7 @@ namespace MicroFinance.Migrations.Application
 
                     b.Property<string>("ClientId")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ClientIfMemberOfOtherParty")

@@ -82,7 +82,7 @@ namespace MicroFinance.Services.ClientSetup
             )
             {
                 int updateStatus = await _clientRepo.UpdateClient(updateClientDto, modifierDetails);
-                if(updateStatus>=1) new ResponseDto(){Message=$"Update successfull for client with Id: {existingClient.ClientId}"};
+                if(updateStatus>=1) return new ResponseDto(){Message=$"Update successfull for client with Id: {existingClient.ClientId}"};
                 throw new Exception("Failed to Update the client's detail");
             }
             throw new BadRequestExceptionHandler("No Data Found for given client");

@@ -8,7 +8,6 @@ namespace MicroFinance.Models.ClientSetup
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [Required]
         public string ClientId { get; set; }
         [Required]
         public bool IsActive { get; set; }

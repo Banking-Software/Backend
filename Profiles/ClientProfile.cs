@@ -10,7 +10,12 @@ namespace MicroFinance.Profiles
         {
             CreateMap<CreateClientDto, Client>()
             .ForMember(dest=>dest.Id, opt=>opt.Ignore())
-            .ForMember(dest=>dest.ClientId, opt=>opt.Ignore());
+            .ForMember(dest=>dest.ClientId, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientType, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ShareType, opt=>opt.Ignore())
+            .ForMember(dest=>dest.KYMType, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientGroup, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientUnit, opt=>opt.Ignore());
             
             CreateMap<Client, ClientDto>()
             .ForMember(dest=>dest.ClientType, opt=>opt.MapFrom(src=>src.ClientType.Type))
@@ -19,7 +24,12 @@ namespace MicroFinance.Profiles
             .ForMember(dest=>dest.ClientUnit, opt=>opt.MapFrom(src=>src.ClientUnit.Code))
             .ForMember(dest=>dest.KYMType, opt=>opt.MapFrom(src=>src.KYMType.Type));
 
-            CreateMap<UpdateClientDto, Client>();
+            CreateMap<UpdateClientDto, Client>()
+            .ForMember(dest=>dest.ClientType, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ShareType, opt=>opt.Ignore())
+            .ForMember(dest=>dest.KYMType, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientGroup, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientUnit, opt=>opt.Ignore());
 
            
 

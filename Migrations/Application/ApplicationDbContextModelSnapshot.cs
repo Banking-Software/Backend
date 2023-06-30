@@ -292,6 +292,7 @@ namespace MicroFinance.Migrations.Application
 
                     b.Property<string>("ClientId")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ClientIfMemberOfOtherParty")

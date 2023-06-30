@@ -9,7 +9,6 @@ namespace MicroFinance.Configuration.ClientSetup
         public void Configure(EntityTypeBuilder<Client> builder)
         {
             builder.HasIndex(c=>c.ClientId).IsUnique();
-
             builder.HasOne(c=>c.ShareType).WithMany(l=>l.Client).HasForeignKey(c=>c.ClientShareTypeInfoId).IsRequired(false).OnDelete(DeleteBehavior.ClientSetNull);
             builder.HasOne(c=>c.ClientType).WithMany(ct=>ct.Clients).HasForeignKey(c=>c.ClientTypeId).IsRequired(true).OnDelete(DeleteBehavior.ClientCascade);
             builder.HasOne(c=>c.ClientGroup).WithMany(cg=>cg.Clients).HasForeignKey(c=>c.ClientGroupId).IsRequired(false).OnDelete(DeleteBehavior.ClientSetNull);

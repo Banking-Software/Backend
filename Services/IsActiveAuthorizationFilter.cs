@@ -12,12 +12,19 @@ namespace MicroFinance.Services
         private readonly IEmployeeService _employeeService;
         private ISuperAdminService _superAdminService;
         private readonly ICompanyProfileService _companyProfile;
+        private readonly ILogger<IsActiveAuthorizationFilter> _logger;
 
-        public IsActiveAuthorizationFilter(IEmployeeService employeeService, ISuperAdminService superAdminService, ICompanyProfileService companyProfile)
+        public IsActiveAuthorizationFilter(
+            IEmployeeService employeeService, 
+            ISuperAdminService superAdminService, 
+            ICompanyProfileService companyProfile,
+            ILogger<IsActiveAuthorizationFilter> logger
+            )
         {   
             _employeeService= employeeService;
             _superAdminService = superAdminService;
             _companyProfile=companyProfile;
+            _logger = logger;
         }
 
 
@@ -33,6 +40,7 @@ namespace MicroFinance.Services
                 var branch = await _companyProfile.GetBranchServiceByBranchCodeService(branchCode);
                 if(user.Message!="Success" || user.IsActive==false || branch==null || branch.IsActive==false)
                 {
+                    _logger.LogError($"{DateTime.Now}: Failed to give access to {user.UserName}. 'User Active Status': {user.IsActive}, 'Branch':{branch?.BranchCode}, 'Branch Status':{branch?.IsActive}");
                     context.Result=new UnauthorizedResult();
                 }
             }
