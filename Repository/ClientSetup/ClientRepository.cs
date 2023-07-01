@@ -77,7 +77,22 @@ namespace MicroFinance.Repository.ClientSetup
         public async Task<int> UpdateClient(UpdateClientDto updateClientDto, Dictionary<string, string> modifierDetails)
         {
             var existingClient = await _dbContext.Clients.FindAsync(updateClientDto.Id);
-            Client updateClient = _mapper.Map<Client>(updateClientDto);
+            // Client updateClient = _mapper.Map<Client>(updateClientDto);
+            var propertyBagOfExistingClient = _dbContext.Entry(existingClient).CurrentValues;
+            List<string> excludeProperties = new List<string>()
+            {"Id", "ClientId", "ClientTypeId", "ClientType", "KYMType", "KYMTypeId","ShareType", "ClientGroup", "ClientGroupId", "ClientUnit", "ClientUnitId"};
+
+            foreach (var property in propertyBagOfExistingClient.Properties)
+            {
+                if(!excludeProperties.Contains(property.Name))
+                {
+                    var newValue = updateClientDto.GetType().GetProperty(property.Name)?.GetValue(updateClientDto);
+                    if(newValue!=null && !Equals(propertyBagOfExistingClient[property.Name], newValue))
+                    {
+                        propertyBagOfExistingClient[property.Name] = newValue;
+                    }
+                }
+            }
             if (existingClient.ClientTypeId != (int)updateClientDto.ClientType)
                 existingClient.ClientType = await GetClientTypeById((int)updateClientDto.ClientType);
             if (updateClientDto.KYMType != null && (int)updateClientDto.KYMType != existingClient.KYMTypeId)
@@ -93,7 +108,7 @@ namespace MicroFinance.Repository.ClientSetup
 
             if (updateClientDto.ClientUnitId != null && updateClientDto.ClientUnitId != existingClient.ClientUnitId)
                 existingClient.ClientUnit = await GetClientUnitById((int)updateClientDto.ClientUnitId);
-
+            existingClient.IsModified = true;
             existingClient.ModifiedBy = modifierDetails["currentUserName"];
             existingClient.ModifierId = modifierDetails["currentUserId"];
             existingClient.ModifiedOn = DateTime.Now;

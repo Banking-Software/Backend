@@ -45,80 +45,80 @@ namespace MicroFinance.Controllers.ClientSetup
                 return claims;
         }
 
-        [HttpPost]
+        [HttpPost("createNewClient")]
         public async Task<ActionResult<ResponseDto>> CreateClient(CreateClientDto createClientDto)
         {
             Dictionary<string, string> claims = GetClaims();
             return await _clientService.CreateClientService(createClientDto, claims);
         }
 
-        [HttpPut]
+        [HttpPut("updateClient")]
         public async Task<ActionResult<ResponseDto>> UpdateClient(UpdateClientDto updateClientDto)
         {
             Dictionary<string, string> claims = GetClaims();
             return await _clientService.UpdateClientService(updateClientDto, claims);
         }
 
-        [HttpGet]
+        [HttpGet("getAllClients")]
         public async Task<ActionResult<List<ClientDto>>> GetAllClients()
         {
             return await _clientService.GetAllClientsService();
         }
 
-        [HttpGet("clientId")]
+        [HttpGet("getClientByClientId")]
         public async Task<ActionResult<ClientDto>> GetClientByClientId([FromQuery] string clientId)
         {
             return await _clientService.GetClientByClientIdService(clientId);
         }
 
-        [HttpGet("by-group")]
+        [HttpGet("getClientByGroup")]
         public async Task<ActionResult<List<ClientDto>>> GetClientByGroup([FromQuery] int groupId)
         {
             return await _clientService.GetClientsByGroupService(groupId);
         }
 
-        [HttpGet("by-unit")]
+        [HttpGet("getClientByUnit")]
         public async Task<ActionResult<List<ClientDto>>> GetClientByUnit([FromQuery] int unitId)
         {
             return await _clientService.GetClientsByUnitService(unitId);
         }
-        [HttpGet("by-group-and-unit")]
+        [HttpGet("getClientByGroupAndUnit")]
         public async Task<ActionResult<List<ClientDto>>> GetClientByGroupAndUnit([FromQuery] int groupId, [FromQuery] int unitId)
         {
             return await _clientService.GetClientByGroupAndUnitService(groupId,unitId);
         }
 
-        [HttpGet("by-sharetype")]
+        [HttpGet("getClientByShareType")]
         public async Task<ActionResult<List<ClientDto>>> GetClientByShareType([FromQuery] int shareId)
         {
             return await _clientService.GetClientByAssignedShareTypeService(shareId);
         }
 
-        [HttpGet("get-client-types")]
+        [HttpGet("getAllClientTypes")]
         public async Task<ActionResult<List<ClientTypeDto>>> GetAllClientTypes()
         {
             return await _clientService.GetClientTypesService();
         }
 
-        [HttpGet("get-kym-types")]
+        [HttpGet("getAllKYMTypes")]
         public async Task<ActionResult<List<ClientKYMTypeDto>>> GetAllClientKYMTypes()
         {
             return await _clientService.GetClientKYMTypesService();
         }
 
-        [HttpGet("get-share-types")]
+        [HttpGet("getAllShareTypes")]
         public async Task<ActionResult<List<ClientShareTypeDto>>> GetAllShareTypes()
         {
             return await _clientService.GetClientShareTypesService();
         }
 
-        [HttpGet("get-groups")]
+        [HttpGet("getAllGroups")]
         public async Task<ActionResult<List<ClientGroupDto>>> GetAllClientGroups()
         {
             return await _clientService.GetClientGroupsService();
         }
 
-        [HttpGet("get-units")]
+        [HttpGet("getAllUnits")]
         public async Task<ActionResult<List<ClientUnitDto>>> GetAllClientUnits()
         {
             return await _clientService.GetClientUnitsService();
