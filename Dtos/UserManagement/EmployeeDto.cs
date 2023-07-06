@@ -7,6 +7,9 @@ namespace MicroFinance.Dtos.UserManagement
         public string? Message { get; set; }
         public int? Id { get; set; }
         public string? CreatedBy { get; set; }
+        public DateTime? CreatedOn { get; set; }
+        public string? ModifiedBy { get; set; }
+        public DateTime? ModifiedOn { get; set; }
         public string? Name { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
@@ -25,5 +28,7 @@ namespace MicroFinance.Dtos.UserManagement
         public string? OtherFacilities { get; set; }
         public string? Grade { get; set; }
         public string? PANNumber { get; set; }
+        public string? AttachedDocumentUrlLink { get; set; }
+        public string? ProfilePictureUrlLink {get; set;}
     }
 }

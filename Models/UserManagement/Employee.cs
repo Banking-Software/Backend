@@ -12,6 +12,8 @@ namespace MicroFinance.Models.UserManagement
         [Required]
         public string CreatedBy { get; set; }
         [Required]
+        public DateTime CreatedOn { get; set; }
+        [Required]
         public string Name { get; set; }
         [Required]
         public string Email { get; set; }
@@ -21,10 +23,13 @@ namespace MicroFinance.Models.UserManagement
         public string CompanyName { get; set; }
         [Required]
         public string BranchCode { get; set; }
+        // Optional Field
+        public string? ModifiedBy { get; set; }
+        public DateTime? ModifiedOn { get; set; }
         [DataType(DataType.Date)]
         public DateTime? DateOfJoining { get; set; }
         public string? Designation { get; set; }
-        public string? Gender { get; set; }
+        public int? GenderCode { get; set; }
         public bool? PFAllowed { get; set; }
         public string? SalaryPostingAccount { get; set; }
         public string? ProvidentPostingAccount { get; set; }
@@ -34,7 +39,8 @@ namespace MicroFinance.Models.UserManagement
         public string? OtherFacilities { get; set; }
         public string? Grade { get; set; }
         public string? PANNumber { get; set; }
-        // public AuthorizedUser AuthorizedUser { get; set; }
+        public string? AttachedDocumentUrlLink { get; set; }
+        public string? ProfilePictureUrlLink {get; set;}
         public User User { get; set; }
     }
 }

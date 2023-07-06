@@ -30,9 +30,12 @@ namespace MicroFinance.Profiles
             CreateMap<UserRegisterDto, User>();
             CreateMap<UserRegisterDto, Employee>();
             CreateMap<CreateEmployeeDto, Employee>();
+            CreateMap<UpdateEmployeeDto, Employee>();
             CreateMap<User, UserDto>()
             .ForMember(dest=>dest.UserId, opt=> opt.MapFrom(src=>src.Id));
-            CreateMap<Employee, EmployeeDto>();
+            CreateMap<Employee, EmployeeDto>()
+            .ForMember(dest=>dest.Gender, opt=>opt.MapFrom(src=>src.GenderCode==1?"पुरूष":(src.GenderCode==2?"महिला":null)));
+
             // END
 
             // TokenDto

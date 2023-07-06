@@ -40,7 +40,7 @@ namespace MicroFinance.Controllers.UserManagement
         // START: API for Authorized user //
         [TypeFilter(typeof(IsUserOfficerFilter))]
         [HttpPost("register")]
-        public async Task<ActionResult<ResponseDto>> Register(UserRegisterDto userRegisterDto)
+        public async Task<ActionResult<ResponseDto>> RegisterUser(UserRegisterDto userRegisterDto)
         {
 
             if (userRegisterDto.IsActive)
@@ -79,8 +79,8 @@ namespace MicroFinance.Controllers.UserManagement
         [HttpPut("update-profile")]
         public async Task<ActionResult<ResponseDto>> UpdateUserProfile(UserProfileUpdateDto userProfileUpdateDto)
         {
-
-            return Ok(await _employeeService.UpdateUserProfileService(userProfileUpdateDto));
+            var claims = GetClaims();
+            return Ok(await _employeeService.UpdateUserProfileService(userProfileUpdateDto, claims["currentUserName"]));
 
         }
 
@@ -179,9 +179,10 @@ namespace MicroFinance.Controllers.UserManagement
 
         [TypeFilter(typeof(IsUserOfficerFilter))]
         [HttpPut("edit-profile")]
-        public async Task<ActionResult<ResponseDto>> UpdateEmployeeProfile(CreateEmployeeDto createEmployeeDto)
+        public async Task<ActionResult<ResponseDto>> UpdateEmployeeProfile(UpdateEmployeeDto updateEmployeeDto)
         {
-            return Ok(await _employeeService.EditProfileService(createEmployeeDto));
+            Dictionary<string, string> claims = GetClaims();
+            return Ok(await _employeeService.EditProfileService(updateEmployeeDto, claims));
         }
 
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]

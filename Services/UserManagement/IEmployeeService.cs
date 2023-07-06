@@ -11,7 +11,7 @@ namespace MicroFinance.Services.UserManagement
         Task<ResponseDto> RegisterService(UserRegisterDto userRegisterDto, string createdBy);
         Task<TokenResponseDto> LoginService(UserLoginDto userLoginDto);
         Task<ResponseDto> UpdatePasswordService(UpdateUserPasswordDto updateUserPasswordDto, string userName);
-        Task<ResponseDto> UpdateUserProfileService(UserProfileUpdateDto userProfileUpdateDto);
+        Task<ResponseDto> UpdateUserProfileService(UserProfileUpdateDto userProfileUpdateDto, string modifiedBy);
         Task<UserDto> GetUserByUserNameService(string userName);
         Task<UserDto> GetUserByEmailService(string email);
         Task<UserDetailsDto> GetUserDetailsByUserNameService(string userName);
@@ -27,7 +27,7 @@ namespace MicroFinance.Services.UserManagement
         // START: Service for Employee
 
         Task<ResponseDto> CreateEmployeeService(CreateEmployeeDto createEmployeeDto, string createdBy,string companyName);
-        Task<ResponseDto> EditProfileService(CreateEmployeeDto createEmployeeDto);
+        Task<ResponseDto> EditProfileService(UpdateEmployeeDto updateEmployeeDto, Dictionary<string, string> claimsParameters);
         Task<EmployeeDto> GetEmployeeByEmail(string email);
         Task<EmployeeDto> GetEmployeeById(int id);
         Task<List<EmployeeDto>> GetEmployess();

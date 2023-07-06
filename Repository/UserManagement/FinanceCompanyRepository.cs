@@ -153,10 +153,21 @@ namespace MicroFinance.Repository.UserManagement
         public async Task<int> EditEmployeeProfile(Employee employee)
         {
             var existingEmployee =
-            await _userDbContext.Employees.FirstOrDefaultAsync(u => u.Email == employee.Email);
+            await _userDbContext.Employees.FirstOrDefaultAsync(u => u.Id == employee.Id);
             if (existingEmployee != null)
             {
                 employee.Id = existingEmployee.Id;
+                if(employee.Email!=existingEmployee.Email)
+                {
+                    var existingUser = await _userManager.FindByEmailAsync(existingEmployee.Email);
+                    if(existingUser!=null)
+                    {
+                        existingUser.Email = employee.Email;
+                        existingUser.ModifiedBy = employee.ModifiedBy;
+                        existingUser.ModifiedOn=employee.ModifiedOn;
+                        await _userManager.UpdateAsync(existingUser);
+                    }
+                }
                 var propertyBag = _userDbContext.Entry(existingEmployee).CurrentValues;
                 foreach (var property in propertyBag.Properties)
                 {

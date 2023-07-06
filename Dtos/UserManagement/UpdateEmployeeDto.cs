@@ -2,9 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MicroFinance.Dtos.UserManagement
 {
-    public class CreateEmployeeDto
+    public class UpdateEmployeeDto
     {
         // START: Required Fields
+        public int Id { get; set; }
         public string Name { get; set; } // Name of Employee
         public string Email { get; set; } // Email of Employee
         public string PhoneNumber { get; set; } // Employee Cell Number
@@ -28,6 +29,5 @@ namespace MicroFinance.Dtos.UserManagement
         public string? OtherFacilities { get; set; }
         public string? Grade { get; set; }
         public string? PANNumber { get; set; }
-        
     }
 }

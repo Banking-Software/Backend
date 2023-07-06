@@ -34,14 +34,17 @@ namespace MicroFinance.Migrations.UserManagement.User
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DateOfJoining = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Designation = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GenderCode = table.Column<int>(type: "int", nullable: true),
                     PFAllowed = table.Column<bool>(type: "bit", nullable: true),
                     SalaryPostingAccount = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProvidentPostingAccount = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -50,7 +53,9 @@ namespace MicroFinance.Migrations.UserManagement.User
                     Facilities = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OtherFacilities = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Grade = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PANNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    PANNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AttachedDocumentUrlLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProfilePictureUrlLink = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -87,6 +92,9 @@ namespace MicroFinance.Migrations.UserManagement.User
                     LoanLimit = table.Column<double>(type: "float", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EmployeeId = table.Column<int>(type: "int", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -203,10 +211,10 @@ namespace MicroFinance.Migrations.UserManagement.User
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "38f1d103-eb77-40b7-8395-f16d7f6cd0cc", "8aaf3d1c-c165-47b5-878a-68cabaeb2a2c", "Officer", "OFFICER" },
-                    { "76086980-a967-4e0c-bf05-334055ee7d91", "ddf45810-067f-4d83-812d-6d5969118ecb", "SeniorAssistant", "SENIORASSISTANT" },
-                    { "774a90eb-228c-4ca7-af4c-21082b9dc149", "d24cfa8d-fb47-4e52-ba55-88bfd381353f", "Assistant", "ASSISTANT" },
-                    { "d8eaaee5-4fe4-456e-8167-b44b9046d3f5", "acae2e68-e52e-458d-81a3-da8a09e6353a", "Marketing", "MARKETING" }
+                    { "7c4c528e-2cc2-41f9-b838-f0972a27a296", "11c8c581-8a50-4872-8534-9372cfdf431f", "Marketing", "MARKETING" },
+                    { "8f1e430c-a774-4e08-9656-3091f28723f2", "17b0419f-2df8-4f31-88f2-179f28135c17", "Assistant", "ASSISTANT" },
+                    { "ddba4952-49ea-45e0-8390-c9f0940014a6", "4f473614-ad16-4b42-9c96-1f7b58006cd7", "Officer", "OFFICER" },
+                    { "fa4202f8-9dfe-4024-aa2c-b5fa2cc3684d", "1ee0b0b1-a785-425d-87b0-d382a0fa786d", "SeniorAssistant", "SENIORASSISTANT" }
                 });
 
             migrationBuilder.CreateIndex(

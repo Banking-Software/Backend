@@ -73,6 +73,7 @@ namespace MicroFinance.Services.UserManagement
             var user = _mapper.Map<User>(userRegisterDto);
             user.Employee = employee;
             user.CreatedBy=createdBy;
+            user.CreatedOn = DateTime.Now;
             var userCredentials =
             await _employeeRepo.Register(user, userRegisterDto.Password, userRegisterDto.Role.ToString());
             _logger.LogInformation($"{DateTime.Now}: User Login Credentails Created > {userRegisterDto.UserName}");
@@ -114,13 +115,15 @@ namespace MicroFinance.Services.UserManagement
             throw new UnAuthorizedExceptionHandler("UnAuthorized");
         }
 
-        public async Task<ResponseDto> UpdateUserProfileService(UserProfileUpdateDto userProfileUpdateDto)
+        public async Task<ResponseDto> UpdateUserProfileService(UserProfileUpdateDto userProfileUpdateDto, string modifiedBy)
         {
             var user = await _employeeRepo.GetUserByUsername(userProfileUpdateDto.UserName);
             if (user != null)
             {
                 user.DepositLimit = userProfileUpdateDto.DepositLimit;
                 user.LoanLimit = userProfileUpdateDto.LoanLimit;
+                user.ModifiedBy = modifiedBy;
+                user.ModifiedOn = DateTime.Now;
                 var statusUpdate = await _employeeRepo.UpdateUserProfile(user);
                 if (statusUpdate.Succeeded)
                 {
@@ -322,6 +325,9 @@ namespace MicroFinance.Services.UserManagement
             var employee = _mapper.Map<Employee>(createEmployeeDto);
             employee.CreatedBy = createdBy;
             employee.CompanyName = companyName;
+            employee.CreatedOn = DateTime.Now;
+            employee.AttachedDocumentUrlLink="https://s3.amazonaws.com/images.seroundtable.com/google-samples-1601379104.jpg";
+            employee.ProfilePictureUrlLink="https://s3.amazonaws.com/images.seroundtable.com/google-samples-1601379104.jpg";
             var newUserStaff = await _employeeRepo.CreateEmployee(employee);
             if (newUserStaff >= 1)
             {
@@ -338,15 +344,17 @@ namespace MicroFinance.Services.UserManagement
 
         }
 
-        public async Task<ResponseDto> EditProfileService(CreateEmployeeDto createEmployeeDto)
+        public async Task<ResponseDto> EditProfileService(UpdateEmployeeDto updateEmployeeDto, Dictionary<string, string> claimsParameters)
         {
 
-            var employee = _mapper.Map<Employee>(createEmployeeDto);
+            var employee = _mapper.Map<Employee>(updateEmployeeDto);
+            employee.ModifiedBy = claimsParameters["currentUserName"];
+            employee.ModifiedOn = DateTime.Now;
             var editStatus = await _employeeRepo.EditEmployeeProfile(employee);
             if (editStatus >= 1)
             {
                 var responseDto = new ResponseDto();
-                _logger.LogInformation($"{DateTime.Now} Employee Profile Updated: {createEmployeeDto.Email}");
+                _logger.LogInformation($"{DateTime.Now} Employee Profile Updated: {updateEmployeeDto.Email}");
                 responseDto.Message = "Update Successfull";
                 responseDto.StatusCode = "200";
                 responseDto.Status = true;

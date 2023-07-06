@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MicroFinance.Migrations.UserManagement.User
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20230628173019_Initial")]
+    [Migration("20230706111727_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -33,6 +33,9 @@ namespace MicroFinance.Migrations.UserManagement.User
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AttachedDocumentUrlLink")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("BranchCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -44,6 +47,9 @@ namespace MicroFinance.Migrations.UserManagement.User
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateOfJoining")
                         .HasColumnType("datetime2");
@@ -58,11 +64,17 @@ namespace MicroFinance.Migrations.UserManagement.User
                     b.Property<string>("Facilities")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Gender")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("GenderCode")
+                        .HasColumnType("int");
 
                     b.Property<string>("Grade")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -79,6 +91,9 @@ namespace MicroFinance.Migrations.UserManagement.User
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProfilePictureUrlLink")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProvidentPostingAccount")
@@ -117,6 +132,9 @@ namespace MicroFinance.Migrations.UserManagement.User
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<double?>("DepositLimit")
                         .HasColumnType("float");
 
@@ -141,6 +159,12 @@ namespace MicroFinance.Migrations.UserManagement.User
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -215,29 +239,29 @@ namespace MicroFinance.Migrations.UserManagement.User
                     b.HasData(
                         new
                         {
-                            Id = "d8eaaee5-4fe4-456e-8167-b44b9046d3f5",
-                            ConcurrencyStamp = "acae2e68-e52e-458d-81a3-da8a09e6353a",
+                            Id = "7c4c528e-2cc2-41f9-b838-f0972a27a296",
+                            ConcurrencyStamp = "11c8c581-8a50-4872-8534-9372cfdf431f",
                             Name = "Marketing",
                             NormalizedName = "MARKETING"
                         },
                         new
                         {
-                            Id = "774a90eb-228c-4ca7-af4c-21082b9dc149",
-                            ConcurrencyStamp = "d24cfa8d-fb47-4e52-ba55-88bfd381353f",
+                            Id = "8f1e430c-a774-4e08-9656-3091f28723f2",
+                            ConcurrencyStamp = "17b0419f-2df8-4f31-88f2-179f28135c17",
                             Name = "Assistant",
                             NormalizedName = "ASSISTANT"
                         },
                         new
                         {
-                            Id = "76086980-a967-4e0c-bf05-334055ee7d91",
-                            ConcurrencyStamp = "ddf45810-067f-4d83-812d-6d5969118ecb",
+                            Id = "fa4202f8-9dfe-4024-aa2c-b5fa2cc3684d",
+                            ConcurrencyStamp = "1ee0b0b1-a785-425d-87b0-d382a0fa786d",
                             Name = "SeniorAssistant",
                             NormalizedName = "SENIORASSISTANT"
                         },
                         new
                         {
-                            Id = "38f1d103-eb77-40b7-8395-f16d7f6cd0cc",
-                            ConcurrencyStamp = "8aaf3d1c-c165-47b5-878a-68cabaeb2a2c",
+                            Id = "ddba4952-49ea-45e0-8390-c9f0940014a6",
+                            ConcurrencyStamp = "4f473614-ad16-4b42-9c96-1f7b58006cd7",
                             Name = "Officer",
                             NormalizedName = "OFFICER"
                         });
