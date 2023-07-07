@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MicroFinance.Dtos.UserManagement
 {
 
@@ -10,7 +12,9 @@ namespace MicroFinance.Dtos.UserManagement
     }
     public class ActivateDeactivateUserDto
     {
+        [Required]
         public string UserName { get; set; }
+        [Required]
         public bool IsActive { get; set; }
     }
 }

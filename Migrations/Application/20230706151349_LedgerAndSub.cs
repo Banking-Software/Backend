@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MicroFinance.Migrations.Application
 {
     /// <inheritdoc />
-    public partial class client : Migration
+    public partial class LedgerAndSub : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,8 +27,7 @@ namespace MicroFinance.Migrations.Application
                 name: "BankTypes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -242,7 +241,9 @@ namespace MicroFinance.Migrations.Application
                 name: "Ledgers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LedgerCode = table.Column<int>(type: "int", nullable: true),
                     GroupTypeId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     NepaliName = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -476,7 +477,9 @@ namespace MicroFinance.Migrations.Application
                 name: "SubLedgers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SubLedgerCode = table.Column<int>(type: "int", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LedgerId = table.Column<int>(type: "int", nullable: false)
@@ -773,6 +776,13 @@ namespace MicroFinance.Migrations.Application
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Ledgers_LedgerCode",
+                table: "Ledgers",
+                column: "LedgerCode",
+                unique: true,
+                filter: "[LedgerCode] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PostingSchemes_Name",
                 table: "PostingSchemes",
                 column: "Name",
@@ -788,6 +798,13 @@ namespace MicroFinance.Migrations.Application
                 table: "SubLedgers",
                 columns: new[] { "Name", "LedgerId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubLedgers_SubLedgerCode",
+                table: "SubLedgers",
+                column: "SubLedgerCode",
+                unique: true,
+                filter: "[SubLedgerCode] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transaction_DepositAccountId",

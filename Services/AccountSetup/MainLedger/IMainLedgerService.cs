@@ -35,7 +35,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
         // END
 
         // START: BANK SETUP DETAILS
-        Task<ResponseDto> CreateBankSetupService(CreateBankSetupDto createBankSetupDto, string branchCode);
+        Task<ResponseDto> CreateBankSetupService(CreateBankSetupDto createBankSetupDto);
         Task<ResponseDto> EditBankSetupService(UpdateBankSetup bankSetupDto);
         Task<List<BankSetupDto>> GetBankSetupService();
         Task<BankSetupDto> GetBankSetupByIdService(int id);

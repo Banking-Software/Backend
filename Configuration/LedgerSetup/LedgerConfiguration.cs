@@ -1,4 +1,6 @@
+using System.Reflection;
 using MicroFinance.Models.AccountSetup;
+using MicroFinance.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,9 +10,13 @@ namespace MicroFinance.Configuration.LedgerSetup
     {
         public void Configure(EntityTypeBuilder<Ledger> builder)
         {
-            builder.Property(at=>at.Id).ValueGeneratedNever();
+            // builder.Property(at=>at.Id).ValueGeneratedNever();
             
+            builder.HasKey(l=>l.Id);
+            builder.Property(l=>l.Id).ValueGeneratedOnAdd();
+
             builder.HasIndex(l => new { l.GroupTypeId, l.Name }).IsUnique();
+            builder.HasIndex(l=>l.LedgerCode).IsUnique();
             builder.Property(l=>l.Name).HasConversion(name=>name.ToUpper(), name=>name);
 
             builder.HasOne(l => l.GroupType)

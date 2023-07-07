@@ -102,8 +102,27 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         {
             _logger.LogInformation($"{DateTime.Now} Creating Ledger...");
             await _dbContext.Ledgers.AddAsync(ledger);
-            return await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
+            return await UpdateLedgerCode(ledger);
+
         }
+        private async Task<int> UpdateLedgerCode(Ledger ledger)
+        {
+            try
+            {
+                var existingledger = await _dbContext.Ledgers.FindAsync(ledger.Id);
+                existingledger.LedgerCode = ledger.Id;
+                await _dbContext.SaveChangesAsync();
+                return existingledger.Id;
+            }
+            catch(Exception ex)
+            {
+                _dbContext.Ledgers.Remove(ledger);
+                throw new Exception(ex.Message);
+            }
+            
+        }
+
 
         public async Task<int> GetUniqueIdForLedger()
         {
@@ -272,21 +291,40 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         public async Task<int> CreateSubLedger(SubLedger subLedger)
         {
             await _dbContext.SubLedgers.AddAsync(subLedger);
-            return await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
+            return await UpdateSubLedgerCode(subLedger);
+        }
+
+        private async Task<int> UpdateSubLedgerCode(SubLedger subLedger)
+        {
+            try
+            {
+                var exitingSubLedger =  await _dbContext.SubLedgers.FindAsync(subLedger.Id);
+                exitingSubLedger.SubLedgerCode = exitingSubLedger.Id;
+                await _dbContext.SaveChangesAsync();
+                return exitingSubLedger.Id;
+            }
+            catch(Exception ex)
+            {
+                _dbContext.SubLedgers.Remove(subLedger);
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<int> EditSubledger(SubLedger subLedger)
         {
             var existingSubLedger = await _dbContext.SubLedgers.FindAsync(subLedger.Id);
-            var propertyBag = _dbContext.Entry(existingSubLedger).CurrentValues;
-            foreach (var property in propertyBag.Properties)
-            {
-                var newValue = subLedger.GetType().GetProperty(property.Name)?.GetValue(subLedger);
-                if (newValue != null && !Equals(propertyBag[property.Name], newValue))
-                {
-                    propertyBag[property.Name] = newValue;
-                }
-            }
+            existingSubLedger.Name = subLedger.Name;
+            existingSubLedger.Description=subLedger.Description;
+            // var propertyBag = _dbContext.Entry(existingSubLedger).CurrentValues;
+            // foreach (var property in propertyBag.Properties)
+            // {
+            //     var newValue = subLedger.GetType().GetProperty(property.Name)?.GetValue(subLedger);
+            //     if (newValue != null && !Equals(propertyBag[property.Name], newValue))
+            //     {
+            //         propertyBag[property.Name] = newValue;
+            //     }
+            // }
             return await _dbContext.SaveChangesAsync();
         }
 

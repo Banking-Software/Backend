@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MicroFinance.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230630195533_client")]
-    partial class client
+    [Migration("20230706151349_LedgerAndSub")]
+    partial class LedgerAndSub
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,10 +97,7 @@ namespace MicroFinance.Migrations.Application
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.BankType", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -167,7 +164,10 @@ namespace MicroFinance.Migrations.Application
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.Ledger", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("CurrentBalance")
                         .HasColumnType("decimal(18,4)");
@@ -190,6 +190,9 @@ namespace MicroFinance.Migrations.Application
                     b.Property<bool>("IsSubLedgerActive")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("LedgerCode")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -198,6 +201,10 @@ namespace MicroFinance.Migrations.Application
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LedgerCode")
+                        .IsUnique()
+                        .HasFilter("[LedgerCode] IS NOT NULL");
 
                     b.HasIndex("GroupTypeId", "Name")
                         .IsUnique();
@@ -208,7 +215,10 @@ namespace MicroFinance.Migrations.Application
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.SubLedger", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -220,9 +230,16 @@ namespace MicroFinance.Migrations.Application
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int?>("SubLedgerCode")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LedgerId");
+
+                    b.HasIndex("SubLedgerCode")
+                        .IsUnique()
+                        .HasFilter("[SubLedgerCode] IS NOT NULL");
 
                     b.HasIndex("Name", "LedgerId")
                         .IsUnique();
@@ -295,7 +312,6 @@ namespace MicroFinance.Migrations.Application
 
                     b.Property<string>("ClientId")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ClientIfMemberOfOtherParty")

@@ -6,6 +6,7 @@ namespace MicroFinance.Dtos.AccountSetup.MainLedger
     {
         [Required]
         public int Id { get; set; }
+        public int LedgerCode { get; set; }
         public int GroupTypeId { get; set; }
         public string GroupTypeName { get; set; }
         public string AccountTypeName { get; set; }

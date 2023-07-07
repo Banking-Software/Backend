@@ -5,9 +5,13 @@ namespace MicroFinance.Dtos.UserManagement
     public class CreateEmployeeDto
     {
         // START: Required Fields
+        [Required]
         public string Name { get; set; } // Name of Employee
+        [Required]
         public string Email { get; set; } // Email of Employee
+        [Required]
         public string PhoneNumber { get; set; } // Employee Cell Number
+        [Required]
         public string BranchCode { get; set; }
 
         // END

@@ -2,13 +2,14 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using MicroFinance.Models.ClientSetup;
 using MicroFinance.Models.DepositSetup;
+using MicroFinance.Services;
 
 namespace MicroFinance.Models.AccountSetup
 {
     public class Ledger
     {
-        [Key]
         public int Id { get; set; }
+        public int? LedgerCode { get; set; }
         public virtual GroupType GroupType { get; set; }
         public int GroupTypeId { get; set; }
         [Required]

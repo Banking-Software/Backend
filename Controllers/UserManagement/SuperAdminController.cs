@@ -53,7 +53,7 @@ namespace MicroFinance.Controllers.UserManagement
         }
 
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpPut("update-password")]
+        [HttpPut("updatePassword")]
         public async Task<ActionResult<ResponseDto>> UpdatePassword(SuperAdminUpdatePasswordDto superAdminUpdatePasswordDto)
         {
 
@@ -64,7 +64,7 @@ namespace MicroFinance.Controllers.UserManagement
         }
 
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpPost("create-admin")]
+        [HttpPost("createAdmin")]
         public async Task<ActionResult<ResponseDto>> CreateAdmin(CreateAdminBySuperAdminDto createAdmin)
         {
             string currentUser = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
@@ -76,8 +76,8 @@ namespace MicroFinance.Controllers.UserManagement
 
         }
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpGet("getusers")]
-        public async Task<ActionResult<List<UserDetailsToSuperAdmin>>> GetUsers()
+        [HttpGet("getAllUsers")]
+        public async Task<ActionResult<List<UserDetailsToSuperAdmin>>> GetAllUsers()
         {
 
             var users = await _superAdminService.GetMicroFinanceUserSerivce();
@@ -90,7 +90,7 @@ namespace MicroFinance.Controllers.UserManagement
         }
 
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpPut("activate-deactivate")]
+        [HttpPut("activateDeactivateUser")]
         public async Task<ActionResult<List<ActiveDeactiveInformation>>> ActivateDeactivateUsers(List<ActivateDeactivateUserDto> activateDeactivateUserDto)
         {
 
@@ -111,16 +111,5 @@ namespace MicroFinance.Controllers.UserManagement
                 return Ok(updatedUserInfo);
            
         }
-
-        
-
-        // [HttpGet("approve-user/{userName}")]
-        // public async Task<ActionResult<AuthorizedUser>> ApproveUser(string userName)
-        // {
-        //     var approvableUserStatus = await _employeeRepo.ApproveUser(userName);
-        //     if (approvableUserStatus <= 0) return BadRequest();
-        //     var usersWithCredentialDetails = await _employeeRepo.GetAuthorizedUserDetailsByUsername(userName);
-        //     return usersWithCredentialDetails;
-        // }
     }
 }

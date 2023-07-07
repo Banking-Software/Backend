@@ -19,7 +19,7 @@ namespace MicroFinance.Controllers.CompanyProfile
 
         [Authorize(AuthenticationSchemes = "SuperAdminToken")]
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpPost("create-branch")]
+        [HttpPost("createBranch")]
         public async Task<ActionResult<ResponseDto>> CreateBranch(CreateBranchDto createBranchDto)
         {
             Dictionary<string, string> claims = GetClaims();
@@ -29,7 +29,7 @@ namespace MicroFinance.Controllers.CompanyProfile
 
         [Authorize(AuthenticationSchemes = "SuperAdminToken")]
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpPost("update-branch")]
+        [HttpPut("updateBranch")]
         public async Task<ActionResult<ResponseDto>> UpdateBranch(UpdateBranchDto updateBranchDto)
         {
             Dictionary<string, string> claims = GetClaims();
@@ -39,7 +39,7 @@ namespace MicroFinance.Controllers.CompanyProfile
         
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpGet("getbranch/id")]
+        [HttpGet("getBranchById")]
         public async Task<ActionResult<BranchDto>> GetBranchById([FromQuery] int id)
         {
             Dictionary<string, string> claims = GetClaims();
@@ -48,7 +48,7 @@ namespace MicroFinance.Controllers.CompanyProfile
         }
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpGet("getbranch/branchcode")]
+        [HttpGet("getBranchByBranchCode")]
         public async Task<ActionResult<BranchDto>> GetBranchByBranchCode([FromQuery] string branchCode)
         {
             Dictionary<string, string> claims = GetClaims();
@@ -57,7 +57,7 @@ namespace MicroFinance.Controllers.CompanyProfile
         }
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpGet("getAllBranches")]
+        [HttpGet("getAllBranch")]
         public async Task<ActionResult<List<BranchDto>>> GetAllbranches()
         {
             Dictionary<string, string> claims = GetClaims();

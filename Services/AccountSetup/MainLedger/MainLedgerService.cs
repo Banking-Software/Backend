@@ -4,18 +4,24 @@ using MicroFinance.Dtos;
 using MicroFinance.Dtos.AccountSetup.MainLedger;
 using MicroFinance.Models.AccountSetup;
 using MicroFinance.Repository.AccountSetup.MainLedger;
+using MicroFinance.Repository.CompanyProfile;
 
 namespace MicroFinance.Services.AccountSetup.MainLedger
 {
     public class MainLedgerService : IMainLedgerService
     {
         private readonly IMainLedgerRepository _mainLedgerRepository;
+        private readonly ICompanyProfileRepository _companyProfileRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<MainLedgerService> _logger;
 
-        public MainLedgerService(IMainLedgerRepository mainLedgerRepository, IMapper mapper, ILogger<MainLedgerService> logger)
+        public MainLedgerService(
+            IMainLedgerRepository mainLedgerRepository, 
+            ICompanyProfileRepository companyProfileRepository,
+            IMapper mapper, ILogger<MainLedgerService> logger)
         {
             _mainLedgerRepository = mainLedgerRepository;
+            _companyProfileRepository= companyProfileRepository;
             _mapper = mapper;
             _logger = logger;
         }
@@ -78,7 +84,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
         public async Task<ResponseDto> UpdateGroupTypeService(UpdateGroupTypeDto updateGroupTypeDto)
         {
             var updateStatus = await _mainLedgerRepository.UpdateGroupType(updateGroupTypeDto);
-            if(updateStatus>=1) return new ResponseDto(){Message="Update Successfull", Status=true, StatusCode="200"};
+            if (updateStatus >= 1) return new ResponseDto() { Message = "Update Successfull", Status = true, StatusCode = "200" };
             throw new Exception("Update Failed");
         }
 
@@ -141,7 +147,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
 
             var ledger = _mapper.Map<Ledger>(createLedgerDto);
             ledger.GroupType = groupType;
-            ledger.IsBank=false;
+            ledger.IsBank = false;
             var createStatus = await _mainLedgerRepository.CreateLedger(ledger);
             if (createStatus >= 1)
                 return new ResponseDto()
@@ -157,7 +163,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
         public async Task<int> GetUniqueIdForLedgerService()
         {
             int uniqueId = await _mainLedgerRepository.GetUniqueIdForLedger();
-            if(uniqueId>=1) return uniqueId;
+            if (uniqueId >= 1) return uniqueId;
             throw new Exception("No unique id found 😢");
 
         }
@@ -276,53 +282,51 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
 
 
         // START: BANK SETUP
-        public async Task<ResponseDto> CreateBankSetupService(CreateBankSetupDto createBankSetupDto, string branchCode)
+        public async Task<ResponseDto> CreateBankSetupService(CreateBankSetupDto createBankSetupDto)
         {
-            //var ledger = await _mainLedgerRepository.GetLedger(createBankSetupDto.LedgerId);
-            //if (ledger == null)
-            //{
-                var bankType = await _mainLedgerRepository.GetBankTypeById(createBankSetupDto.BankTypeId);
-                if(bankType==null) throw new Exception("Bad Request: Bank Type");
+            var bankType = await _mainLedgerRepository.GetBankTypeById(createBankSetupDto.BankTypeId);
+            var branchCode = await _companyProfileRepository.GetBranchByBranchCode(createBankSetupDto.BranchCode);
+            if (bankType == null || branchCode == null) 
+                throw new Exception("Please check branch code or bank type and try again");
 
-                var bankSetup = _mapper.Map<BankSetup>(createBankSetupDto);
-                bankSetup.BankType=bankType;
-                bankSetup.BranchCode=branchCode;
-                var createStatus = await _mainLedgerRepository.CreateBankSetup(bankSetup);
-                if (createStatus >= 1)
-                {
-                    return new ResponseDto()
-                    {
-                        Message = "Bank Create Successfully",
-                        Status = true,
-                        StatusCode = "200"
-                    };
-                }
+            var bankSetup = _mapper.Map<BankSetup>(createBankSetupDto);
+            bankSetup.BankType = bankType;
+            //bankSetup.BranchCode=branchCode;
+            var createStatus = await _mainLedgerRepository.CreateBankSetup(bankSetup);
+            if (createStatus >= 1)
+            {
                 return new ResponseDto()
                 {
-                    Message = "Failed to Create Bank",
-                    Status = false,
-                    StatusCode = "500"
+                    Message = "Bank Create Successfully",
+                    Status = true,
+                    StatusCode = "200"
                 };
-            //}
+            }
+            return new ResponseDto()
+            {
+                Message = "Failed to Create Bank",
+                Status = false,
+                StatusCode = "500"
+            };
         }
         public async Task<ResponseDto> EditBankSetupService(UpdateBankSetup bankSetupDto)
         {
-                var editStatus = await _mainLedgerRepository.EditBankSetup(bankSetupDto);
-                if (editStatus >= 1)
-                {
-                    return new ResponseDto()
-                    {
-                        Message = "Edit Succesfull",
-                        Status = true,
-                        StatusCode = "200"
-                    };
-                }
+            var editStatus = await _mainLedgerRepository.EditBankSetup(bankSetupDto);
+            if (editStatus >= 1)
+            {
                 return new ResponseDto()
                 {
-                    Message = "Edit Failed",
-                    Status = false,
-                    StatusCode = "500"
+                    Message = "Edit Succesfull",
+                    Status = true,
+                    StatusCode = "200"
                 };
+            }
+            return new ResponseDto()
+            {
+                Message = "Edit Failed",
+                Status = false,
+                StatusCode = "500"
+            };
 
             //}
             throw new ArgumentNullException("Content does not Exist");
@@ -360,13 +364,13 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
         public async Task<List<BankTypeDto>> GetAllBankTypeService()
         {
             var bankTypes = await _mainLedgerRepository.GetAllBankType();
-            if(bankTypes==null || bankTypes.Count<=0) throw new Exception("No Data Found");
+            if (bankTypes == null || bankTypes.Count <= 0) throw new Exception("No Data Found");
             return _mapper.Map<List<BankTypeDto>>(bankTypes);
         }
         public async Task<BankTypeDto> GetBankTypeByIdService(int id)
         {
             var bankType = await _mainLedgerRepository.GetBankTypeById(id);
-            if(bankType==null) throw new BadHttpRequestException("Bad Request: ID");
+            if (bankType == null) throw new BadHttpRequestException("Bad Request: ID");
             return _mapper.Map<BankTypeDto>(bankType);
         }
 
@@ -475,7 +479,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
         public async Task<int> GetUniqueIdForSubLedgerService()
         {
             int uniqueId = await _mainLedgerRepository.GetUniqueIdForSubLedger();
-            if(uniqueId>=1) return uniqueId;
+            if (uniqueId >= 1) return uniqueId;
             throw new Exception("No unique id found 😢");
         }
     }

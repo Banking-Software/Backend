@@ -39,8 +39,8 @@ namespace MicroFinance.Controllers.UserManagement
 
         // START: API for Authorized user //
         [TypeFilter(typeof(IsUserOfficerFilter))]
-        [HttpPost("register")]
-        public async Task<ActionResult<ResponseDto>> RegisterUser(UserRegisterDto userRegisterDto)
+        [HttpPost("createLoginCredential")]
+        public async Task<ActionResult<ResponseDto>> CreateLoginCredential(UserRegisterDto userRegisterDto)
         {
 
             if (userRegisterDto.IsActive)
@@ -65,8 +65,8 @@ namespace MicroFinance.Controllers.UserManagement
         }
 
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpPut("update-password")]
-        public async Task<ActionResult<ResponseDto>> UpdatePassword(UpdateUserPasswordDto updateUserPasswordDto)
+        [HttpPut("updateUserPassword")]
+        public async Task<ActionResult<ResponseDto>> UpdateUserPassword(UpdateUserPasswordDto updateUserPasswordDto)
         {
 
             var userName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
@@ -76,7 +76,7 @@ namespace MicroFinance.Controllers.UserManagement
         }
 
         [TypeFilter(typeof(IsUserOfficerFilter))]
-        [HttpPut("update-profile")]
+        [HttpPut("updateUserProfile")]
         public async Task<ActionResult<ResponseDto>> UpdateUserProfile(UserProfileUpdateDto userProfileUpdateDto)
         {
             var claims = GetClaims();
@@ -102,7 +102,7 @@ namespace MicroFinance.Controllers.UserManagement
 
 
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpGet("getuser/id")]
+        [HttpGet("getUserById")]
         public async Task<ActionResult<UserDetailsDto>> GetUserById([FromQuery] string id)
         {
 
@@ -120,8 +120,8 @@ namespace MicroFinance.Controllers.UserManagement
 
 
         [TypeFilter(typeof(IsUserOfficerFilter))]
-        [HttpGet("getusers")]
-        public async Task<ActionResult<List<UserDetailsDto>>> GetUsers()
+        [HttpGet("getAllUsers")]
+        public async Task<ActionResult<List<UserDetailsDto>>> GetAllUsers()
         {
 
             var users = await _employeeService.GetUsersDetailsService();
@@ -153,7 +153,7 @@ namespace MicroFinance.Controllers.UserManagement
         // }
 
         [TypeFilter(typeof(IsUserOfficerFilter))]
-        [HttpPost("assignrole")]
+        [HttpPost("assignRoleToUser")]
         public async Task<ActionResult<ResponseDto>> AssignRole(AssignRoleDto assignRoleDto)
         {
 
@@ -167,7 +167,7 @@ namespace MicroFinance.Controllers.UserManagement
         // START: API for company Employee //
 
         [TypeFilter(typeof(IsUserOfficerFilter))]
-        [HttpPost("create-employee")]
+        [HttpPost("createEmployee")]
         public async Task<ActionResult<ResponseDto>> CreateEmployee(CreateEmployeeDto createEmployeeDto)
         {
             Dictionary<string, string> claims = GetClaims();
@@ -178,7 +178,7 @@ namespace MicroFinance.Controllers.UserManagement
 
 
         [TypeFilter(typeof(IsUserOfficerFilter))]
-        [HttpPut("edit-profile")]
+        [HttpPut("updateEmployeeProfile")]
         public async Task<ActionResult<ResponseDto>> UpdateEmployeeProfile(UpdateEmployeeDto updateEmployeeDto)
         {
             Dictionary<string, string> claims = GetClaims();
@@ -186,7 +186,7 @@ namespace MicroFinance.Controllers.UserManagement
         }
 
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpGet("getemployee/email")]
+        [HttpGet("getemployeeByEmail")]
         public async Task<ActionResult<EmployeeDto>> GetEmployeeByEmail([FromQuery] string email)
         {
             var claims = GetClaims();
@@ -203,7 +203,7 @@ namespace MicroFinance.Controllers.UserManagement
 
 
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
-        [HttpGet("getemployee/id")]
+        [HttpGet("getemployeeById")]
         public async Task<ActionResult<EmployeeDto>> GetEmployeeById([FromQuery] int id)
         {
 
@@ -225,7 +225,7 @@ namespace MicroFinance.Controllers.UserManagement
 
 
         [TypeFilter(typeof(IsUserOfficerFilter))]
-        [HttpGet("getemployees")]
+        [HttpGet("getAllEmployees")]
         public async Task<ActionResult<List<EmployeeDto>>> GetEmployees()
         {
 

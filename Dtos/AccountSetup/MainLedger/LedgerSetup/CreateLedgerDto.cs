@@ -4,8 +4,9 @@ namespace MicroFinance.Dtos.AccountSetup.MainLedger
 {
     public class CreateLedgerDto
     {
-        [RegularExpression(@"^(?!0$)\d+$", ErrorMessage = "Id must be a non-zero positive integer.")]
-        public int Id { get; set; }
+        // [RegularExpression(@"^(?!0$)\d+$", ErrorMessage = "Id must be a non-zero positive integer.")]
+        // public int Id { get; set; }
+        [Required]
         public int GroupTypeId { get; set; }
         [Required]
         public string Name { get; set; }
