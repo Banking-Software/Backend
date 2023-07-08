@@ -14,6 +14,10 @@ The default Identity Table is created for the SuperAdmin.
 
 Main focus table are AspNetUsers, AspNetRoles, AspNetUserRoles
 
+# Fixed Roles of SuperAdmin
+
+> RoleName: SuperAdmin , RoleId: 1
+
 # Responsibility Of SuperAdmin
 
 1) Create every branch of the Sahakari Sastha.
@@ -36,6 +40,17 @@ Inside this Table there are different tables, main focus table are:
 - AspNetRoles: It stores the list of Roles that are present in the Sanstha. 'Officer', 'Senior Assistant', 'Assistant', 'Marketing'
 
 - AspNetUserRoles: It stores the mapping of users to the role.
+
+# Fixed Role (Finance Company):
+
+> RoleName: Marketing , RoleId: 0
+
+> RoleName: Assistant , RoleId: 1
+
+> RoleName: SeniorAssistant , RoleId: 2
+
+> RoleName: Officer , RoleId: 3
+
 
 # Responsibility Of Admin i.e Officer
 
@@ -71,7 +86,9 @@ Officer needs to provide certain information to create a Employee among which be
 
 - "name": "string", "email": "string", "phoneNumber": "string", "branchCode": "string"
 
-## Register Employee Credentials
+## Register Employee Credentials 
+
+> (Here Employee with Credentials is denoted as User)
 
 Officer needs to provide certain information to create a Employee among which below are mandatory
 
@@ -87,3 +104,7 @@ Except the ID you can edit other fields
 ## Edit Registered User Info
 
 Only Deposit Limit and Loan Limit are Editable
+
+## NOTE
+
+Only Admin a.k.a Officer is authorised to create a new Employee and User Credentials for its staff in the application. And it's SuperAdmin's decision wheather to accept or not
