@@ -9,6 +9,8 @@ namespace MicroFinance.Profiles
         public CompanyProfile()
         {
             CreateMap<Branch, BranchDto>();
+            CreateMap<CreateCompanyProfileDto, CompanyDetail>();
+            CreateMap<CompanyDetail, CompanyProfileDto>(); 
         }
     }
 }

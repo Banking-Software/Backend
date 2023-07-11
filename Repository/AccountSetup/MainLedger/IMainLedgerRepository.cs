@@ -31,7 +31,6 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         // Operations related to Ledger
         Task<bool> CheckIfLedgerNameExist(int groupTypeId, string ledgerName);
         Task<int> CreateLedger(Ledger ledger);
-        Task<int> GetUniqueIdForLedger();
         Task<int> EditLedger(UpdateLedgerDto ledger);
         Task<List<Ledger>> GetLedgersByAccountType(int accountTypeId);
         Task<List<Ledger>> GetLedgerByGroupType(int groupTypeId);
@@ -41,8 +40,8 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
 
 
         // Operations related to subledger
-        Task<int> GetUniqueIdForSubLedger();
         Task<int> CreateSubLedger(SubLedger subLedger);
+        Task<int> UpdateSubLedgerCode(int subLedgerId);
         Task<int> EditSubledger(SubLedger subLedger);
         Task<SubLedger> GetSubLedgerById(int id);
         Task<SubLedger> GetSubLedger(int id);

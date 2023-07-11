@@ -11,7 +11,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<MainLedgerRepository> _logger;
 
-        public MainLedgerRepository(ApplicationDbContext dbContext,ILogger<MainLedgerRepository> logger)
+        public MainLedgerRepository(ApplicationDbContext dbContext, ILogger<MainLedgerRepository> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -49,8 +49,8 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         {
             var existingGroup = await _dbContext.GroupTypes.FindAsync(groupTypeDto.Id);
             existingGroup.NepaliName = groupTypeDto.NepaliName;
-            existingGroup.Name=groupTypeDto.Name;
-            existingGroup.Schedule=groupTypeDto.Schedule;
+            existingGroup.Name = groupTypeDto.Name;
+            existingGroup.Schedule = groupTypeDto.Schedule;
             return await _dbContext.SaveChangesAsync();
         }
 
@@ -112,38 +112,18 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             {
                 var existingledger = await _dbContext.Ledgers.FindAsync(ledger.Id);
                 existingledger.LedgerCode = ledger.Id;
-                await _dbContext.SaveChangesAsync();
+                var statusLedgerCode = await _dbContext.SaveChangesAsync();
+                if(statusLedgerCode<1) throw new Exception("Failed To Create Ledger");
                 return existingledger.Id;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _dbContext.Ledgers.Remove(ledger);
+                await _dbContext.SaveChangesAsync();
                 throw new Exception(ex.Message);
             }
-            
+
         }
-
-
-        public async Task<int> GetUniqueIdForLedger()
-        {
-            int numberOfLedgerEntry= await _dbContext.Ledgers.CountAsync();
-            var checkIfEntryExist = await _dbContext.Ledgers.FindAsync(numberOfLedgerEntry+1);
-            if(checkIfEntryExist==null)
-                return numberOfLedgerEntry+1;
-            
-            List<int> ids = await _dbContext.Ledgers.Select(l=>l.Id).ToListAsync();
-            int expectedId =0;
-            for (int i = 1; i < numberOfLedgerEntry+1; i++)
-            {
-                if(!ids.Contains(i))
-                {
-                    expectedId=i;
-                    break;
-                }
-            }
-            return expectedId;
-        }
-
         public async Task<int> EditLedger(UpdateLedgerDto ledger)
         {
             var existingLedger = await _dbContext.Ledgers.FindAsync(ledger.Id);
@@ -152,7 +132,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             existingLedger.IsSubLedgerActive = ledger.IsSubLedgerActive;
             existingLedger.DepreciationRate = ledger.DepreciationRate;
             existingLedger.HisabNumber = ledger.HisabNumber;
-            existingLedger.Name=ledger.Name;
+            existingLedger.Name = ledger.Name;
             return await _dbContext.SaveChangesAsync();
         }
 
@@ -161,13 +141,13 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         {
             return await _dbContext.Ledgers
             .Include(l => l.GroupType)
-            .ThenInclude(gt=>gt.AccountType)
+            .ThenInclude(gt => gt.AccountType)
             .Where(l => l.Id == id)
             .FirstOrDefaultAsync();
         }
         public async Task<List<Ledger>> GetLedgers()
         {
-            return await _dbContext.Ledgers.Include(l => l.GroupType).ThenInclude(gt=>gt.AccountType)
+            return await _dbContext.Ledgers.Include(l => l.GroupType).ThenInclude(gt => gt.AccountType)
             .ToListAsync();
             //return await _dbContext.Ledgers.ToListAsync();
         }
@@ -176,7 +156,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         {
             var ledgers = await _dbContext.Ledgers
             .Include(l => l.GroupType)
-            .ThenInclude(gt=>gt.AccountType)
+            .ThenInclude(gt => gt.AccountType)
             .Where(l => l.GroupType.AccountTypeId == accountTypeId)
             .ToListAsync();
             return ledgers;
@@ -186,7 +166,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         {
             var ledgers = await _dbContext.Ledgers
             .Include(l => l.GroupType)
-            .ThenInclude(gt=>gt.AccountType)
+            .ThenInclude(gt => gt.AccountType)
             .Where(l => l.GroupTypeId == groupTypeId)
             .ToListAsync();
             return ledgers;
@@ -200,7 +180,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         /// <returns></returns>
         public async Task<Ledger> GetLedgerByGroupTypeAndLedgerName(GroupType groupType, string ledgerName)
         {
-            return await _dbContext.Ledgers.Where(l=>l.GroupTypeId==groupType.Id && l.Name==ledgerName.ToUpper()).FirstOrDefaultAsync();
+            return await _dbContext.Ledgers.Where(l => l.GroupTypeId == groupType.Id && l.Name == ledgerName.ToUpper()).FirstOrDefaultAsync();
         }
 
 
@@ -212,31 +192,27 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             Ledger ledger = await _dbContext.Ledgers.Where(l => l.GroupTypeId == groupType.Id && l.Name == bankSetup.Name.ToUpper()).FirstOrDefaultAsync();
             if (ledger == null)
             {
-                int ledgerId = await GetUniqueIdForLedger();
-                if(ledgerId<=0) throw new Exception("Unable to Create Ledger. No Unique Id found");
-                ledger = new Ledger(){
-                    Id = ledgerId,
+                ledger = new Ledger()
+                {
                     GroupType = groupType,
                     Name = bankSetup.Name,
                     NepaliName = bankSetup.NepaliName,
                     EntryDate = DateTime.Now,
                     IsSubLedgerActive = false,
-                    IsBank = true};
+                    IsBank = true
+                };
                 await _dbContext.Ledgers.AddAsync(ledger);
                 await _dbContext.SaveChangesAsync();
             }
-
-                bankSetup.Ledger = ledger;
-                await _dbContext.BankSetups.AddAsync(bankSetup);
-                var bankId = await _dbContext.SaveChangesAsync();
-                if (bankId < 1)
-                {
-                    _dbContext.Ledgers.Remove(ledger);
-                    await _dbContext.SaveChangesAsync();
-                }
-            return bankId;
-
-
+            bankSetup.Ledger = ledger;
+            await _dbContext.BankSetups.AddAsync(bankSetup);
+            var addStatus = await _dbContext.SaveChangesAsync();
+            if (addStatus < 1)
+            {
+                _dbContext.Ledgers.Remove(ledger);
+                await _dbContext.SaveChangesAsync();
+            }
+            return bankSetup.Id;
         }
 
         public async Task<int> EditBankSetup(UpdateBankSetup bankSetup)
@@ -249,7 +225,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             existingBankSetup.InterestRate = bankSetup.InterestRate;
 
             var existingLedger = await _dbContext.Ledgers.FindAsync(existingBankSetup.LedgerId);
-            existingLedger.NepaliName=bankSetup.NepaliName;
+            existingLedger.NepaliName = bankSetup.NepaliName;
             return await _dbContext.SaveChangesAsync();
         }
 
@@ -291,43 +267,35 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         public async Task<int> CreateSubLedger(SubLedger subLedger)
         {
             await _dbContext.SubLedgers.AddAsync(subLedger);
-            await _dbContext.SaveChangesAsync();
-            return await UpdateSubLedgerCode(subLedger);
+            var subLedgerCreateStatus = await _dbContext.SaveChangesAsync();
+            if(subLedgerCreateStatus>=1)
+                return subLedger.Id;
+            return 0;
         }
-
-        private async Task<int> UpdateSubLedgerCode(SubLedger subLedger)
+        public async Task<int> UpdateSubLedgerCode(int subLedgerId)
         {
+            var existingSubLedger = await _dbContext.SubLedgers.FindAsync(subLedgerId);
             try
             {
-                var exitingSubLedger =  await _dbContext.SubLedgers.FindAsync(subLedger.Id);
-                exitingSubLedger.SubLedgerCode = exitingSubLedger.Id;
-                await _dbContext.SaveChangesAsync();
-                return exitingSubLedger.Id;
+                existingSubLedger.SubLedgerCode = subLedgerId;
+                var statusLedgerCode = await _dbContext.SaveChangesAsync();
+                if(statusLedgerCode<1) throw new Exception("Failed To Create Ledger");
+                return existingSubLedger.Id;
             }
             catch(Exception ex)
             {
-                _dbContext.SubLedgers.Remove(subLedger);
+                _dbContext.SubLedgers.Remove(existingSubLedger);
+                await _dbContext.SaveChangesAsync();
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<int> EditSubledger(SubLedger subLedger)
         {
             var existingSubLedger = await _dbContext.SubLedgers.FindAsync(subLedger.Id);
             existingSubLedger.Name = subLedger.Name;
-            existingSubLedger.Description=subLedger.Description;
-            // var propertyBag = _dbContext.Entry(existingSubLedger).CurrentValues;
-            // foreach (var property in propertyBag.Properties)
-            // {
-            //     var newValue = subLedger.GetType().GetProperty(property.Name)?.GetValue(subLedger);
-            //     if (newValue != null && !Equals(propertyBag[property.Name], newValue))
-            //     {
-            //         propertyBag[property.Name] = newValue;
-            //     }
-            // }
+            existingSubLedger.Description = subLedger.Description;
             return await _dbContext.SaveChangesAsync();
         }
-
         public async Task<SubLedger> GetSubLedger(int id)
         {
             return await _dbContext.SubLedgers
@@ -360,13 +328,13 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             .ToListAsync();
         }
 
-         public async Task<List<SubLedger>> GetSubLedgersByAccountType(int accountTypeId)
+        public async Task<List<SubLedger>> GetSubLedgersByAccountType(int accountTypeId)
         {
             return await _dbContext.SubLedgers
             .Include(sl => sl.Ledger)
             .ThenInclude(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
-            .Where(sl => sl.Ledger.GroupType.AccountTypeId==accountTypeId)
+            .Where(sl => sl.Ledger.GroupType.AccountTypeId == accountTypeId)
             .ToListAsync();
         }
 
@@ -376,7 +344,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             .Include(sl => sl.Ledger)
             .ThenInclude(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
-            .Where(sl => sl.Ledger.GroupTypeId==groupTypeId)
+            .Where(sl => sl.Ledger.GroupTypeId == groupTypeId)
             .ToListAsync();
         }
         // DEBIT CREDIT
@@ -387,25 +355,6 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         public async Task<List<DebitOrCredit>> GetDebitOrCredits()
         {
             return await _dbContext.DebitOrCredits.ToListAsync();
-        }
-
-        public async Task<int> GetUniqueIdForSubLedger()
-        {
-            int numberOfSubLedgerEntry = await _dbContext.SubLedgers.CountAsync();
-            var subLedgerExistForNewId = await _dbContext.SubLedgers.FindAsync(numberOfSubLedgerEntry+1);
-            if(subLedgerExistForNewId==null) return numberOfSubLedgerEntry+1;
-
-            List<int> ids = await _dbContext.SubLedgers.Select(sl=>sl.Id).ToListAsync();
-            int expectedId =0;
-            for (int i = 1; i < numberOfSubLedgerEntry+1; i++)
-            {
-                if(!ids.Contains(i))
-                {
-                    expectedId=i;
-                    break;
-                }
-            }
-            return expectedId;
         }
     }
 }

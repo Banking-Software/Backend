@@ -36,7 +36,7 @@ namespace MicroFinance.Controllers.CompanyProfile
             string modifiedBy = claims["currentUserName"];
             return await _companyProfile.UpdateBranchService(updateBranchDto, modifiedBy);
         }
-        
+
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         [HttpGet("getBranchById")]
@@ -46,6 +46,7 @@ namespace MicroFinance.Controllers.CompanyProfile
             string modifiedBy = claims["currentUserName"];
             return await _companyProfile.GetBranchServiceById(id);
         }
+
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         [HttpGet("getBranchByBranchCode")]
@@ -63,6 +64,30 @@ namespace MicroFinance.Controllers.CompanyProfile
             Dictionary<string, string> claims = GetClaims();
             string modifiedBy = claims["currentUserName"];
             return await _companyProfile.GetAllBranchsService();
+        }
+
+        [HttpPost("createCompanyProfile")]
+        [Authorize(AuthenticationSchemes = "UserToken")]
+        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        public async Task<ActionResult<ResponseDto>> CreateCompanyProfile(CreateCompanyProfileDto createCompanyProfileDto)
+        {
+            return await _companyProfile.CreateCompanyProfileService(createCompanyProfileDto);
+        }
+
+        [HttpPut("updateCompanyProfile")]
+        [Authorize(AuthenticationSchemes="UserToken")]
+        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        public async Task<ActionResult<ResponseDto>> UpdateCompanyProfile(UpdateCompanyProfileDto updateCompanyProfileDto)
+        {
+            return await _companyProfile.UpdateCompanyProfileService(updateCompanyProfileDto);
+        }
+
+        [HttpPut("getCompanyProfileById")]
+        [Authorize(AuthenticationSchemes="UserToken")]
+        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        public async Task<ActionResult<CompanyProfileDto>> GetCompanyProfileById([FromQuery] int id)
+        {
+            return await _companyProfile.GetCompanyProfileByIdService(id);
         }
         private Dictionary<string,string> GetClaims()
        {

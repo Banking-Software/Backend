@@ -97,7 +97,7 @@ namespace MicroFinance.Services.UserManagement
                         Status=true
                     };
                 _logger.LogError($"{DateTime.Now}: Failed to update password of super admin > {userName}");
-                throw new BadRequestExceptionHandler($"Failed to ppdate the password");
+                throw new BadRequestExceptionHandler($"Failed to update the password");
                 
             }
             _logger.LogError($"{DateTime.Now}: Attempting to change password of unknown user in super admin database > {userName}");

@@ -160,13 +160,6 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
 
         }
 
-        public async Task<int> GetUniqueIdForLedgerService()
-        {
-            int uniqueId = await _mainLedgerRepository.GetUniqueIdForLedger();
-            if (uniqueId >= 1) return uniqueId;
-            throw new Exception("No unique id found 😢");
-
-        }
         public async Task<ResponseDto> EditLedgerService(UpdateLedgerDto ledgerDto)
         {
             // var ledger = await _mainLedgerRepository.GetLedger(ledgerDto.Id);
@@ -245,13 +238,6 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
             {
                 var ledgerDetailsDto = _mapper.Map<LedgerDto>(ledger);
                 return ledgerDetailsDto;
-                // var groupLedgerDto = new GroupLedgerDto()
-                // {
-                //     Ledger = _mapper.Map<LedgerDto>(mappedDetails.Ledger),
-                //     GroupType = _mapper.Map<GroupTypeDto>(mappedDetails.GroupType)
-                // };
-                // return groupLedgerDto;
-
             }
             throw new ArgumentNullException("Content Doesnot exist");
         }
@@ -264,16 +250,6 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
             {
                 var ledgerDetailsDto = _mapper.Map<List<LedgerDto>>(ledgers);
                 return ledgerDetailsDto;
-                // foreach (var map in mappedDetails)
-                // {
-                //     var groupLedgerDto = new GroupLedgerDto()
-                //     {
-                //         Ledger = _mapper.Map<LedgerDto>(map.Ledger),
-                //         GroupType = _mapper.Map<GroupTypeDto>(map.GroupType)
-                //     };
-                //     groupLedgerDtos.Add(groupLedgerDto);
-                // }
-                // return groupLedgerDtos;
             }
             else if (ledgers.Count < 1) return new List<LedgerDto>();
             throw new ArgumentNullException("Content Doesnot exist");
@@ -384,15 +360,17 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
             {
                 var subledger = _mapper.Map<SubLedger>(createSubLedgerDto);
                 subledger.Ledger = ledger;
-                var createStatus = await _mainLedgerRepository.CreateSubLedger(subledger);
-                if (createStatus >= 1)
+                int subLedgerId = await _mainLedgerRepository.CreateSubLedger(subledger);
+                if (subLedgerId >= 1)
                 {
-                    return new ResponseDto()
-                    {
-                        Message = "Successfully Created Sub Ledger",
-                        Status = true,
-                        StatusCode = "200"
-                    };
+                    int subLedgerCode = await _mainLedgerRepository.UpdateSubLedgerCode(subLedgerId);
+                    if(subLedgerCode>=1)
+                        return new ResponseDto()
+                        {
+                            Message = "Successfully Created Sub Ledger",
+                            Status = true,
+                            StatusCode = "200"
+                        };
                 }
                 return new ResponseDto()
                 {
@@ -438,16 +416,6 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
             {
                 var subLedgerDetailsDto = _mapper.Map<SubLedgerDto>(subLedger);
                 return subLedgerDetailsDto;
-                // var ledgerDetails = await _mainLedgerRepository.GetLedgerById(subLedger.LedgerId);
-                // if(ledgerDetails!=null)
-                // {
-                //     var groupSubLedger = new GroupSubLedgerDto()
-                //     {
-                //         GroupType = _mapper.Map<GroupTypeDto>(ledgerDetails.GroupType),
-                //         SubLedger = _mapper.Map<SubLedgerDto>(subLedger)
-                //     };
-                //     return groupSubLedger;
-                // }
             }
             throw new ArgumentNullException("Content Not Found");
         }
@@ -474,13 +442,6 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
             }
             else if (subLedgers.Count < 1) return new List<SubLedgerDto>();
             throw new ArgumentNullException("Content Not Found");
-        }
-
-        public async Task<int> GetUniqueIdForSubLedgerService()
-        {
-            int uniqueId = await _mainLedgerRepository.GetUniqueIdForSubLedger();
-            if (uniqueId >= 1) return uniqueId;
-            throw new Exception("No unique id found 😢");
         }
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MicroFinance.Migrations.Application
 {
     /// <inheritdoc />
-    public partial class LedgerAndSub : Migration
+    public partial class Sub : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -125,8 +125,15 @@ namespace MicroFinance.Migrations.Application
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CompanyAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CompanyEmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CompanyNameNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyAddressNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PANNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EstablishedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PhoneNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyEmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyLogo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FromDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -385,7 +392,7 @@ namespace MicroFinance.Migrations.Application
                     ClientGroupId = table.Column<int>(type: "int", nullable: true),
                     ClientUnitId = table.Column<int>(type: "int", nullable: true),
                     KYMTypeId = table.Column<int>(type: "int", nullable: true),
-                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatorBranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -668,7 +675,8 @@ namespace MicroFinance.Migrations.Application
                 name: "IX_Clients_ClientId",
                 table: "Clients",
                 column: "ClientId",
-                unique: true);
+                unique: true,
+                filter: "[ClientId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Clients_ClientShareTypeInfoId",

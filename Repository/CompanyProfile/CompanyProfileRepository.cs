@@ -19,6 +19,13 @@ namespace MicroFinance.Repository.CompanyProfile
             return await _companyProfileDbContex.SaveChangesAsync();
         }
 
+        public async Task<int> CreateCompanyProfile(CompanyDetail companyDetail)
+        {
+            await _companyProfileDbContex.CompanyDetails.AddAsync(companyDetail);
+            await _companyProfileDbContex.SaveChangesAsync();
+            return companyDetail.Id;
+        }
+
         public async Task<Branch> GetBranchByBranchCode(string branchCode)
         {
             var branch = await _companyProfileDbContex.Branches.Where(b=>b.BranchCode==branchCode).FirstOrDefaultAsync();
@@ -36,6 +43,11 @@ namespace MicroFinance.Repository.CompanyProfile
             return await _companyProfileDbContex.Branches.ToListAsync();
         }
 
+        public async Task<CompanyDetail> GetCompanyDetailById(int id)
+        {
+            return await _companyProfileDbContex.CompanyDetails.FindAsync(id);
+        }
+
         public async Task<int> UpdateBranch(UpdateBranchDto branchDto, string modifiedBy)
         {
             var existingBranch = await _companyProfileDbContex.Branches.Where(b=>b.Id==branchDto.Id).FirstOrDefaultAsync();
@@ -44,6 +56,22 @@ namespace MicroFinance.Repository.CompanyProfile
             existingBranch.ModifiedOn = DateTime.Now;
             existingBranch.ModifiedBy=modifiedBy;
             return await _companyProfileDbContex.SaveChangesAsync();
+        }
+
+        public async Task<int> UpdateCompanyProfile(UpdateCompanyProfileDto updateCompanyProfileDto)
+        {
+           CompanyDetail existingCompanyDetail = await _companyProfileDbContex.CompanyDetails.FindAsync(updateCompanyProfileDto.Id);
+           if(existingCompanyDetail==null) throw new NotImplementedException("No details found");
+           existingCompanyDetail.CompanyName = updateCompanyProfileDto.CompanyName;
+           existingCompanyDetail.CompanyNameNepali  = updateCompanyProfileDto.CompanyNameNepali;
+           existingCompanyDetail.CompanyAddress = updateCompanyProfileDto.CompanyAddress;
+           existingCompanyDetail.CompanyAddressNepali = updateCompanyProfileDto.CompanyAddressNepali;
+           existingCompanyDetail.CompanyEmailAddress = updateCompanyProfileDto.CompanyEmailAddress;
+           existingCompanyDetail.EstablishedDate = updateCompanyProfileDto.EstablishedDate;
+           existingCompanyDetail.FromDate=updateCompanyProfileDto.FromDate;
+           existingCompanyDetail.PANNo=updateCompanyProfileDto.PANNo;
+           existingCompanyDetail.PhoneNo=updateCompanyProfileDto.PhoneNo;
+           return await _companyProfileDbContex.SaveChangesAsync();  
         }
     }
 }

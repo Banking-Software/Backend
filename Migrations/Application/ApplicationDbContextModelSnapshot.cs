@@ -308,7 +308,6 @@ namespace MicroFinance.Migrations.Application
                         .HasColumnType("int");
 
                     b.Property<string>("ClientId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ClientIfMemberOfOtherParty")
@@ -539,7 +538,8 @@ namespace MicroFinance.Migrations.Application
                     b.HasIndex("ClientGroupId");
 
                     b.HasIndex("ClientId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ClientId] IS NOT NULL");
 
                     b.HasIndex("ClientShareTypeInfoId");
 
@@ -664,7 +664,7 @@ namespace MicroFinance.Migrations.Application
                     b.ToTable("Branches");
                 });
 
-            modelBuilder.Entity("MicroFinance.Models.CompanyProfile.CompanyDetails", b =>
+            modelBuilder.Entity("MicroFinance.Models.CompanyProfile.CompanyDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -673,15 +673,34 @@ namespace MicroFinance.Migrations.Application
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CompanyAddress")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyAddressNepali")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CompanyEmailAddress")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyLogo")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyNameNepali")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EstablishedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FromDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PANNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNo")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

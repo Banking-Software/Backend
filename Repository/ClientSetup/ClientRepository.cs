@@ -25,17 +25,33 @@ namespace MicroFinance.Repository.ClientSetup
             _mapper = mapper;
         }
 
-
+        private async Task<string> AddClientId(Client client)
+        {
+            try
+            {
+                var existingclient = await _dbContext.Clients.FindAsync(client.Id);
+                client.ClientId = client.Id.ToString().PadLeft(5, '0');
+                var statusUpdate = await _dbContext.SaveChangesAsync();
+                if(statusUpdate<1) throw new Exception("Client Creation failed");
+                return client.ClientId;
+            }
+            catch (Exception ex)
+            {
+                _dbContext.Clients.Remove(client);
+                throw new Exception(ex.Message);
+            }
+        }
 
         public async Task<string> CreateClient(Client client)
         {
             _logger.LogInformation($"{DateTime.Now} Creating Client...");
             var highestClientId = await _dbContext.Clients.OrderByDescending(c=>c.ClientId).FirstOrDefaultAsync();
-            client.ClientId = highestClientId==null?"1".PadLeft(5,'0'):(Convert.ToInt32(highestClientId.ClientId)+1).ToString().PadLeft(5,'0');
+            //client.ClientId = highestClientId==null?"1".PadLeft(5,'0'):(Convert.ToInt32(highestClientId.ClientId)+1).ToString().PadLeft(5,'0');
             await _dbContext.Clients.AddAsync(client);
             int result = await _dbContext.SaveChangesAsync();
-            if (result >= 1) return client.ClientId;
-            throw new Exception("Unable to Create a Client");
+            if(result<1)
+                throw new Exception("Unable to Create a Client");
+            return await AddClientId(client);
         }
 
         private void UpdatePropertyBag<TEntity>(PropertyValues propertyBag, TEntity updatedEntity)

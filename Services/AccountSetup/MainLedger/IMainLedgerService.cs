@@ -25,7 +25,6 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
 
         // START: LEDGER
         Task<ResponseDto> CreateLedgerService(CreateLedgerDto createLedgerDto);
-        Task<int> GetUniqueIdForLedgerService();
         Task<ResponseDto> EditLedgerService(UpdateLedgerDto ledgerDto);
         Task<LedgerDto> GetLedgerByIdService(int id);
         Task<List<LedgerDto>> GetLedgers();
@@ -48,7 +47,6 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
 
         // First check if entry exist and only then create ledger and map it
         Task<ResponseDto> CreateSubLedgerService(CreateSubLedgerDto createSubLedgerDto);
-        Task<int> GetUniqueIdForSubLedgerService();
         Task<ResponseDto> EditSubLedgerService(UpdateSubLedgerDto subLedgerDto);
         Task<List<SubLedgerDto>> GetSubLedgerByLedgerService(int ledgerId);
         Task<SubLedgerDto> GetSubLedgerByIdService(int id);

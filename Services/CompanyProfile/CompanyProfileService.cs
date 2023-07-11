@@ -31,6 +31,17 @@ namespace MicroFinance.Services.CompanyProfile
             throw new Exception("Not able to Create a Branch");
         }
 
+        public async Task<ResponseDto> CreateCompanyProfileService(CreateCompanyProfileDto createCompanyProfileDto)
+        {
+            CompanyDetail newCompanyDetail = _mapper.Map<CompanyDetail>(createCompanyProfileDto);
+            var creationStatus  = await _companyProfile.CreateCompanyProfile(newCompanyDetail);
+            if(creationStatus>=1)
+            {
+                return new ResponseDto(){Message="Comapny Profile Created Successfully", Status=true, StatusCode="200"};
+            }
+            throw new Exception("Failed to create the company profile");
+        }
+
         public async Task<List<BranchDto>> GetAllBranchsService()
         {
             var branches = await _companyProfile.GetBranches();
@@ -55,6 +66,12 @@ namespace MicroFinance.Services.CompanyProfile
             return _mapper.Map<BranchDto>(branch);
         }
 
+        public async Task<CompanyProfileDto> GetCompanyProfileByIdService(int id)
+        {
+            var companyDetail=await _companyProfile.GetCompanyDetailById(id);
+            return _mapper.Map<CompanyProfileDto>(companyDetail);
+        }
+
         public async Task<ResponseDto> UpdateBranchService(UpdateBranchDto updateBranchDto, string modifiedBy)
         {
             Branch branchExist = await _companyProfile.GetBranchById(updateBranchDto.Id);
@@ -65,6 +82,16 @@ namespace MicroFinance.Services.CompanyProfile
                 throw new Exception("Unable to Update the Branch");
             }
             throw new NotImplementedException("No Branch Found");
+        }
+
+        public async Task<ResponseDto> UpdateCompanyProfileService(UpdateCompanyProfileDto updateCompanyProfileDto)
+        {
+            var updateCompanyDetail = await _companyProfile.UpdateCompanyProfile(updateCompanyProfileDto);
+            if(updateCompanyDetail>=1)
+            {
+                return new ResponseDto(){Message="Update Successfull", Status=true, StatusCode="200"};
+            }
+            throw new Exception("Failed to Update the coompany profile");
         }
     }
 }
