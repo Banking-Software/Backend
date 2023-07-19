@@ -4,6 +4,7 @@ using MicroFinance.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MicroFinance.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230718065512_Calendar")]
+    partial class Calendar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -701,16 +704,13 @@ namespace MicroFinance.Migrations.Application
                     b.Property<int>("NumberOfDay")
                         .HasColumnType("int");
 
-                    b.Property<int>("RunningDay")
+                    b.Property<int?>("RunningDay")
                         .HasColumnType("int");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Year", "Month")
-                        .IsUnique();
 
                     b.ToTable("Calendars");
                 });
@@ -732,6 +732,9 @@ namespace MicroFinance.Migrations.Application
                     b.Property<string>("CompanyEmailAddress")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CompanyLogo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -744,15 +747,6 @@ namespace MicroFinance.Migrations.Application
 
                     b.Property<DateTime?>("FromDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<byte[]>("LogoFileData")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("LogoFileName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("LogoFileType")
-                        .HasColumnType("int");
 
                     b.Property<string>("PANNo")
                         .HasColumnType("nvarchar(max)");

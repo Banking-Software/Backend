@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using MicroFinance.Enums;
 
 namespace MicroFinance.Dtos.UserManagement
 {
@@ -13,7 +14,6 @@ namespace MicroFinance.Dtos.UserManagement
         public string? Name { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
-        public string? CompanyName { get; set; }
         public string? BranchCode { get; set; }
         [DataType(DataType.Date)]
         public DateTime? DateOfJoining { get; set; }
@@ -28,7 +28,15 @@ namespace MicroFinance.Dtos.UserManagement
         public string? OtherFacilities { get; set; }
         public string? Grade { get; set; }
         public string? PANNumber { get; set; }
-        public string? AttachedDocumentUrlLink { get; set; }
-        public string? ProfilePictureUrlLink {get; set;}
+        public string? ProfilePicFileData { get; set; }
+        public string? ProfilePicFileName { get; set; }
+        public FileType? ProfilePicFileType { get; set; }
+        public string? CitizenShipFileData { get; set; }
+        public string? CitizenShipFileName { get; set; }
+        public FileType? CitizenShipFileType { get; set; }
+         public string? SignatureFileData { get; set; }
+        public string? SignatureFileName { get; set; }
+        public FileType? SignatureFileType { get; set; }
+
     }
 }

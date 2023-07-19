@@ -36,19 +36,21 @@ namespace MicroFinance.Controllers.UserManagement
             _tokenService = tokenService;
         }
 
-
+        private TokenDto GetDecodedToken()
+        {
+            string token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var decodedToken = _tokenService.DecodeJWT(token);
+            return decodedToken;
+        }
         // START: API for Authorized user //
         [TypeFilter(typeof(IsUserOfficerFilter))]
         [HttpPost("createLoginCredential")]
         public async Task<ActionResult<ResponseDto>> CreateLoginCredential(UserRegisterDto userRegisterDto)
         {
-
             if (userRegisterDto.IsActive)
                 throw new UnAuthorizedExceptionHandler("You are not authorized to activate User");
-
-            var claims = GetClaims();
-            return Ok(await _employeeService.RegisterService(userRegisterDto, claims["currentUserName"]));
-
+            var decodedToken = GetDecodedToken();
+            return Ok(await _employeeService.RegisterService(userRegisterDto, decodedToken.UserName));
         }
 
         [HttpPost("login")]
@@ -79,9 +81,8 @@ namespace MicroFinance.Controllers.UserManagement
         [HttpPut("updateUserProfile")]
         public async Task<ActionResult<ResponseDto>> UpdateUserProfile(UserProfileUpdateDto userProfileUpdateDto)
         {
-            var claims = GetClaims();
-            return Ok(await _employeeService.UpdateUserProfileService(userProfileUpdateDto, claims["currentUserName"]));
-
+            var decodedToken = GetDecodedToken();
+            return Ok(await _employeeService.UpdateUserProfileService(userProfileUpdateDto, decodedToken.UserName));
         }
 
 
@@ -168,30 +169,30 @@ namespace MicroFinance.Controllers.UserManagement
 
         [TypeFilter(typeof(IsUserOfficerFilter))]
         [HttpPost("createEmployee")]
-        public async Task<ActionResult<ResponseDto>> CreateEmployee(CreateEmployeeDto createEmployeeDto)
+        public async Task<ActionResult<ResponseDto>> CreateEmployee([FromForm] CreateEmployeeDto createEmployeeDto)
         {
-            Dictionary<string, string> claims = GetClaims();
+            var decodedToken = GetDecodedToken();
             var userCreate = await _employeeService
-            .CreateEmployeeService(createEmployeeDto, claims["currentUserName"], claims["companyName"]);
+            .CreateEmployeeService(createEmployeeDto, decodedToken.UserName);
             return Ok(userCreate);
         }
 
 
         [TypeFilter(typeof(IsUserOfficerFilter))]
         [HttpPut("updateEmployeeProfile")]
-        public async Task<ActionResult<ResponseDto>> UpdateEmployeeProfile(UpdateEmployeeDto updateEmployeeDto)
+        public async Task<ActionResult<ResponseDto>> UpdateEmployeeProfile([FromForm] UpdateEmployeeDto updateEmployeeDto)
         {
-            Dictionary<string, string> claims = GetClaims();
-            return Ok(await _employeeService.EditProfileService(updateEmployeeDto, claims));
+            var decodedToken = GetDecodedToken();
+            return Ok(await _employeeService.EditProfileService(updateEmployeeDto, decodedToken));
         }
 
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         [HttpGet("getemployeeByEmail")]
         public async Task<ActionResult<EmployeeDto>> GetEmployeeByEmail([FromQuery] string email)
         {
-            var claims = GetClaims();
+            var decodedToken = GetDecodedToken();
 
-            if (claims["role"] != UserRole.Officer.ToString() && claims["email"] != email)
+            if (decodedToken.Role != UserRole.Officer.ToString() && decodedToken.Email != email)
                 throw new UnAuthorizedExceptionHandler("Not Authorized to view");
 
             var employee = await _employeeService.GetEmployeeByEmail(email);
@@ -206,59 +207,32 @@ namespace MicroFinance.Controllers.UserManagement
         [HttpGet("getemployeeById")]
         public async Task<ActionResult<EmployeeDto>> GetEmployeeById([FromQuery] int id)
         {
-
-            var role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
-            var currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
+            var decodedToken = GetDecodedToken();
+            var role = decodedToken.Role;
+            var currentUserId = decodedToken.UserId;
             var employee = await _employeeService.GetEmployeeById(id);
             if (employee.Message != "Success")
                 throw new NotFoundExceptionHandler(employee.Message);
 
-            var user = await _employeeService.GetUserByEmailService(employee.Email);
-
-            if (role != UserRole.Officer.ToString() && currentUserId != user.UserId)
-                throw new UnAuthorizedExceptionHandler("Not Authorized to view");
+            if (role != UserRole.Officer.ToString())
+            {
+                var user = await _employeeService.GetUserByEmailService(employee.Email);
+                if (currentUserId != user.UserId) throw new UnAuthorizedExceptionHandler("Not Authorized to view");
+            }
 
             return Ok(employee);
 
         }
-
-
         [TypeFilter(typeof(IsUserOfficerFilter))]
         [HttpGet("getAllEmployees")]
         public async Task<ActionResult<List<EmployeeDto>>> GetEmployees()
         {
 
-                var employees = await _employeeService.GetEmployess();
-                if (employees.Count <= 1 && employees[0].Message != null) 
-                    throw new NotFoundExceptionHandler(employees[0].Message);
+            var employees = await _employeeService.GetEmployess();
+            if (employees.Count <= 1 && employees[0].Message != null)
+                throw new NotFoundExceptionHandler(employees[0].Message);
+            return Ok(employees);
 
-                return Ok(employees);
-            
         }
-
-       private Dictionary<string,string> GetClaims()
-       {
-            var currentUserName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-            var currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
-            var isUserActive = HttpContext.User.FindFirst("IsActive").Value;
-            string branchCode = HttpContext.User.FindFirst("BranchCode").Value;
-            string companyName = HttpContext.User.FindFirst("CompanyName").Value;
-            string email = HttpContext.User.FindFirst(ClaimTypes.Email).Value;
-
-            Dictionary<string, string> claims = new Dictionary<string, string>
-            {
-                {"currentUserName",currentUserName},
-                {"currentUserId",currentUserId},
-                {"role",role},
-                {"isUserActive", isUserActive},
-                {"branchCode", branchCode},
-                {"companyName", companyName},
-                {"email", email}
-            };
-            return claims;
-       }
-        // END
     }
 }

@@ -34,7 +34,10 @@ namespace MicroFinance.Profiles
             CreateMap<User, UserDto>()
             .ForMember(dest=>dest.UserId, opt=> opt.MapFrom(src=>src.Id));
             CreateMap<Employee, EmployeeDto>()
-            .ForMember(dest=>dest.Gender, opt=>opt.MapFrom(src=>src.GenderCode==1?"पुरूष":(src.GenderCode==2?"महिला":null)));
+            .ForMember(dest=>dest.Gender, opt=>opt.MapFrom(src=>src.GenderCode==1?"पुरूष":(src.GenderCode==2?"महिला":null)))
+            .ForMember(dest=>dest.CitizenShipFileData, opt=>opt.MapFrom(src => (src.CitizenShipFileData != null ? Convert.ToBase64String(src.CitizenShipFileData) : null)))
+            .ForMember(dest=>dest.ProfilePicFileData, opt=>opt.MapFrom(src => (src.ProfilePicFileData != null ? Convert.ToBase64String(src.ProfilePicFileData) : null)))
+            .ForMember(dest=>dest.SignatureFileData, opt=>opt.MapFrom(src => (src.SignatureFileData != null ? Convert.ToBase64String(src.SignatureFileData) : null)));
 
             // END
 

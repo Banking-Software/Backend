@@ -15,5 +15,7 @@ namespace MicroFinance.Dtos.CompanyProfile
         public string? PhoneNo { get; set; }
         public string? CompanyEmailAddress { get; set; }
         public DateTime? FromDate { get; set; }
+        public IFormFile? CompanyLogo { get; set; }
+        public bool IsLogoChanged { get; set; }=false;
     }
 }

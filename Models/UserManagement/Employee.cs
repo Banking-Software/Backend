@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MicroFinance.Enums;
 
 namespace MicroFinance.Models.UserManagement
 {
@@ -20,8 +21,6 @@ namespace MicroFinance.Models.UserManagement
         [Required]
         public string PhoneNumber { get; set; }
         [Required]
-        public string CompanyName { get; set; }
-        [Required]
         public string BranchCode { get; set; }
         // Optional Field
         public string? ModifiedBy { get; set; }
@@ -39,8 +38,15 @@ namespace MicroFinance.Models.UserManagement
         public string? OtherFacilities { get; set; }
         public string? Grade { get; set; }
         public string? PANNumber { get; set; }
-        public string? AttachedDocumentUrlLink { get; set; }
-        public string? ProfilePictureUrlLink {get; set;}
+        public byte[]? ProfilePicFileData { get; set; }
+        public string? ProfilePicFileName { get; set; }
+        public FileType? ProfilePicFileType { get; set; }
+        public byte[]? CitizenShipFileData { get; set; }
+        public FileType? CitizenShipFileType { get; set; }
+        public string? CitizenShipFileName { get; set; }
+        public byte[]? SignatureFileData { get; set; }
+        public FileType? SignatureFileType { get; set; }
+        public string? SignatureFileName { get; set; }
         public User User { get; set; }
     }
 }

@@ -4,19 +4,16 @@ using MicroFinance.DBContext.UserManagement;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace MicroFinance.Migrations.UserManagement.User
+namespace MicroFinance.Migrations.User
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20230706111727_Initial")]
-    partial class Initial
+    partial class UserDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,16 +30,18 @@ namespace MicroFinance.Migrations.UserManagement.User
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AttachedDocumentUrlLink")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("BranchCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CompanyName")
-                        .IsRequired()
+                    b.Property<byte[]>("CitizenShipFileData")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("CitizenShipFileName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CitizenShipFileType")
+                        .HasColumnType("int");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
@@ -93,8 +92,14 @@ namespace MicroFinance.Migrations.UserManagement.User
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProfilePictureUrlLink")
+                    b.Property<byte[]>("ProfilePicFileData")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ProfilePicFileName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProfilePicFileType")
+                        .HasColumnType("int");
 
                     b.Property<string>("ProvidentPostingAccount")
                         .HasColumnType("nvarchar(max)");
@@ -104,6 +109,15 @@ namespace MicroFinance.Migrations.UserManagement.User
 
                     b.Property<string>("SalaryPostingAccount")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("SignatureFileData")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("SignatureFileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SignatureFileType")
+                        .HasColumnType("int");
 
                     b.Property<float?>("Tax")
                         .HasColumnType("real");
@@ -239,29 +253,29 @@ namespace MicroFinance.Migrations.UserManagement.User
                     b.HasData(
                         new
                         {
-                            Id = "7c4c528e-2cc2-41f9-b838-f0972a27a296",
-                            ConcurrencyStamp = "11c8c581-8a50-4872-8534-9372cfdf431f",
+                            Id = "eef5d3f5-beff-4f40-8cb2-ec6a49f30065",
+                            ConcurrencyStamp = "b62a8525-e8b5-48b8-b2d8-942fc57331ef",
                             Name = "Marketing",
                             NormalizedName = "MARKETING"
                         },
                         new
                         {
-                            Id = "8f1e430c-a774-4e08-9656-3091f28723f2",
-                            ConcurrencyStamp = "17b0419f-2df8-4f31-88f2-179f28135c17",
+                            Id = "40c79eb6-8bcf-4b5a-878f-4d24b65b7c7a",
+                            ConcurrencyStamp = "edc0f33c-3f68-4e7b-84ea-48e9311ff6e7",
                             Name = "Assistant",
                             NormalizedName = "ASSISTANT"
                         },
                         new
                         {
-                            Id = "fa4202f8-9dfe-4024-aa2c-b5fa2cc3684d",
-                            ConcurrencyStamp = "1ee0b0b1-a785-425d-87b0-d382a0fa786d",
+                            Id = "43d45a62-692a-4919-a7f9-1340c841b8cc",
+                            ConcurrencyStamp = "efaac2a9-aef3-4452-81a6-239d4f97c197",
                             Name = "SeniorAssistant",
                             NormalizedName = "SENIORASSISTANT"
                         },
                         new
                         {
-                            Id = "ddba4952-49ea-45e0-8390-c9f0940014a6",
-                            ConcurrencyStamp = "4f473614-ad16-4b42-9c96-1f7b58006cd7",
+                            Id = "8baaf0a8-8bca-40b5-ba2e-185d71ea5760",
+                            ConcurrencyStamp = "1a98fbf0-8e9f-4385-912d-d37832048514",
                             Name = "Officer",
                             NormalizedName = "OFFICER"
                         });

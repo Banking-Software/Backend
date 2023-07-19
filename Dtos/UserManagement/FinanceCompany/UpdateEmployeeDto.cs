@@ -34,5 +34,11 @@ namespace MicroFinance.Dtos.UserManagement
         public string? OtherFacilities { get; set; }
         public string? Grade { get; set; }
         public string? PANNumber { get; set; }
+        public IFormFile? ProfilePic { get; set; }
+        public bool IsProfilePicChanged { get; set; }=false;
+        public IFormFile? CitizenShipPic { get; set; }
+        public bool IsCitizenPicChanged { get; set; }=false;
+        public IFormFile? SignaturePic { get; set; }
+        public bool IsSignaturePicChanged { get; set; }=false;
     }
 }

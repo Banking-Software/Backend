@@ -51,6 +51,8 @@ namespace MicroFinance.DBContext
         //START: Company Details
         public DbSet<Branch> Branches { get; set; }
         public DbSet<CompanyDetail> CompanyDetails { get; set; }
+        public DbSet<Calendar> Calendars { get; set; }
+        public int MyProperty { get; set; }
 
         // START: RecordsWithCode
         public DbSet<Cast> Casts { get; set; }

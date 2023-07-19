@@ -22,7 +22,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // DB CONTEXT REGISTRY
-
 builder.Services.AddDbServiceExtension(builder.Configuration);
 
 // Identity Service /////////////////////////////////////////////////////
@@ -32,6 +31,7 @@ builder.Services.AddUserIdentityServiceAsync(builder.Configuration);
 ////////////////////////////////////////////////////////////////////////
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });

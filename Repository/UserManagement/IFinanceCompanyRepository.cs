@@ -25,7 +25,7 @@ namespace MicroFinance.Repository.UserManagement
 
         // START: Employee
         Task<int> CreateEmployee(Employee employee);
-        Task<int> EditEmployeeProfile(Employee employee);
+        Task<int> EditEmployeeProfile(Employee updateEmployee, string oldEmail);
         Task<Employee> GetEmployeeByEmail(string email);
         Task<Employee> GetEmployeeById(int id);
         Task<List<Employee>> GetEmployees();

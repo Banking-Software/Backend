@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace MicroFinance.Migrations.UserManagement.User
+namespace MicroFinance.Migrations.User
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Employee : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,7 +38,6 @@ namespace MicroFinance.Migrations.UserManagement.User
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -54,8 +53,15 @@ namespace MicroFinance.Migrations.UserManagement.User
                     OtherFacilities = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Grade = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PANNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AttachedDocumentUrlLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProfilePictureUrlLink = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ProfilePicFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    ProfilePicFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProfilePicFileType = table.Column<int>(type: "int", nullable: true),
+                    CitizenShipFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    CitizenShipFileType = table.Column<int>(type: "int", nullable: true),
+                    CitizenShipFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SignatureFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    SignatureFileType = table.Column<int>(type: "int", nullable: true),
+                    SignatureFileName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -211,10 +217,10 @@ namespace MicroFinance.Migrations.UserManagement.User
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "7c4c528e-2cc2-41f9-b838-f0972a27a296", "11c8c581-8a50-4872-8534-9372cfdf431f", "Marketing", "MARKETING" },
-                    { "8f1e430c-a774-4e08-9656-3091f28723f2", "17b0419f-2df8-4f31-88f2-179f28135c17", "Assistant", "ASSISTANT" },
-                    { "ddba4952-49ea-45e0-8390-c9f0940014a6", "4f473614-ad16-4b42-9c96-1f7b58006cd7", "Officer", "OFFICER" },
-                    { "fa4202f8-9dfe-4024-aa2c-b5fa2cc3684d", "1ee0b0b1-a785-425d-87b0-d382a0fa786d", "SeniorAssistant", "SENIORASSISTANT" }
+                    { "40c79eb6-8bcf-4b5a-878f-4d24b65b7c7a", "edc0f33c-3f68-4e7b-84ea-48e9311ff6e7", "Assistant", "ASSISTANT" },
+                    { "43d45a62-692a-4919-a7f9-1340c841b8cc", "efaac2a9-aef3-4452-81a6-239d4f97c197", "SeniorAssistant", "SENIORASSISTANT" },
+                    { "8baaf0a8-8bca-40b5-ba2e-185d71ea5760", "1a98fbf0-8e9f-4385-912d-d37832048514", "Officer", "OFFICER" },
+                    { "eef5d3f5-beff-4f40-8cb2-ec6a49f30065", "b62a8525-e8b5-48b8-b2d8-942fc57331ef", "Marketing", "MARKETING" }
                 });
 
             migrationBuilder.CreateIndex(

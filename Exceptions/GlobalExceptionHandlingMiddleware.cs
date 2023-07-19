@@ -27,17 +27,15 @@ namespace MicroFinance.Exceptions
         private class ErrorResponse
         {
             public string? Message { get; set; }
-            public string? StatusTrace { get; set; }
             public HttpStatusCode? Status { get; set; }
         }
 
-        private static ErrorResponse GetErrorResponse(string message, string statusTrace, HttpStatusCode status)
+        private static ErrorResponse GetErrorResponse(string message, HttpStatusCode status)
         {
             return new ErrorResponse
             {
                 Message = message,
-                Status = status,
-                StatusTrace = statusTrace
+                Status = status
             };
         }
 
@@ -49,45 +47,38 @@ namespace MicroFinance.Exceptions
             {
                 case NotFoundExceptionHandler exception:
                     errorResponse =
-                    GetErrorResponse(exception.Message + exception.InnerException?.Message, 
-                    exception.StackTrace, HttpStatusCode.NotFound);
+                    GetErrorResponse(exception.Message + exception.InnerException?.Message, HttpStatusCode.NotFound);
                     break;
 
                 case BadRequestExceptionHandler exception:
                     errorResponse =
-                    GetErrorResponse(exception.Message + exception.InnerException?.Message, 
-                    exception.StackTrace, HttpStatusCode.BadRequest);
+                    GetErrorResponse(exception.Message + exception.InnerException?.Message, HttpStatusCode.BadRequest);
                     break;
 
                 case KeyNotFoundExceptionHandler exception:
                     errorResponse =
-                    GetErrorResponse(exception.Message + exception.InnerException?.Message, 
-                    exception.StackTrace, HttpStatusCode.NotAcceptable);
+                    GetErrorResponse(exception.Message + exception.InnerException?.Message, HttpStatusCode.NotAcceptable);
                     break;
 
                 case NotImplementedExceptionHandler exception:
                     errorResponse =
-                    GetErrorResponse(exception.Message + exception.InnerException?.Message, 
-                    exception.StackTrace, HttpStatusCode.NotImplemented);
+                    GetErrorResponse(exception.Message + exception.InnerException?.Message,  HttpStatusCode.NotImplemented);
                     break;
                 
                 case UnAuthorizedExceptionHandler exception:
                     errorResponse = 
-                    GetErrorResponse(exception.Message + exception.InnerException?.Message, 
-                    exception.StackTrace, HttpStatusCode.Unauthorized);
+                    GetErrorResponse(exception.Message + exception.InnerException?.Message,  HttpStatusCode.Unauthorized);
                     break;
 
                 default:
                     errorResponse = 
-                    GetErrorResponse(ex.Message + ex.InnerException?.Message, 
-                    ex.StackTrace, HttpStatusCode.Unauthorized);
+                    GetErrorResponse(ex.Message + ex.InnerException?.Message, HttpStatusCode.Unauthorized);
                     break;
             }
             
             var errors = new Dictionary<string, List<string>>
             {
-                {"Message", new List<string>{errorResponse.Message}},
-                {"StatusTrace", new List<string>{errorResponse.StatusTrace}}
+                {"Message", new List<string>{errorResponse.Message}}
             };
 
             var exceptionResult = JsonSerializer.Serialize(new {errors});

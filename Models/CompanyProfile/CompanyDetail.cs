@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MicroFinance.Enums;
 
 namespace MicroFinance.Models.CompanyProfile
 {
@@ -16,8 +17,11 @@ namespace MicroFinance.Models.CompanyProfile
         public DateTime? EstablishedDate { get; set; }
         public string? PhoneNo { get; set; }
         public string? CompanyEmailAddress { get; set; }
-        public string? CompanyLogo { get; set; }
         public DateTime? FromDate { get; set; }
+        public byte[]? LogoFileData { get; set; }
+        public string? LogoFileName { get; set; }
+        public FileType? LogoFileType { get; set; }
+
         // LOGO
     }
 }

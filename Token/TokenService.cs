@@ -26,7 +26,6 @@ namespace MicroFinance.Token
                 new Claim(ClaimTypes.Role, tokenDto.Role),  
                 new Claim("IsActive", tokenDto.IsActive),
                 new Claim("BranchCode", tokenDto.BranchCode),
-                new Claim("CompanyName", tokenDto.CompanyName),
                 new Claim(ClaimTypes.Email, tokenDto.Email)            
             };            
             var issuer = _config["Token:SuperIssuer"];
@@ -59,7 +58,6 @@ namespace MicroFinance.Token
                 user.Role = decodedToken.Claims.First(c => c.Type == "role").Value;
                 user.IsActive = decodedToken.Claims.First(c=>c.Type=="IsActive").Value;
                 user.BranchCode = decodedToken.Claims.First(c=>c.Type=="BranchCode").Value;
-                user.CompanyName= decodedToken.Claims.First(c=>c.Type=="CompanyName").Value;
                 user.Email= decodedToken.Claims.First(c=>c.Type=="email").Value;
             }
             return user;

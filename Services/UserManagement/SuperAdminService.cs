@@ -51,7 +51,6 @@ namespace MicroFinance.Services.UserManagement
                         Role=await _superAdminRepo.GetRole(superadmin),
                         IsActive = superadmin.IsActive.ToString(),
                         Email=superadmin.Email,
-                        CompanyName="Fintex",
                         BranchCode="Fintex"
                     };
                     var token = _tokenService.CreateToken(tokenDto);
@@ -110,16 +109,9 @@ namespace MicroFinance.Services.UserManagement
         {
             var responseDto = new ResponseDto();
             var userStaff = _mapper.Map<CreateEmployeeDto>(createAdminBySuperAdminDto);
-            string companyName = createAdminBySuperAdminDto.CompanyName;
-            responseDto = await _employeeService.CreateEmployeeService(userStaff, createdBy, companyName);
-            
-            // if (responseDto.Status)
-            // {
-            //     // Register the created staff
+            responseDto = await _employeeService.CreateEmployeeService(userStaff, createdBy);
             var user = _mapper.Map<UserRegisterDto>(createAdminBySuperAdminDto);
             responseDto = await _employeeService.RegisterService(user, createdBy);
-
-            //}
             return responseDto;
            
         }

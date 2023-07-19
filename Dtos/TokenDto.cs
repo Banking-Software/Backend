@@ -7,7 +7,6 @@ namespace MicroFinance.Dtos
         public string UserId { get; set; }
         public string Role { get; set; }
         public string IsActive { get; set; }
-        public string CompanyName { get; set; }
         public string BranchCode { get; set; }
     }
 }

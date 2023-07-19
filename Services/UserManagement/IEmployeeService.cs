@@ -26,8 +26,8 @@ namespace MicroFinance.Services.UserManagement
 
         // START: Service for Employee
 
-        Task<ResponseDto> CreateEmployeeService(CreateEmployeeDto createEmployeeDto, string createdBy,string companyName);
-        Task<ResponseDto> EditProfileService(UpdateEmployeeDto updateEmployeeDto, Dictionary<string, string> claimsParameters);
+        Task<ResponseDto> CreateEmployeeService(CreateEmployeeDto createEmployeeDto, string createdBy);
+        Task<ResponseDto> EditProfileService(UpdateEmployeeDto updateEmployeeDto, TokenDto decodedToken);
         Task<EmployeeDto> GetEmployeeByEmail(string email);
         Task<EmployeeDto> GetEmployeeById(int id);
         Task<List<EmployeeDto>> GetEmployess();

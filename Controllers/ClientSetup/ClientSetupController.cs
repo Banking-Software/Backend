@@ -29,7 +29,6 @@ namespace MicroFinance.Controllers.ClientSetup
                 var role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
                 var isUserActive = HttpContext.User.FindFirst("IsActive").Value;
                 string branchCode = HttpContext.User.FindFirst("BranchCode").Value;
-                string companyName = HttpContext.User.FindFirst("CompanyName").Value;
                 string email = HttpContext.User.FindFirst(ClaimTypes.Email).Value;
 
                 Dictionary<string, string> claims = new Dictionary<string, string>
@@ -39,7 +38,6 @@ namespace MicroFinance.Controllers.ClientSetup
                     {"role",role},
                     {"isUserActive", isUserActive},
                     {"branchCode", branchCode},
-                    {"companyName", companyName},
                     {"email", email}
                 };
                 return claims;

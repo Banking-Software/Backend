@@ -1,8 +1,10 @@
-namespace MicroFinance.Dtos.CompanyProfile
+using System.ComponentModel.DataAnnotations;
+
+namespace MicroFinance.Dtos.CompanyProfile  
 {
-    public class CompanyProfileDto
+    public class CreateCompanyProfileDto
     {
-        public int Id { get; set; }
+        [Required]
         public string CompanyName { get; set; }
         public string? CompanyNameNepali { get; set; }
         public string? CompanyAddress { get; set; }
@@ -11,7 +13,7 @@ namespace MicroFinance.Dtos.CompanyProfile
         public DateTime? EstablishedDate { get; set; }
         public string? PhoneNo { get; set; }
         public string? CompanyEmailAddress { get; set; }
-        public string? CompanyLogo { get; set; }
         public DateTime? FromDate { get; set; }
+        public IFormFile? CompanyLogo { get; set; }
     }
 }

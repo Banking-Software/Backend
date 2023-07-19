@@ -1,3 +1,4 @@
+using System.Transactions;
 using MicroFinance.DBContext.UserManagement;
 using MicroFinance.Exceptions;
 using MicroFinance.Models.UserManagement;
@@ -38,12 +39,12 @@ namespace MicroFinance.Repository.UserManagement
         {
             using var transaction = await _userDbContext.Database.BeginTransactionAsync();
             var userCreate = await _userManager.CreateAsync(user, password);
-            string errorDescription="Not able to Create User";
+            string errorDescription = "Not able to Create User";
             string errorCode = "Invalid";
             if (userCreate.Succeeded)
             {
                 var roleAssign = await _userManager.AddToRoleAsync(user, role);
-                if(!roleAssign.Succeeded)
+                if (!roleAssign.Succeeded)
                 {
                     await transaction.RollbackAsync();
                     await DeleteUser(user);
@@ -122,8 +123,8 @@ namespace MicroFinance.Repository.UserManagement
         {
             //return await _userManager.FindByNameAsync(userName);
             return await _userManager.Users
-            .Include(usr=>usr.Employee)
-            .Where(usr=>usr.UserName==userName)
+            .Include(usr => usr.Employee)
+            .Where(usr => usr.UserName == userName)
             .FirstOrDefaultAsync();
         }
 
@@ -150,36 +151,38 @@ namespace MicroFinance.Repository.UserManagement
             return await _userDbContext.SaveChangesAsync();
         }
         // Admin Task or User Task
-        public async Task<int> EditEmployeeProfile(Employee employee)
+        public async Task<int> EditEmployeeProfile(Employee updateEmployee, string oldEmail)
         {
-            var existingEmployee =
-            await _userDbContext.Employees.FirstOrDefaultAsync(u => u.Id == employee.Id);
-            if (existingEmployee != null)
+            string newEmail = updateEmployee.Email;
+            var existingEmployee = await _userDbContext.Employees.FindAsync(updateEmployee.Id);
+            using (var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                employee.Id = existingEmployee.Id;
-                if(employee.Email!=existingEmployee.Email)
+                try
                 {
-                    var existingUser = await _userManager.FindByEmailAsync(existingEmployee.Email);
-                    if(existingUser!=null)
+                    _userDbContext.Entry(existingEmployee).State = EntityState.Detached;
+                    _userDbContext.Employees.Attach(updateEmployee);
+                    _userDbContext.Entry(updateEmployee).State = EntityState.Modified;
+                    if (oldEmail != newEmail)
                     {
-                        existingUser.Email = employee.Email;
-                        existingUser.ModifiedBy = employee.ModifiedBy;
-                        existingUser.ModifiedOn=employee.ModifiedOn;
-                        await _userManager.UpdateAsync(existingUser);
+                        var existingUserWithOldEmail = await _userManager.FindByEmailAsync(oldEmail);
+                        if (existingUserWithOldEmail != null)
+                        {
+                            existingUserWithOldEmail.Email = newEmail;
+                            existingUserWithOldEmail.ModifiedBy = updateEmployee.ModifiedBy;
+                            existingUserWithOldEmail.ModifiedOn = DateTime.Now;
+                            await _userManager.UpdateAsync(existingUserWithOldEmail);
+                        }
                     }
+                    await _userDbContext.SaveChangesAsync();
+                    transactionScope.Complete();
+                    return 1;
                 }
-                var propertyBag = _userDbContext.Entry(existingEmployee).CurrentValues;
-                foreach (var property in propertyBag.Properties)
+                catch (Exception)
                 {
-                    var newValue = employee.GetType().GetProperty(property.Name)?.GetValue(employee);
-                    if (newValue != null && !Equals(propertyBag[property.Name], newValue))
-                    {
-                        propertyBag[property.Name] = newValue;
-                    }
+                    transactionScope.Dispose();
+                    return 0;
                 }
-                return await _userDbContext.SaveChangesAsync();
             }
-            return 0;
         }
 
         public async Task<List<Employee>> GetEmployees()

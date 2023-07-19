@@ -1,6 +1,8 @@
+using System.Reflection;
 using AutoMapper;
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.UserManagement;
+using MicroFinance.Enums;
 using MicroFinance.Exceptions;
 using MicroFinance.Models.UserManagement;
 using MicroFinance.Repository.UserManagement;
@@ -17,6 +19,7 @@ namespace MicroFinance.Services.UserManagement
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
         private readonly ICompanyProfileService _companyProfile;
+        private readonly IConfiguration _config;
 
         public EmployeeService
         (
@@ -24,14 +27,16 @@ namespace MicroFinance.Services.UserManagement
             ILogger<EmployeeService> logger,
             IMapper mapper,
             ITokenService tokenService,
-            ICompanyProfileService companyProfile
+            ICompanyProfileService companyProfile,
+            IConfiguration config
         )
         {
             _employeeRepo = employeeRepo;
             _logger = logger;
             _mapper = mapper;
             _tokenService = tokenService;
-            _companyProfile=companyProfile;
+            _companyProfile = companyProfile;
+            _config = config;
         }
 
         // START: Authorized User Service
@@ -51,9 +56,8 @@ namespace MicroFinance.Services.UserManagement
                         UserId = user.Id,
                         Role = await _employeeRepo.GetRole(user),
                         IsActive = user.IsActive.ToString(),
-                        Email=user.Email,
-                        CompanyName=user.Employee.CompanyName,
-                        BranchCode=user.Employee.BranchCode
+                        Email = user.Email,
+                        BranchCode = user.Employee.BranchCode
                     };
                     var token = _tokenService.CreateToken(tokenData);
                     return new TokenResponseDto() { Token = token };
@@ -72,7 +76,7 @@ namespace MicroFinance.Services.UserManagement
 
             var user = _mapper.Map<User>(userRegisterDto);
             user.Employee = employee;
-            user.CreatedBy=createdBy;
+            user.CreatedBy = createdBy;
             user.CreatedOn = DateTime.Now;
             var userCredentials =
             await _employeeRepo.Register(user, userRegisterDto.Password, userRegisterDto.Role.ToString());
@@ -315,19 +319,68 @@ namespace MicroFinance.Services.UserManagement
 
 
         // START: Employee Service
-        public async Task<ResponseDto> CreateEmployeeService(CreateEmployeeDto createEmployeeDto, string createdBy, string companyName)
+        private static void SetPropertyByName(object obj, string propertyName, object newValue)
+        {
+            Type type = obj.GetType();
+            PropertyInfo propertyInfo = type.GetProperty(propertyName);
+            if (propertyInfo != null && propertyInfo.CanWrite)
+                propertyInfo.SetValue(obj, newValue);
+            else
+                throw new Exception($"Property '{propertyName}' not found or not writable.");
+        }
+
+        private Task<Employee> UploadImage(Employee employee, IFormFile? image, List<string> listOfPropertyName)
+        {
+            if(image==null) 
+                return Task.FromResult(employee);
+            string fileExtenstion = (Path.GetExtension(image.FileName)).Replace(".", "").ToUpper();
+            try
+            {
+                float maxFileValue = float.Parse(_config["ApplicationSettings:ImageMaxSize"]);
+                double maxFileSize = maxFileValue * 1024 * 1024; // 3MB 
+                if (image.Length > maxFileSize)
+                    throw new Exception($"File size exceeded the Limit. Upto {maxFileSize}MB is allowed while {image.Length}MB is received");
+                var fileType = (FileType)Enum.Parse(typeof(FileType), fileExtenstion);
+                using (var stream = new MemoryStream())
+                {
+                    image.CopyTo(stream);
+                    //employee.GetType().GetProperty(listOfPropertyName[0]).SetValue(employee, stream.ToArray);
+                    SetPropertyByName(employee, listOfPropertyName[0], stream.ToArray());
+                    SetPropertyByName(employee, listOfPropertyName[1], image.FileName);
+                    SetPropertyByName(employee, listOfPropertyName[2], fileType);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Given Image Format is wrong. {ex.Message}");
+            }
+            return Task.FromResult(employee);
+        }
+        public async Task<ResponseDto> CreateEmployeeService(CreateEmployeeDto createEmployeeDto, string createdBy)
         {
             var userStaff = await _employeeRepo.GetEmployeeByEmail(createEmployeeDto.Email);
             if (userStaff != null)
                 throw new BadRequestExceptionHandler("Employee Already Exist");
+
             var branch = await _companyProfile.GetBranchServiceByBranchCodeService(createEmployeeDto.BranchCode);
-            if(!branch.IsActive) throw new Exception("Branch is not active");
+            var company = await _companyProfile.GetCompanyProfileService();
+            if (branch == null || !branch.IsActive || company == null)
+                throw new Exception("Branch and company details should exist and they need to be active inorder to proceed.");
+            
             var employee = _mapper.Map<Employee>(createEmployeeDto);
             employee.CreatedBy = createdBy;
-            employee.CompanyName = companyName;
-            employee.CreatedOn = DateTime.Now;
-            employee.AttachedDocumentUrlLink="https://s3.amazonaws.com/images.seroundtable.com/google-samples-1601379104.jpg";
-            employee.ProfilePictureUrlLink="https://s3.amazonaws.com/images.seroundtable.com/google-samples-1601379104.jpg";
+            employee.CreatedOn = DateTime.Now;            
+            List<string> listOfProfileProperty = new List<string>(){nameof(Employee.ProfilePicFileData),  nameof(Employee.ProfilePicFileName),nameof(Employee.ProfilePicFileType)};
+            List<string> listOfCitizenProperty = new List<string>(){nameof(Employee.CitizenShipFileData), nameof(Employee.CitizenShipFileName),nameof(Employee.CitizenShipFileType)};
+            List<string> listOfSignatureProperty = new List<string>(){nameof(Employee.SignatureFileData), nameof(Employee.SignatureFileName),nameof(Employee.SignatureFileType)};
+
+            //if(createEmployeeDto.ProfilePic!=null)
+            employee = await UploadImage(employee, createEmployeeDto?.ProfilePic,listOfProfileProperty);
+            //if(createEmployeeDto.CitizenShipPic!=null)
+            employee = await UploadImage(employee, createEmployeeDto?.CitizenShipPic,listOfCitizenProperty);
+            //if(createEmployeeDto.SignaturePic!=null)
+            employee = await UploadImage(employee, createEmployeeDto?.SignaturePic,listOfSignatureProperty);
+            
             var newUserStaff = await _employeeRepo.CreateEmployee(employee);
             if (newUserStaff >= 1)
             {
@@ -344,13 +397,60 @@ namespace MicroFinance.Services.UserManagement
 
         }
 
-        public async Task<ResponseDto> EditProfileService(UpdateEmployeeDto updateEmployeeDto, Dictionary<string, string> claimsParameters)
+        private async Task<Employee> UpdateImage(UpdateEmployeeDto updateEmployeeDto, Employee updateEmployee, Employee existingEmployee)
         {
+            if(updateEmployeeDto.IsProfilePicChanged)
+            {
+                List<string> listOfProfileProperty = new List<string>(){nameof(Employee.ProfilePicFileData),  nameof(Employee.ProfilePicFileName),nameof(Employee.ProfilePicFileType)};
+                updateEmployee = await UploadImage(updateEmployee, updateEmployeeDto?.ProfilePic,listOfProfileProperty);
+            }
+            else
+            {
+                updateEmployee.ProfilePicFileData = existingEmployee.ProfilePicFileData;
+                updateEmployee.ProfilePicFileName = existingEmployee.ProfilePicFileName;
+                updateEmployee.ProfilePicFileType = existingEmployee.ProfilePicFileType;
+            }
+            if(updateEmployeeDto.IsCitizenPicChanged)
+            {
+                List<string> listOfCitizenProperty = new List<string>(){nameof(Employee.CitizenShipFileData), nameof(Employee.CitizenShipFileName),nameof(Employee.CitizenShipFileType)};
+                updateEmployee = await UploadImage(updateEmployee, updateEmployeeDto?.CitizenShipPic,listOfCitizenProperty);
+
+            }
+            else
+            {
+                updateEmployee.CitizenShipFileData = existingEmployee.CitizenShipFileData;
+                updateEmployee.CitizenShipFileName = existingEmployee.CitizenShipFileName;
+                updateEmployee.CitizenShipFileType = existingEmployee.CitizenShipFileType;
+            }
+            if(updateEmployeeDto.IsSignaturePicChanged)
+            {
+                List<string> listOfSignatureProperty = new List<string>(){nameof(Employee.SignatureFileData), nameof(Employee.SignatureFileName),nameof(Employee.SignatureFileType)};
+                updateEmployee = await UploadImage(updateEmployee, updateEmployeeDto?.SignaturePic,listOfSignatureProperty);
+            }
+            else
+            {
+                updateEmployee.SignatureFileData = existingEmployee.SignatureFileData;
+                updateEmployee.SignatureFileName= existingEmployee.SignatureFileName;
+                updateEmployee.SignatureFileType = existingEmployee.SignatureFileType;
+            }
+
+            return updateEmployee;
+        }
+
+        public async Task<ResponseDto> EditProfileService(UpdateEmployeeDto updateEmployeeDto, TokenDto decodedToken)
+        {
+            var existingEmployee =  await _employeeRepo.GetEmployeeById(updateEmployeeDto.Id);
+            if(existingEmployee==null) 
+                throw new Exception("Invalid Employee Request");
 
             var employee = _mapper.Map<Employee>(updateEmployeeDto);
-            employee.ModifiedBy = claimsParameters["currentUserName"];
+            employee.Id= existingEmployee.Id;
+            employee.CreatedBy = existingEmployee.CreatedBy;
+            employee.CreatedOn = existingEmployee.CreatedOn;
+            employee.ModifiedBy = decodedToken.UserName;
             employee.ModifiedOn = DateTime.Now;
-            var editStatus = await _employeeRepo.EditEmployeeProfile(employee);
+            employee = await UpdateImage(updateEmployeeDto, employee, existingEmployee);
+            var editStatus = await _employeeRepo.EditEmployeeProfile(employee, existingEmployee.Email);
             if (editStatus >= 1)
             {
                 var responseDto = new ResponseDto();

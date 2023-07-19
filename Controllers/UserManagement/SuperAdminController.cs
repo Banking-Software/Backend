@@ -27,19 +27,29 @@ namespace MicroFinance.Controllers.UserManagement
         private readonly IMapper _mapper;
         private readonly ISuperAdminService _superAdminService;
         private readonly ICompanyProfileService _companyProfile;
+        private readonly ITokenService _tokenService;
 
         public SuperAdminController
         (
             ILogger<SuperAdminController> logger,
             ISuperAdminService superAdminService,
             IMapper mapper,
-            ICompanyProfileService companyProfile
+            ICompanyProfileService companyProfile,
+            ITokenService tokenService
         )
         {
             _logger = logger;
             _mapper = mapper;
             _superAdminService = superAdminService;
             _companyProfile=companyProfile;
+            _tokenService = tokenService;
+        }
+
+        private TokenDto GetDecodedToken()
+        {
+            string token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var decodedToken = _tokenService.DecodeJWT(token);
+            return decodedToken;
         }
 
         [AllowAnonymous]
@@ -62,13 +72,12 @@ namespace MicroFinance.Controllers.UserManagement
             return Ok(updatePassword);
 
         }
-
+        
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         [HttpPost("createAdmin")]
         public async Task<ActionResult<ResponseDto>> CreateAdmin(CreateAdminBySuperAdminDto createAdmin)
         {
             string currentUser = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-
             if (createAdmin.Role != UserRole.Officer)
                 throw new UnAuthorizedExceptionHandler("You are only authorized to create 'Officer'");
             var userCreate = await _superAdminService.CreateAdminService(createAdmin, currentUser);
@@ -109,7 +118,6 @@ namespace MicroFinance.Controllers.UserManagement
 
                 }
                 return Ok(updatedUserInfo);
-           
         }
     }
 }
