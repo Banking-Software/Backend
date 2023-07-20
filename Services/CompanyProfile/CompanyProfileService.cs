@@ -92,6 +92,8 @@ namespace MicroFinance.Services.CompanyProfile
         public async Task<CompanyProfileDto> GetCompanyProfileService()
         {
             var companyDetail = await _companyProfile.GetCompanyDetail();
+            if(companyDetail==null) 
+                throw new Exception("Please Create Company Profile");
             var companyDetailDto = _mapper.Map<CompanyProfileDto>(companyDetail);
             if(companyDetail.LogoFileData!=null)
             {
