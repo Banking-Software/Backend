@@ -9,6 +9,7 @@ namespace MicroFinance.Models.RecordsWithCode
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public int Code { get; set; }
-        public string Title { get; set; }
+        public string? NepaliName { get; set; }
+        public string? EnglishName { get; set; }
     }
 }

@@ -22,25 +22,30 @@ namespace MicroFinance.Profiles
             .ForMember(dest=>dest.ShareType, opt=>opt.MapFrom(src=>src.ShareType.Name))
             .ForMember(dest=>dest.ClientGroup, opt=>opt.MapFrom(src=>src.ClientGroup.Code))
             .ForMember(dest=>dest.ClientUnit, opt=>opt.MapFrom(src=>src.ClientUnit.Code))
-            .ForMember(dest=>dest.KYMType, opt=>opt.MapFrom(src=>src.KYMType.Type));
+            .ForMember(dest=>dest.KYMType, opt=>opt.MapFrom(src=>src.KYMType.Type))
+            .ForMember(dest=>dest.ClientPhotoFileData,opt=>opt.MapFrom(src=>(src.ClientPhotoFileData!=null?Convert.ToBase64String(src.ClientPhotoFileData):null)))
+            .ForMember(dest=>dest.ClientCitizenshipFileData, opt=>opt.MapFrom(src=>(src.ClientCitizenshipFileData!=null?Convert.ToBase64String(src.ClientCitizenshipFileData):null)))
+            .ForMember(dest=>dest.ClientSignatureFileData, opt=>opt.MapFrom(src=>(src.ClientSignatureFileData!=null?Convert.ToBase64String(src.ClientSignatureFileData):null)))
+            .ForMember(dest=>dest.NomineePhotoFileData, opt=>opt.MapFrom(src=>(src.NomineePhotoFileData!=null?Convert.ToBase64String(src.NomineePhotoFileData):null)));
+
 
             CreateMap<UpdateClientDto, Client>()
+            .ForMember(dest=>dest.Id, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientId, opt=>opt.Ignore())
             .ForMember(dest=>dest.ClientType, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientTypeId, opt=>opt.Ignore())
             .ForMember(dest=>dest.ShareType, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientShareTypeInfoId, opt=>opt.Ignore())
             .ForMember(dest=>dest.KYMType, opt=>opt.Ignore())
+            .ForMember(dest=>dest.KYMTypeId, opt=>opt.Ignore())
             .ForMember(dest=>dest.ClientGroup, opt=>opt.Ignore())
-            .ForMember(dest=>dest.ClientUnit, opt=>opt.Ignore());
-
-           
-
-            // CreateMap<ClientDto, Client>()
-            // .ForMember(dest=> dest.ClientInfo, opt=>opt.MapFrom(src=>src.ClientInfo))
-            // .ForMember(dest=>dest.ClientContactInfo, opt=>opt.MapFrom(src=>src.ClientContact))
-            // .ForMember(dest=> dest.ClientAddressInfo, opt=>opt.MapFrom(src=>src.ClientAddress))
-            // .ForMember(dest=>dest.ClientAccountTypeInfo, opt=>opt.MapFrom(src=>src.ClientAccountType))
-            // .ForMember(dest=> dest.ClientTypeInfo, opt=>opt.MapFrom(src=>src.ClientType))
-            // .ForMember(dest=>dest.ClientFamilyInfo, opt=>opt.MapFrom(src=>src.ClientFamily))
-            // .ForMember(dest=> dest.ClientNomineeInfo, opt=>opt.MapFrom(src=>src.ClientNominee))
+            .ForMember(dest=>dest.ClientGroupId, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientUnitId, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientUnit, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientPhotoFileData, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientSignatureFileData, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientCitizenshipFileData, opt=>opt.Ignore())
+            .ForMember(dest=>dest.NomineePhotoFileData, opt=>opt.Ignore());
         }
     }
 }

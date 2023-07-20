@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using MicroFinance.Enums;
 
 namespace MicroFinance.Dtos.ClientSetup
 {
@@ -38,10 +39,7 @@ namespace MicroFinance.Dtos.ClientSetup
         public string? PermanentToleVillageNepali { get; set; }
         public string? PermanentWardNumber { get; set; }
         public string? PermanentWardNumberNepali { get; set; }
-        public string? PermanentDistrict { get; set; }
         public int? PermanentDistrictCode { get; set; }
-        public string? PermanentDistrictNepali { get; set; }
-        public string? PermanentState { get; set; }
         public int? PermanentStateCode {get;set;}
         public string? TemporaryVdcMunicipality { get; set; }
         public string? TemporaryVdcMunicipalityNepali { get; set; }
@@ -49,10 +47,7 @@ namespace MicroFinance.Dtos.ClientSetup
         public string? TemporaryToleVillageNepali { get; set; }
         public string? TemporaryWardNumber { get; set; }
         public string? TemporaryWardNumberNepali { get; set; }
-        public string? TemporaryDistrict { get; set; }
         public int? TemporaryDistrictCode { get; set; }
-        public string? TemporaryDistrictNepali { get; set; }
-        public string? TemporaryState { get; set; }
         public int? TemporaryStateCode { get; set; }
         // Address End
 
@@ -85,9 +80,7 @@ namespace MicroFinance.Dtos.ClientSetup
         public string? ClientMiddleName { get; set; }
         public string ClientLastName { get; set; }
         public string? ClientNepaliName { get; set; }
-        public string? ClientCast { get; set; }
         public int? ClientCastCode { get; set; }
-        public string? ClientGender { get; set; }
         public int? ClientGenderCode { get; set; }
         [DataType(DataType.Date)]
         public DateTime? ClientDateOfBirth { get; set; }
@@ -99,7 +92,6 @@ namespace MicroFinance.Dtos.ClientSetup
         public string? ClientNationality { get; set; }
         public string? ClientPanNumber { get; set; }
         public string? ClientEducationStatus { get; set; }
-        public string? ClientMaritalStatus { get; set; }
         public int? ClientMartialStatusCode { get; set; }
         public string? ClientNationalityIdStatus { get; set; }
         public string? ClientVotingId { get; set; }
@@ -119,6 +111,19 @@ namespace MicroFinance.Dtos.ClientSetup
         public string? NomineeAddress { get; set; }
         public string? NomineeCitizenshipNumber { get; set; }
         public string? NomineeContactNumber { get; set; }
-       
+
+        // File Attach
+        public string? ClientPhotoFileData { get; set; }
+        public string? ClientPhotoFileName { get; set; }
+        public FileType? ClientPhotoFileType { get; set; }
+        public string? ClientCitizenshipFileData { get; set; }
+        public string? ClientCitizenshipFileName { get; set; }
+        public FileType? ClientCitizenshipFileType { get; set; }
+        public string? ClientSignatureFileData { get; set; }
+        public string? ClientSignatureFileName { get; set; }
+        public FileType? ClientSignatureFileType { get; set; }
+        public string? NomineePhotoFileData { get; set; }
+        public string? NomineePhotoFileName { get; set; }
+        public FileType? NomineePhotoFileType { get; set; }
     }
 }

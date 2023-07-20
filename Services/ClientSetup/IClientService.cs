@@ -5,8 +5,8 @@ namespace MicroFinance.Services.ClientSetup
 {
     public interface IClientService
     {
-       Task<ResponseDto> CreateClientService(CreateClientDto newClient, Dictionary<string, string> creatorDetails); 
-       Task<ResponseDto> UpdateClientService(UpdateClientDto updateClientDto, Dictionary<string, string> modifierDetails);
+       Task<ResponseDto> CreateClientService(CreateClientDto newClient, TokenDto decodedToken); 
+       Task<ResponseDto> UpdateClientService(UpdateClientDto updateClientDto, TokenDto decodedToken);
        Task<ClientDto> GetClientByClientIdService(string clientId);
        Task<List<ClientDto>> GetAllClientsService();
        Task<List<ClientDto>> GetClientsByGroupService(int groupId);

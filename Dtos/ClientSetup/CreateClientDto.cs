@@ -5,20 +5,20 @@ namespace MicroFinance.Dtos.ClientSetup
 {
     public class CreateClientDto
     {
-
+        [Required]
         public bool IsKYMUpdated { get; set; }
+        [Required]
         public DateTime RegistrationDate { get; set; }
+        [Required]
         public bool IsActive { get; set; }
+        [Required]
         public bool IsShareAllowed { get; set; }
-
-        //public int ClientTypeId { get; set; }
+        [Required]
         public ClientTypeEnum ClientType { get; set; }
-        //public int? ClientShareTypeInfoId { get; set; }
         public ShareTypeEnum? ShareType { get; set; }
         public int? ClientGroupId { get; set; }
         public int? ClientUnitId { get; set; }
         public KYMTypeEnum? KYMType { get; set; }
-        //public int? KYMTypeId { get; set; }
         // Address //
         public string? PermanentVdcMunicipality { get; set; }
         public string? PermanentVdcMunicipalityNepali { get; set; }
@@ -26,10 +26,9 @@ namespace MicroFinance.Dtos.ClientSetup
         public string? PermanentToleVillageNepali { get; set; }
         public string? PermanentWardNumber { get; set; }
         public string? PermanentWardNumberNepali { get; set; }
-        public string? PermanentDistrict { get; set; }
+        [Range(1,77, ErrorMessage ="Invalid District Code")]
         public int? PermanentDistrictCode { get; set; }
-        public string? PermanentDistrictNepali { get; set; }
-        public string? PermanentState { get; set; }
+        [Range(1,7, ErrorMessage = "Invalid State Code")]
         public int? PermanentStateCode {get;set;}
         public string? TemporaryVdcMunicipality { get; set; }
         public string? TemporaryVdcMunicipalityNepali { get; set; }
@@ -37,10 +36,9 @@ namespace MicroFinance.Dtos.ClientSetup
         public string? TemporaryToleVillageNepali { get; set; }
         public string? TemporaryWardNumber { get; set; }
         public string? TemporaryWardNumberNepali { get; set; }
-        public string? TemporaryDistrict { get; set; }
+        [Range(1,77, ErrorMessage ="Invalid District Code")]
         public int? TemporaryDistrictCode { get; set; }
-        public string? TemporaryDistrictNepali { get; set; }
-        public string? TemporaryState { get; set; }
+        [Range(1,7, ErrorMessage = "Invalid State Code")]
         public int? TemporaryStateCode { get; set; }
         // Address End
 
@@ -69,13 +67,15 @@ namespace MicroFinance.Dtos.ClientSetup
         // Family End //
 
         // Client Personal Info //
+        [Required]
         public string ClientFirstName { get; set; }
         public string? ClientMiddleName { get; set; }
+        [Required]
         public string ClientLastName { get; set; }
         public string? ClientNepaliName { get; set; }
-        public string? ClientCast { get; set; }
+        [Range(1,45, ErrorMessage = "Invalid Cast Code")]
         public int? ClientCastCode { get; set; }
-        public string? ClientGender { get; set; }
+        [Range(1,2, ErrorMessage = "Invalid Gender Code")]
         public int? ClientGenderCode { get; set; }
         [DataType(DataType.Date)]
         public DateTime? ClientDateOfBirth { get; set; }
@@ -87,7 +87,7 @@ namespace MicroFinance.Dtos.ClientSetup
         public string? ClientNationality { get; set; }
         public string? ClientPanNumber { get; set; }
         public string? ClientEducationStatus { get; set; }
-        public string? ClientMaritalStatus { get; set; }
+        [Range(1, 6, ErrorMessage = "Invalid Martial Status Code")]
         public int? ClientMartialStatusCode { get; set; }
         public string? ClientNationalityIdStatus { get; set; }
         public string? ClientVotingId { get; set; }
@@ -109,7 +109,10 @@ namespace MicroFinance.Dtos.ClientSetup
         public string? NomineeContactNumber { get; set; }
         // Nominee Ended
 
-        
+        public IFormFile? ClientPhoto { get; set; }
+        public IFormFile? ClientCitizenshipPhoto { get; set; }
+        public IFormFile? NomineePhoto { get; set; }
+        public IFormFile? ClientSignaturePhoto { get; set; }
 
     }
 }

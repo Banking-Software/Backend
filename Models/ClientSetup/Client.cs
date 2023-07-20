@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MicroFinance.Enums;
 using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.DepositSetup;
 using MicroFinance.Models.Share;
@@ -25,10 +26,7 @@ namespace MicroFinance.Models.ClientSetup
         public string? PermanentToleVillageNepali { get; set; }
         public string? PermanentWardNumber { get; set; }
         public string? PermanentWardNumberNepali { get; set; }
-        public string? PermanentDistrict { get; set; }
         public int? PermanentDistrictCode { get; set; }
-        public string? PermanentDistrictNepali { get; set; }
-        public string? PermanentState { get; set; }
         public int? PermanentStateCode {get;set;}
         public string? TemporaryVdcMunicipality { get; set; }
         public string? TemporaryVdcMunicipalityNepali { get; set; }
@@ -36,11 +34,8 @@ namespace MicroFinance.Models.ClientSetup
         public string? TemporaryToleVillageNepali { get; set; }
         public string? TemporaryWardNumber { get; set; }
         public string? TemporaryWardNumberNepali { get; set; }
-        public string? TemporaryDistrict { get; set; }
         public int? TemporaryDistrictCode { get; set; }
-        public string? TemporaryDistrictNepali { get; set; }
-        public string? TemporaryState { get; set; }
-        public int? TemporaryStateCode { get; set; }
+        public string? TemporaryStateCode { get; set; }
         // Address End
 
         // Contact //
@@ -74,9 +69,7 @@ namespace MicroFinance.Models.ClientSetup
         [Required]
         public string ClientLastName { get; set; }
         public string? ClientNepaliName { get; set; }
-        public string? ClientCast { get; set; }
         public int? ClientCastCode { get; set; }
-        public string? ClientGender { get; set; }
         public int? ClientGenderCode { get; set; }
         [DataType(DataType.Date)]
         public DateTime? ClientDateOfBirth { get; set; }
@@ -88,7 +81,6 @@ namespace MicroFinance.Models.ClientSetup
         public string? ClientNationality { get; set; }
         public string? ClientPanNumber { get; set; }
         public string? ClientEducationStatus { get; set; }
-        public string? ClientMaritalStatus { get; set; }
         public int? ClientMartialStatusCode { get; set; }
         public string? ClientNationalityIdStatus { get; set; }
         public string? ClientVotingId { get; set; }
@@ -109,6 +101,20 @@ namespace MicroFinance.Models.ClientSetup
         public string? NomineeCitizenshipNumber { get; set; }
         public string? NomineeContactNumber { get; set; }
         // Nominee Ended
+
+        // Files Attached
+        public byte[]? ClientPhotoFileData { get; set; }
+        public string? ClientPhotoFileName { get; set; }
+        public FileType? ClientPhotoFileType { get; set; }
+        public byte[]? ClientCitizenshipFileData { get; set; }
+        public string? ClientCitizenshipFileName { get; set; }
+        public FileType? ClientCitizenshipFileType { get; set; }
+        public byte[]? ClientSignatureFileData { get; set; }
+        public string? ClientSignatureFileName { get; set; }
+        public FileType? ClientSignatureFileType { get; set; }
+        public byte[]? NomineePhotoFileData { get; set; }
+        public string? NomineePhotoFileName { get; set; }
+        public FileType? NomineePhotoFileType { get; set; }
 
         public virtual ClientType ClientType { get;set;}
         public int ClientTypeId { get; set; }

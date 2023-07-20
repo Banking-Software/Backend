@@ -8,7 +8,7 @@ namespace MicroFinance.Repository.ClientSetup
     public interface IClientRepository
     {
         Task<string> CreateClient(Client client);
-        Task<int> UpdateClient(UpdateClientDto updateClientDto, Dictionary<string, string> modifierDetails);
+        Task<int> UpdateClient(Client updateClient);
         Task<Client> GetClientByClientId(string clientId);
         Task<Client> GetClientById(int id);
         Task<List<Client>> GetAllClients();

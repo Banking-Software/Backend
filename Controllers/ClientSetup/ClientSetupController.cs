@@ -4,6 +4,7 @@ using MicroFinance.Dtos.ClientSetup;
 using MicroFinance.ErrorManage;
 using MicroFinance.Services;
 using MicroFinance.Services.ClientSetup;
+using MicroFinance.Token;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,45 +17,33 @@ namespace MicroFinance.Controllers.ClientSetup
     {
         private readonly ILogger<ClientSetupController> _logger;
         private readonly IClientService _clientService;
+        private readonly ITokenService _tokenService;
 
-        public ClientSetupController(ILogger<ClientSetupController> logger, IClientService clientService)
+        public ClientSetupController(ILogger<ClientSetupController> logger, IClientService clientService,ITokenService tokenService)
         {
             _logger = logger;
             _clientService = clientService;
+            _tokenService = tokenService;
         }
-        private Dictionary<string,string> GetClaims()
+        private TokenDto GetDecodedToken()
         {
-                var currentUserName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-                var currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                var role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
-                var isUserActive = HttpContext.User.FindFirst("IsActive").Value;
-                string branchCode = HttpContext.User.FindFirst("BranchCode").Value;
-                string email = HttpContext.User.FindFirst(ClaimTypes.Email).Value;
-
-                Dictionary<string, string> claims = new Dictionary<string, string>
-                {
-                    {"currentUserName",currentUserName},
-                    {"currentUserId",currentUserId},
-                    {"role",role},
-                    {"isUserActive", isUserActive},
-                    {"branchCode", branchCode},
-                    {"email", email}
-                };
-                return claims;
+            string token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var decodedToken = _tokenService.DecodeJWT(token);
+            return decodedToken;
         }
 
         [HttpPost("createNewClient")]
-        public async Task<ActionResult<ResponseDto>> CreateClient(CreateClientDto createClientDto)
+        public async Task<ActionResult<ResponseDto>> CreateClient([FromForm] CreateClientDto createClientDto)
         {
-            Dictionary<string, string> claims = GetClaims();
-            return await _clientService.CreateClientService(createClientDto, claims);
+            var decodedToken = GetDecodedToken();
+            return await _clientService.CreateClientService(createClientDto, decodedToken);
         }
 
         [HttpPut("updateClient")]
-        public async Task<ActionResult<ResponseDto>> UpdateClient(UpdateClientDto updateClientDto)
+        public async Task<ActionResult<ResponseDto>> UpdateClient([FromForm] UpdateClientDto updateClientDto)
         {
-            Dictionary<string, string> claims = GetClaims();
-            return await _clientService.UpdateClientService(updateClientDto, claims);
+            var decodedToken = GetDecodedToken();
+            return await _clientService.UpdateClientService(updateClientDto, decodedToken);
         }
 
         [HttpGet("getAllClients")]

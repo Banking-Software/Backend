@@ -314,48 +314,8 @@ namespace MicroFinance.Services.UserManagement
                 Status = false
             };
         }
-
         // END
 
-
-        // START: Employee Service
-        private static void SetPropertyByName(object obj, string propertyName, object newValue)
-        {
-            Type type = obj.GetType();
-            PropertyInfo propertyInfo = type.GetProperty(propertyName);
-            if (propertyInfo != null && propertyInfo.CanWrite)
-                propertyInfo.SetValue(obj, newValue);
-            else
-                throw new Exception($"Property '{propertyName}' not found or not writable.");
-        }
-
-        private Task<Employee> UploadImage(Employee employee, IFormFile? image, List<string> listOfPropertyName)
-        {
-            if(image==null) 
-                return Task.FromResult(employee);
-            string fileExtenstion = (Path.GetExtension(image.FileName)).Replace(".", "").ToUpper();
-            try
-            {
-                float maxFileValue = float.Parse(_config["ApplicationSettings:ImageMaxSize"]);
-                double maxFileSize = maxFileValue * 1024 * 1024; // 3MB 
-                if (image.Length > maxFileSize)
-                    throw new Exception($"File size exceeded the Limit. Upto {maxFileSize}MB is allowed while {image.Length}MB is received");
-                var fileType = (FileType)Enum.Parse(typeof(FileType), fileExtenstion);
-                using (var stream = new MemoryStream())
-                {
-                    image.CopyTo(stream);
-                    //employee.GetType().GetProperty(listOfPropertyName[0]).SetValue(employee, stream.ToArray);
-                    SetPropertyByName(employee, listOfPropertyName[0], stream.ToArray());
-                    SetPropertyByName(employee, listOfPropertyName[1], image.FileName);
-                    SetPropertyByName(employee, listOfPropertyName[2], fileType);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Given Image Format is wrong. {ex.Message}");
-            }
-            return Task.FromResult(employee);
-        }
         public async Task<ResponseDto> CreateEmployeeService(CreateEmployeeDto createEmployeeDto, string createdBy)
         {
             var userStaff = await _employeeRepo.GetEmployeeByEmail(createEmployeeDto.Email);
@@ -369,17 +329,15 @@ namespace MicroFinance.Services.UserManagement
             
             var employee = _mapper.Map<Employee>(createEmployeeDto);
             employee.CreatedBy = createdBy;
-            employee.CreatedOn = DateTime.Now;            
+            employee.CreatedOn = DateTime.Now;  
+                      
             List<string> listOfProfileProperty = new List<string>(){nameof(Employee.ProfilePicFileData),  nameof(Employee.ProfilePicFileName),nameof(Employee.ProfilePicFileType)};
             List<string> listOfCitizenProperty = new List<string>(){nameof(Employee.CitizenShipFileData), nameof(Employee.CitizenShipFileName),nameof(Employee.CitizenShipFileType)};
             List<string> listOfSignatureProperty = new List<string>(){nameof(Employee.SignatureFileData), nameof(Employee.SignatureFileName),nameof(Employee.SignatureFileType)};
-
-            //if(createEmployeeDto.ProfilePic!=null)
-            employee = await UploadImage(employee, createEmployeeDto?.ProfilePic,listOfProfileProperty);
-            //if(createEmployeeDto.CitizenShipPic!=null)
-            employee = await UploadImage(employee, createEmployeeDto?.CitizenShipPic,listOfCitizenProperty);
-            //if(createEmployeeDto.SignaturePic!=null)
-            employee = await UploadImage(employee, createEmployeeDto?.SignaturePic,listOfSignatureProperty);
+            ImageUploadService uploadService = new ImageUploadService(_config);
+            employee = await uploadService.UploadImage(employee, createEmployeeDto?.ProfilePic,listOfProfileProperty);
+            employee = await uploadService.UploadImage(employee, createEmployeeDto?.CitizenShipPic,listOfCitizenProperty);
+            employee = await uploadService.UploadImage(employee, createEmployeeDto?.SignaturePic,listOfSignatureProperty);
             
             var newUserStaff = await _employeeRepo.CreateEmployee(employee);
             if (newUserStaff >= 1)
@@ -399,10 +357,12 @@ namespace MicroFinance.Services.UserManagement
 
         private async Task<Employee> UpdateImage(UpdateEmployeeDto updateEmployeeDto, Employee updateEmployee, Employee existingEmployee)
         {
+            ImageUploadService uploadService = new ImageUploadService(_config);
+
             if(updateEmployeeDto.IsProfilePicChanged)
             {
                 List<string> listOfProfileProperty = new List<string>(){nameof(Employee.ProfilePicFileData),  nameof(Employee.ProfilePicFileName),nameof(Employee.ProfilePicFileType)};
-                updateEmployee = await UploadImage(updateEmployee, updateEmployeeDto?.ProfilePic,listOfProfileProperty);
+                updateEmployee = await uploadService.UploadImage(updateEmployee, updateEmployeeDto?.ProfilePic,listOfProfileProperty);
             }
             else
             {
@@ -413,7 +373,7 @@ namespace MicroFinance.Services.UserManagement
             if(updateEmployeeDto.IsCitizenPicChanged)
             {
                 List<string> listOfCitizenProperty = new List<string>(){nameof(Employee.CitizenShipFileData), nameof(Employee.CitizenShipFileName),nameof(Employee.CitizenShipFileType)};
-                updateEmployee = await UploadImage(updateEmployee, updateEmployeeDto?.CitizenShipPic,listOfCitizenProperty);
+                updateEmployee = await uploadService.UploadImage(updateEmployee, updateEmployeeDto?.CitizenShipPic,listOfCitizenProperty);
 
             }
             else
@@ -425,7 +385,7 @@ namespace MicroFinance.Services.UserManagement
             if(updateEmployeeDto.IsSignaturePicChanged)
             {
                 List<string> listOfSignatureProperty = new List<string>(){nameof(Employee.SignatureFileData), nameof(Employee.SignatureFileName),nameof(Employee.SignatureFileType)};
-                updateEmployee = await UploadImage(updateEmployee, updateEmployeeDto?.SignaturePic,listOfSignatureProperty);
+                updateEmployee = await uploadService.UploadImage(updateEmployee, updateEmployeeDto?.SignaturePic,listOfSignatureProperty);
             }
             else
             {
