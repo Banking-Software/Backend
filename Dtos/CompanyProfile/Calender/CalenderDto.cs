@@ -7,7 +7,7 @@ namespace MicroFinance.Dtos.CompanyProfile
         public int Month { get; set; }
         public string MonthName { get; set; }
         public int NumberOfDay { get; set; }
-        public int? RunningDay { get; set; }
+        public int RunningDay { get; set; }
         public bool IsActive { get; set; }
         public bool? IsLocked { get; set; }
         public DateTime CreatedOn { get; set; }

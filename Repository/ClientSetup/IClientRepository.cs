@@ -1,7 +1,6 @@
 using MicroFinance.Dtos.ClientSetup;
 using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.ClientSetup;
-using MicroFinance.Models.Share;
 
 namespace MicroFinance.Repository.ClientSetup
 {
@@ -16,6 +15,7 @@ namespace MicroFinance.Repository.ClientSetup
         Task<List<Client>> GetClientByUnit(int unitId);
         Task<List<Client>> GetClientByGroupAndUnit(int groupId, int unitId);
         Task<List<Client>> GetClientByAssignedShareType(int shareTypeId);
+        Task<List<Client>> GetActiveClientsByBranchCode(string branchCode);
 
         Task<List<ClientType>> GetClientTypes();
         Task<ClientType> GetClientTypeById(int id);

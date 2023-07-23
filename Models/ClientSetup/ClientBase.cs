@@ -14,7 +14,7 @@ namespace MicroFinance.Models.ClientSetup
         [Required]
         public string CreatedBy { get; set; }
         [Required]
-        public string CreatorBranchCode { get; set; }
+        public string BranchCode { get; set; }
         [Required]
         public string CreatorId { get; set; }
         [Required]

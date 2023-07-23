@@ -17,6 +17,7 @@ namespace MicroFinance.ServiceExtensions.DbService
 
             services.AddDbContext<SuperAdminDbContext>(options =>
             options.UseSqlServer(config.GetConnectionString("SuperAdmin")));
+            
 
             // For Micro Finance User management 
             services.AddDbContext<UserDbContext>(options =>
@@ -24,17 +25,6 @@ namespace MicroFinance.ServiceExtensions.DbService
             
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(config.GetConnectionString("CompanyOperations")));
-            // For Main Ledger Setup
-            // services.AddDbContext<LedgerDbContext>(options =>
-            // options.UseSqlServer(config.GetConnectionString("CompanyOperations")));
-            
-            // // For Client Setup
-            // services.AddDbContext<ClientDbContext>(options =>
-            // options.UseSqlServer(config.GetConnectionString("CompanyOperations")));
-
-            //  // For Deposit Setup
-            // services.AddDbContext<DepositDbContext>(options =>
-            // options.UseSqlServer(config.GetConnectionString("CompanyOperations")));
 
             return services;
         }

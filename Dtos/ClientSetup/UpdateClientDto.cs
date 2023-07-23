@@ -5,13 +5,20 @@ namespace MicroFinance.Dtos.ClientSetup
 {
     public class UpdateClientDto
     {
+        [Required]
         public int Id { get; set; }
+        [Required]
         public string ClientId { get; set; }
+        [Required]
         public bool IsActive { get; set; }
+        [Required]
         public bool IsKYMUpdated { get; set; }
+        [Required]
         public bool IsShareAllowed { get; set; }
+        [Required]
         public DateTime RegistrationDate { get; set; }
         // Foreign Key
+        [Required]
         public ClientTypeEnum ClientType { get; set; }
         public ShareTypeEnum? ShareType { get; set; }
         public int? ClientGroupId { get; set; }
@@ -66,8 +73,10 @@ namespace MicroFinance.Dtos.ClientSetup
         // Family End //
 
         // Client Personal Info //
+        [Required]
         public string ClientFirstName { get; set; }
         public string? ClientMiddleName { get; set; }
+        [Required]
         public string ClientLastName { get; set; }
         public string? ClientNepaliName { get; set; }
         [Range(1, 45, ErrorMessage = "Invalid Cast Code")]

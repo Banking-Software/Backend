@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using MicroFinance.Enums;
 using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.DepositSetup;
 using MicroFinance.Models.Share;
-using MicroFinance.Models.UserManagement;
 
 namespace MicroFinance.Models.ClientSetup
 {
@@ -128,6 +126,7 @@ namespace MicroFinance.Models.ClientSetup
         public int? KYMTypeId { get; set; }
 
         public virtual ICollection<DepositAccount> DepositAccountSelf { get; set; }
-        public virtual ICollection<DepositAccount> DepositAccountJoint { get; set; }
+        public virtual ICollection<JointAccount> JointAccounts { get; set; }
+        public virtual ICollection<ShareAccount> ShareAccounts { get; set; }
     }
 }

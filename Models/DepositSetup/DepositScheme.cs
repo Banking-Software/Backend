@@ -1,56 +1,32 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MicroFinance.Enums;
+using MicroFinance.Enums.Deposit.Scheme;
 using MicroFinance.Models.AccountSetup;
 
 namespace MicroFinance.Models.DepositSetup
 {
-    public class DepositScheme
+    public class DepositScheme : BaseDeposit
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-        [Required]
-        public string Name { get; set; }
-        public string? NameNepali { get; set; }
-        [Required]
-        public string DepositType { get; set; }
-        [Required]
+        
+        public string SchemeName { get; set; }
+        public string? SchemeNameNepali { get; set; }
+        public virtual Ledger SchemeType { get; set; }
+        public int? SchemeTypeId { get; set; }
         public string Symbol { get; set; }
-        [Required]
-        public int MinimumBalance { get; set; } //Balance required to open account
-        [Required]
-        [Column(TypeName = "decimal(5,2)")]
+        public int MinimumBalance { get; set; }
         public decimal InterestRateOnMinimumBalance { get; set; }
-        [Required]
-        [Column(TypeName = "decimal(5,2)")]
         public decimal InterestRate { get; set; }
-        [Required]
-        [Column(TypeName = "decimal(5,2)")]
         public decimal MinimumInterestRate { get; set; }
-        [Required]
-        [Column(TypeName = "decimal(5,2)")]
         public decimal MaximumInterestRate { get; set; }
-        [Required]
-        public string Calculation { get; set; } = "Daily Balance";
-
-        public virtual PostingScheme PostingScheme { get; set; }
-        public int PostingSchemeId { get; set; }
-
-        public int? ClosingCharge { get; set; }
-
-        public int LedgerAsLiabilityAccountId { get; set; }
-        public int LedgerAsInterestAccountId { get; set; }
-        public Ledger LedgerAsLiabilityAccount { get; set; }
-        public Ledger LedgerAsInterestAccount { get; set; }
-
-        public int? FineAmount { get; set; }
-        [Required]
-        public string CreatedBy { get; set; }
-        [Required]
-        public DateTime CreatedOn { get; set; }
-        public string? ModifiedBy { get; set; }
-        public DateTime? ModifiedOn { get; set; }
-
+        public CalculationTypeEnum Calculation { get; set; }
+        public PostingSchemeEnum PostingScheme { get; set; }
+        public int? InterestSubLedgerId { get; set; }
+        public virtual SubLedger InterestSubledger { get; set; }
+        public int? DepositSubledgerId { get; set; }
+        public virtual SubLedger DepositSubLedger { get; set; }
+        public int? TaxSubledgerId { get; set; }
+        public virtual SubLedger TaxSubledger { get; set; }
         public virtual ICollection<DepositAccount> DepositAccounts { get; set; }
         public virtual ICollection<FlexibleInterestRate> FlexibleInterestRates { get; set; }
 

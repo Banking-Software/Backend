@@ -1,16 +1,16 @@
 using AutoMapper;
 using MicroFinance.Dtos;
-using MicroFinance.Dtos.AccountSetup.MainLedger;
-using MicroFinance.Dtos.ClientSetup;
 using MicroFinance.Dtos.DepositSetup;
-using MicroFinance.Enums;
-using MicroFinance.Exceptions;
+using MicroFinance.Enums.Deposit.Account;
 using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.ClientSetup;
 using MicroFinance.Models.DepositSetup;
+using MicroFinance.Models.Wrapper;
 using MicroFinance.Repository.AccountSetup.MainLedger;
 using MicroFinance.Repository.ClientSetup;
 using MicroFinance.Repository.DepositSetup;
+using MicroFinance.Services.CompanyProfile;
+using MicroFinance.Services.UserManagement;
 
 namespace MicroFinance.Services.DepositSetup
 {
@@ -21,6 +21,8 @@ namespace MicroFinance.Services.DepositSetup
         private readonly IDepositSchemeRepository _depositSchemeRepository;
         private readonly IMainLedgerRepository _mainLedgerRepository;
         private readonly IClientRepository _clientRepo;
+        private readonly ICompanyProfileService _companyProfileService;
+        private readonly IEmployeeService _employeeService;
 
         public DepositSchemeService
         (
@@ -28,7 +30,9 @@ namespace MicroFinance.Services.DepositSetup
         IMapper mapper,
         IDepositSchemeRepository depositSchemeRepository,
         IMainLedgerRepository mainLedgerRepository,
-        IClientRepository clientRepository
+        IClientRepository clientRepository,
+        ICompanyProfileService companyProfileService,
+        IEmployeeService employeeService
         )
         {
             _loggger = logger;
@@ -36,470 +40,428 @@ namespace MicroFinance.Services.DepositSetup
             _depositSchemeRepository = depositSchemeRepository;
             _mainLedgerRepository = mainLedgerRepository;
             _clientRepo = clientRepository;
+            _companyProfileService = companyProfileService;
+            _employeeService = employeeService;
         }
 
-        /// <summary>
-        /// Create Deposit Scheme Service.
-        /// Validation: 
-        /// 1. Minimum Interest Rate Should be less than or Equal to Maximum Interest Rate. 
-        /// 2. If LiabilityAccount Name and InterestAccount Name is not provided then with some naming convention create it
-        /// 3. LiabilityAccount is Ledger under Account Type 'Liability'  and GroupType 'Saving and Deposit'
-        /// 4. InterestAccount is also Ledger under Account Type 'Interest' and GroupType 'Interest Expenses'
-        /// 5. If the Ledger exist use that otherwise first create the ledger and then do other task
-        /// </summary>
-        /// <param name="createDepositScheme"></param>
-        /// <param name="currentUser"></param>
-        /// <returns></returns>
-        public async Task<ResponseDto> CreateDepositSchemeService(CreateDepositSchemeDto createDepositScheme, string currentUser)
+
+        private async Task<List<SubLedger>> CreateSubLedgerForDepositScheme(CreateDepositSchemeDto createDepositScheme)
         {
+            var depositSubledgerName = createDepositScheme.DepositSubledger ?? createDepositScheme.SchemeName + " " + "Deposit";
+            var interestSubledgerName = createDepositScheme.InterestSubledger ?? createDepositScheme.SchemeName + " " + "Interest";
+            var taxSublegderName = createDepositScheme.TaxSubledger ?? createDepositScheme.SchemeName + " " + "Tax";
+             // Deposit SubLedger
+            int depositLedgerId = (int)createDepositScheme.SchemeType;
+            Ledger depsoitLedgerSchemeType = await _mainLedgerRepository.GetLedger(depositLedgerId);
+            SubLedger depositSubledger = new SubLedger() { Name = depositSubledgerName, Ledger = depsoitLedgerSchemeType, Description = $"Subledger created while creating Deposit Scheme {createDepositScheme.SchemeName}" };
+            // Interest SubLedger
+            Ledger interestLedger = await _mainLedgerRepository.GetLedger(68); // Interest Expenses
+            SubLedger interestSubledger = new SubLedger() { Name = interestSubledgerName, Ledger = interestLedger, Description = $"Subledger created while creating Deposit Scheme {createDepositScheme.SchemeName}" };
+            // Tax SubLedger
+            Ledger taxLedger = await _mainLedgerRepository.GetLedger(29); // Tax Payable
+            SubLedger taxSubledger = new SubLedger() { Name = taxSublegderName, Ledger = taxLedger, Description = $"Subledger created while creating Deposit Scheme {createDepositScheme.SchemeName}" };
+            List<SubLedger> allSublegders = new List<SubLedger>() { depositSubledger, interestSubledger, taxSubledger };
+            int subledgerCreateStatus = await _mainLedgerRepository.CreateMultipleSubLedger(allSublegders);
+            if (subledgerCreateStatus < 1) throw new Exception("Unable to create the Scheme. Subledger creation failed");
+            return new List<SubLedger>(){depositSubledger, interestSubledger, taxSubledger};
 
-
-            var depositLedgerAsLiability = createDepositScheme.LiabilityAccount ?? createDepositScheme.Name + " " + "Liability";
-            var depositLedgerAsInterest = createDepositScheme.InterestAccount ?? createDepositScheme.Name + " " + "Interest";
-
-            var depositExist = await _depositSchemeRepository
-            .GetDepositSchemeByName(createDepositScheme.Name);
-
-            if (depositExist == null && createDepositScheme.MinimumInterestRate <= createDepositScheme.InterestRate && createDepositScheme.InterestRate <= createDepositScheme.MaximumInterestRate)
+        }
+        public async Task<ResponseDto> CreateDepositSchemeService(CreateDepositSchemeDto createDepositScheme, TokenDto decodedToken)
+        {
+            var depositSchemeWithSameName = await _depositSchemeRepository.GetDepositSchemeByName(createDepositScheme.SchemeName);
+            var depositSchemeWithSameSymbol = await _depositSchemeRepository.GetDepositSchemeBySymbol(createDepositScheme.Symbol);
+            if (depositSchemeWithSameName != null || depositSchemeWithSameSymbol!=null)
+                throw new Exception("Deposit Scheme with same name or symbol exist");
+            
+            var companyCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
+            var depositScheme = _mapper.Map<DepositScheme>(createDepositScheme);
+            List<SubLedger> subLedgersForDepositScheme = await CreateSubLedgerForDepositScheme(createDepositScheme);
+            depositScheme.SchemeType = await _mainLedgerRepository.GetLedger((int) createDepositScheme.SchemeType);
+            depositScheme.DepositSubLedger = subLedgersForDepositScheme[0];
+            depositScheme.InterestSubledger = subLedgersForDepositScheme[1];
+            depositScheme.TaxSubledger = subLedgersForDepositScheme[2];
+            depositScheme.CreatedBy = decodedToken.UserName;
+            depositScheme.CreatorId = decodedToken.UserId;
+            depositScheme.BranchCode = decodedToken.BranchCode;
+            depositScheme.RealWorldCreationDate = DateTime.Now;
+            depositScheme.CompanyCalendarCreationDate = new DateTime(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            var depositSchemeId = await _depositSchemeRepository.CreateDepositScheme(depositScheme);
+            return new ResponseDto()
             {
-                var groupTypeAsLiability = await _mainLedgerRepository.GetGroupByName("Saving and Deposit", "Liability");
-                var groupTypeAsInterest = await _mainLedgerRepository.GetGroupByName("Interest Expenses", "Expense");
+                Message = $"'{depositScheme.SchemeName}' created successfully",
+                Status = true,
+                StatusCode = "200"
+            };
 
-                Ledger ledgerAsLiability = new Ledger();
-                Ledger ledgerAsInterest = new Ledger();
+        }
 
-                ledgerAsLiability = await _mainLedgerRepository
-                .GetLedgerByGroupTypeAndLedgerName(groupTypeAsLiability, depositLedgerAsLiability);
-
-                ledgerAsInterest = await _mainLedgerRepository
-                .GetLedgerByGroupTypeAndLedgerName(groupTypeAsInterest, depositLedgerAsInterest);
-
-                var ledgerAsLiabilityStatus = 1;
-                var ledgerAsInterestStatus = 1;
-
-                if (ledgerAsLiability == null || ledgerAsLiability.Id <= 0)
-                {
-                    ledgerAsLiability.Name = depositLedgerAsLiability;
-                    ledgerAsLiability.EntryDate = DateTime.Now;
-                    ledgerAsLiability.IsSubLedgerActive = false;
-                    ledgerAsLiability.GroupType = groupTypeAsLiability;
-                    ledgerAsLiability.IsBank=false;
-                    ledgerAsLiabilityStatus =
-                    await _mainLedgerRepository.CreateLedger(ledgerAsLiability);
-                }
-                if (ledgerAsInterest == null || ledgerAsInterest.Id <= 0)
-                {
-                    ledgerAsInterest.Name = depositLedgerAsInterest;
-                    ledgerAsInterest.EntryDate = DateTime.Now;
-                    ledgerAsInterest.IsSubLedgerActive = false;
-                    ledgerAsInterest.GroupType=groupTypeAsInterest;
-                    ledgerAsInterest.IsBank=false;
-                    ledgerAsInterestStatus =
-                    await _mainLedgerRepository.CreateLedger(ledgerAsInterest);
-                }
-                if (ledgerAsInterestStatus >= 1 && ledgerAsInterestStatus >= 1)
-                {
-                    var depositScheme = _mapper.Map<DepositScheme>(createDepositScheme);
-
-                    int postingId = (int)createDepositScheme.Posting;
-                    var positng = await _depositSchemeRepository
-                    .GetPositingScheme(postingId);
-                    depositScheme.PostingScheme = positng;
-
-                    depositScheme.LedgerAsInterestAccount = ledgerAsInterest;
-                    depositScheme.LedgerAsLiabilityAccount = ledgerAsLiability;
-                    depositScheme.DepositType = createDepositScheme.DepositType.ToString();
-                    depositScheme.CreatedBy = currentUser;
-                    depositScheme.CreatedOn = DateTime.Now;
-
-                    int depositCreationStatus =
-                    await _depositSchemeRepository.CreateDepositScheme(depositScheme);
-
-                    if (depositCreationStatus < 1)
-                        throw new NotImplementedException("Unable to create Deposit. Try again!!!");
-                }
-                else
-                    throw new NotImplementedException("Unable to Create Ledger. Try again!!!");
-
-                return new ResponseDto
-                {
-                    Status = true,
-                    StatusCode = "200",
-                    Message = "Deposit Scheme Created"
-                };
-
+        public async Task<ResponseDto> UpdateDepositSchemeService(UpdateDepositSchemeDto updateDepositScheme, TokenDto decodedToken)
+        {
+            var existingDepositScheme = await _depositSchemeRepository.GetDepositSchemeById(updateDepositScheme.Id);
+            var companyCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
+            if (!existingDepositScheme.IsActive && !updateDepositScheme.IsActive)
+            {
+                _loggger.LogError($"{DateTime.Now}: Employee {decodedToken.UserName} tried to edit the inactive deposit scheme '{existingDepositScheme.SchemeName}'");
+                throw new Exception("Deposit Scheme you want update is In-Active. Please activate it and then update the infornation");
             }
-
-            else if (createDepositScheme.MinimumInterestRate > createDepositScheme.InterestRate || createDepositScheme.InterestRate > createDepositScheme.MaximumInterestRate)
-                throw new Exception("'Interest Rate' should be between 'minimum interest rate' and 'maximum interest rate'. Follow minimumInterestRate<=interestRate<=maximumInterestRate");
-            return new ResponseDto
+            else if (!existingDepositScheme.IsActive && updateDepositScheme.IsActive)
             {
-                Status = false,
-                StatusCode = "500",
-                Message = "Deposit Scheme Already Existed"
+                _loggger.LogInformation($"{DateTime.Now}: Employee {decodedToken.UserName} sends request to activate '{existingDepositScheme.SchemeName}' depsoit scheme");
+            }
+            else if (existingDepositScheme.IsActive && !updateDepositScheme.IsActive)
+            {
+                _loggger.LogInformation($"{DateTime.Now}: Employee {decodedToken.UserName} sends request to deactivate '{existingDepositScheme.SchemeName}' depsoit scheme");
+            }
+            existingDepositScheme.InterestRate = updateDepositScheme.InterestRate;
+            existingDepositScheme.InterestRateOnMinimumBalance = updateDepositScheme.InterestRateOnMinimumBalance;
+            existingDepositScheme.MaximumInterestRate = updateDepositScheme.MaximumInterestRate;
+            existingDepositScheme.MinimumInterestRate = updateDepositScheme.MinimumInterestRate;
+            existingDepositScheme.IsActive = updateDepositScheme.IsActive;
+            existingDepositScheme.ModifiedBy = decodedToken.UserName;
+            existingDepositScheme.ModifierId = decodedToken.UserId;
+            existingDepositScheme.ModifierBranchCode = decodedToken.BranchCode;
+            existingDepositScheme.RealWorldModificationDate = DateTime.Now;
+            existingDepositScheme.CompanyCalendarModificationDate = new DateTime(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            var updateStatus = await _depositSchemeRepository.UpdateDepositScheme(existingDepositScheme);
+            if (updateStatus < 1)
+                throw new Exception("Failed to update the Deposit Scheme");
+            return new ResponseDto()
+            {
+                Message = "Successfully updated the Scheme",
+                Status = true,
+                StatusCode = "200"
             };
         }
 
-        public async Task<ResponseDto> UpdateDepositSchemeService(UpdateDepositSchemeDto updateDepositScheme, string currentUser)
-        {
-            UpdateDepositScheme depositScheme = _mapper.Map<UpdateDepositScheme>(updateDepositScheme);
-            depositScheme.ModifiedBy = currentUser;
-            depositScheme.ModifiedOn = DateTime.Now;
-            int modifiedStatus = await _depositSchemeRepository.UpdateDepositScheme(depositScheme);
-            if (modifiedStatus >= 1)
-            {
-                return new ResponseDto
-                {
-                    Status = true,
-                    StatusCode = "200",
-                    Message = "Deposit Scheme Updated"
-                };
-            }
-            throw new Exception("Failed to update");
-
-        }
-
-        private DepositSchemeDto GetDepositSchemeDto(ResponseDepositScheme scheme)
-        {
-            DepositSchemeDto tempDepositSchemeDto = new DepositSchemeDto()
-            {
-                Id = scheme.Id,
-                Name = scheme.Name,
-                NameNepali = scheme.NameNepali,
-                DepositType = scheme.DepositType,
-                Symbol = scheme.Symbol,
-                MinimumBalance = scheme.MinimumBalance,
-                InterestRateOnMinimumBalance = scheme.InterestRateOnMinimumBalance,
-                InterestRate = scheme.InterestRate,
-                MinimumInterestRate = scheme.MinimumInterestRate,
-                MaximumInterestRate = scheme.MaximumInterestRate,
-                Calculation = scheme.Calculation,
-                FineAmount = scheme.FineAmount,
-                ClosingCharge = scheme.ClosingCharge,
-                PostingScheme = scheme.PostingScheme,
-                CreatedBy = scheme.CreatedBy,
-                ModifiedBy = scheme.ModifiedBy,
-                CreatedOn = scheme.CreatedOn,
-                ModifiedOn = scheme.ModifiedOn,
-                LiabilityAccount = _mapper.Map<LedgerDto>(scheme.LiabilityAccount),
-                InterestAccount = _mapper.Map<LedgerDto>(scheme.InterestAccount)
-            };
-            return tempDepositSchemeDto;
-        }
 
         public async Task<List<DepositSchemeDto>> GetAllDepositSchemeService()
         {
-            var depositScheme = await _depositSchemeRepository.GetAllDepositScheme();
-            List<DepositSchemeDto> depositSchemeDtos = new List<DepositSchemeDto>();
-            foreach (var scheme in depositScheme)
+            var allDepositScheme = await _depositSchemeRepository.GetAllDepositScheme();
+            if (allDepositScheme != null)
             {
-                depositSchemeDtos.Add(GetDepositSchemeDto(scheme));
+                return _mapper.Map<List<DepositSchemeDto>>(allDepositScheme);
             }
-            return depositSchemeDtos;
+            throw new Exception("Null Deposit Scheme");
         }
 
-        public async Task<DepositSchemeDto> GetDepositSchemeService(int id)
+        public async Task<DepositSchemeDto> GetDepositSchemeByIdService(int id)
         {
-            var scheme = await _depositSchemeRepository.GetDepositScheme(id);
-            ResponseDepositScheme depositSchemeWithLedgerDetails = _mapper.Map<ResponseDepositScheme>(scheme);
-            var ledgerAsInterest = await _mainLedgerRepository.GetLedger(scheme.LedgerAsInterestAccountId);
-            var ledgerAsLiability = await _mainLedgerRepository.GetLedger(scheme.LedgerAsLiabilityAccountId);
-            //await Task.WhenAll(ledgerAsInterest, ledgerAsLiability);
-            depositSchemeWithLedgerDetails.LiabilityAccount = ledgerAsLiability;
-            depositSchemeWithLedgerDetails.InterestAccount = ledgerAsInterest;
-            var depositSchemeDto = GetDepositSchemeDto(depositSchemeWithLedgerDetails);
-            return depositSchemeDto;
+            var depositScheme = await _depositSchemeRepository.GetDepositSchemeById(id);
+            if (depositScheme != null)
+                return _mapper.Map<DepositSchemeDto>(depositScheme);
+            throw new Exception("No Deposit Scheme Found");
         }
 
 
-        // DEPOSIT ACCOUNT
-        /// <summary>
-        /// This Returns the Unique account number for the given deposit scheme at the current context
-        /// </summary>
-        /// <param name="depositSchemeId"></param>
-        /// <returns></returns>
-        public async Task<AccountNumberDto> GetUniqueAccountNumberService(int depositSchemeId)
+        private async Task AddClientInDepositAccount(CreateDepositAccountDto createDepositAccountDto, DepositAccount newDepositAccount, TokenDto decodedToken)
         {
-            var depositScheme = await _depositSchemeRepository.GetDepositScheme(depositSchemeId);
-            if (depositScheme == null) throw new NotFoundExceptionHandler("Deposit Scheme Not Found");
-            var depositAccounts = await _depositSchemeRepository.GetDepositAccountByDepositScheme(depositSchemeId);
-            int count = depositAccounts.Count >= 1 ? depositAccounts.Count + 1 : 1;
-            string accountNumber = depositScheme.Symbol + count.ToString("D5");
-            AccountNumberDto accountNumberDto = new AccountNumberDto() { AccountNumber = accountNumber };
-            return accountNumberDto;
-        }
-
-        /// <summary>
-        /// Create Deposit Account under provided deposit scheme.
-        /// Validation:
-        /// 1. Given Interest Rate should be between Minimum and Maximum Interest Rate defined under deposit scheme.
-        /// 2. Only when account type is joint we expect jointClientId
-        /// 3. For InterestPositing and MatureInterestPositng, if provided account Number is not equal to current account number than, this account number should exist in database
-        /// </summary>
-        /// <param name="createDepositAccountDto"></param>
-        /// <param name="createdBy"></param>
-        /// <returns></returns>
-        public async Task<ResponseDto> CreateDepositAccountService(CreateDepositAccountDto createDepositAccountDto, string createdBy)
-        {
-            var depositScheme = await _depositSchemeRepository.GetDepositScheme(createDepositAccountDto.DepositSchemeId);
             var client = await _clientRepo.GetClientById(createDepositAccountDto.ClientId);
-            string interestPostingAccountNumber = createDepositAccountDto.InterestPostingAccountNumber;
-            string? matureInterestPostingAccountNumber = createDepositAccountDto.MatureInterestPostingAccountNumber;
-            var givenInterestRate = createDepositAccountDto.InterestRate;
-            var minimumInterestRate = depositScheme.MinimumInterestRate;
-            var maximumInterestRate = depositScheme.MaximumInterestRate;
-
-
-            if (
-                depositScheme != null
-                && client != null
-                && minimumInterestRate <= givenInterestRate
-                && givenInterestRate <= maximumInterestRate
-                && (((int)createDepositAccountDto.AccountType == 1 && createDepositAccountDto.JointClientId < 1)
-                || ((int)createDepositAccountDto.AccountType == 1 && createDepositAccountDto.JointClientId == null)
-                || ((int)createDepositAccountDto.AccountType == 2 && createDepositAccountDto.JointClientId >= 1))
-                && createDepositAccountDto.ClientId != createDepositAccountDto.JointClientId
-                )
+            if (client == null || !client.IsActive)
             {
-                if (interestPostingAccountNumber != createDepositAccountDto.AccountNumber)
-                {
-                    var checkAccountNumberForInterestPosting = await _depositSchemeRepository.GetDepositAccountByAccountNumber(interestPostingAccountNumber);
-                    if (checkAccountNumberForInterestPosting == null) throw new NotFoundExceptionHandler("Interest Posting Account Number Doesnot Exist");
-                }
-                if (matureInterestPostingAccountNumber != null && matureInterestPostingAccountNumber != createDepositAccountDto.AccountNumber)
-                {
-                    var checkMatureAccountNumber = await _depositSchemeRepository.GetDepositAccountByAccountNumber(matureInterestPostingAccountNumber);
-                    if (checkMatureAccountNumber == null) throw new NotFoundExceptionHandler("Mature Interest Posting Account Number Doesnot Exist");
-                }
-                Client jointClient = new Client();
-                DepositAccount newDepositAccount = new DepositAccount();
-                if (createDepositAccountDto.JointClientId >= 1)
-                {
-                    jointClient = await _clientRepo.GetClientById((int)createDepositAccountDto.JointClientId);
-                    if (jointClient == null) throw new NotFoundExceptionHandler("Provided Joint Client is not found");
-                    newDepositAccount.JointClient = jointClient;
-                }
+                throw new Exception
+                ($"UnAuthorized to proceed. Client '{client?.ClientFirstName}' has active status '{client?.IsActive}'.");
+            }
+            if (client.BranchCode != decodedToken.BranchCode)
+                throw new Exception("Given Client is not found under your branch");
+            newDepositAccount.Client = client;
+        }
 
-                newDepositAccount.DepositScheme = depositScheme;
-                newDepositAccount.AccountNumber = createDepositAccountDto.AccountNumber;
-                newDepositAccount.Client = client;
-                newDepositAccount.OpeningDate = createDepositAccountDto.OpeningDate;
-                newDepositAccount.Period = createDepositAccountDto?.Period;
-                newDepositAccount.PeriodType = (int?)createDepositAccountDto.PeriodType;
-                newDepositAccount.AccountType = (int)createDepositAccountDto.AccountType;
-                newDepositAccount.MatureDate = createDepositAccountDto.MatureDate;
-                newDepositAccount.InterestRate = givenInterestRate;
-                newDepositAccount.MinimumBalance = createDepositAccountDto.MinimumBalance;
-                newDepositAccount.ReferredBy = createDepositAccountDto.ReferredBy;
+        private async Task AddDepositSchemeInDepositAccount(CreateDepositAccountDto createDepositAccountDto, DepositAccount newDepositAccount)
+        {
+            var depositScheme = await _depositSchemeRepository.GetDepositSchemeById(createDepositAccountDto.DepositSchemeId);
+            if (depositScheme == null || !depositScheme.IsActive)
+            {
+                throw new Exception($"Provided Deposit Scheme '{depositScheme?.SchemeName}' active status is '{depositScheme?.IsActive}'");
+            }
+            if(createDepositAccountDto.InterestRate<depositScheme.MinimumInterestRate || createDepositAccountDto.InterestRate>depositScheme.MaximumInterestRate)
+            {
+                throw new Exception($"MinimumInterestRate<=InterestRate<=MaximumInterestRate constraint doesnot match. Available minimum Interest Rate is {depositScheme.MinimumInterestRate} and maximum interest rate is {depositScheme.MaximumInterestRate}");
+            }
+            newDepositAccount.DepositScheme = depositScheme;
+        }
+
+        private async Task AddInterestAndMaturePostingAccountInDepositAccount(CreateDepositAccountDto createDepositAccountDto, DepositAccount newDepositAccount, TokenDto decodedToken)
+        {
+            if (createDepositAccountDto.InterestPostingAccountId != null)
+            {
+                var interestPostingAccountNumber = await _depositSchemeRepository.GetDepositAccountById((int)createDepositAccountDto.InterestPostingAccountId);
+                if (interestPostingAccountNumber == null || interestPostingAccountNumber.BranchCode != decodedToken.BranchCode)
+                    throw new Exception("InterestPostingAccountNumber: Cannot Find Account Number under your branch");
                 newDepositAccount.InterestPostingAccountNumber = interestPostingAccountNumber;
+            }
+            if (createDepositAccountDto.MatureInterestPostingAccountId != null)
+            {
+                var matureInterestPostingAccountNumber = await _depositSchemeRepository.GetDepositAccountById((int)createDepositAccountDto.MatureInterestPostingAccountId);
+                if (matureInterestPostingAccountNumber == null || matureInterestPostingAccountNumber.BranchCode != decodedToken.BranchCode)
+                    throw new Exception("MatureInterestPositingAccountNumber: Cannot Find Account Number under your branch");
                 newDepositAccount.MatureInterestPostingAccountNumber = matureInterestPostingAccountNumber;
-                newDepositAccount.Description = createDepositAccountDto.Description;
-                newDepositAccount.Status = (int)createDepositAccountDto.Status;
-                newDepositAccount.IsSMSServiceActive = createDepositAccountDto.IsSMSServiceActive;
-                newDepositAccount.DailyDepositAmount = createDepositAccountDto?.DailyDepositAmount;
-                newDepositAccount.TotalDepositAmount = createDepositAccountDto?.TotalDepositAmount;
-                newDepositAccount.TotalReturnAmount = createDepositAccountDto?.TotalReturnAmount;
-                newDepositAccount.TotalInterestAmount = createDepositAccountDto?.TotalInterestAmount;
-                newDepositAccount.TotalDepositDay = createDepositAccountDto?.TotalDepositDay;
-                newDepositAccount.CreatedBy = createdBy;
-                newDepositAccount.CreatedOn = DateTime.Now;
-
-                int createStatus = await _depositSchemeRepository.CreateDepositAccount(newDepositAccount);
-                if (createStatus >= 1)
-                {
-                    return new ResponseDto()
-                    {
-                        Message = "Account Created Successfully",
-                        Status = true,
-                        StatusCode = "200"
-                    };
-                }
-                return new ResponseDto()
-                {
-                    Message = "Account Create Failed",
-                    Status = false,
-                    StatusCode = "500"
-                };
             }
+        }
+        private async Task AddReferredByEmployeeInDepositAccount(CreateDepositAccountDto createDepositAccountDto, DepositAccount newDepositAccount, TokenDto decodedToken)
+        {
+            if (createDepositAccountDto.ReferredByEmployeeId != null)
+            {
+                var referredByEmployee = await _employeeService.GetEmployeeById((int)createDepositAccountDto.ReferredByEmployeeId);
+                if (referredByEmployee == null || referredByEmployee.BranchCode != decodedToken.BranchCode)
+                    throw new Exception("ReferredByEmployeeId: Provided Employee Details not found under your branch");
+                newDepositAccount.ReferredByEmployeeId = (int)createDepositAccountDto.ReferredByEmployeeId;
+            }
+        }
 
+        private async Task<List<Client>> GetAllJointClientDetails(List<int> jointClientIds, TokenDto decodedToken)
+        {
+            List<Client> listOfAllJointClients = new List<Client>();
+            foreach (var jointClientId in jointClientIds)
+            {
+                var jointClient = await _clientRepo.GetClientById(jointClientId);
+                if (jointClient == null || jointClient.BranchCode != decodedToken.BranchCode)
+                    throw new Exception($"Provided Joint Clients are not found under your branch. Id:{jointClientId}");
+                if (!jointClient.IsActive)
+                    throw new Exception($"Joint Client {jointClient.ClientId} is inactive");
+                listOfAllJointClients.Add(jointClient);
+            }
+            return listOfAllJointClients;
+        }
+        private async Task AddBasicDetailsInDepositAccount(DepositAccount newDepositAccount, TokenDto decodedToken)
+        {
+            var companyCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
+            newDepositAccount.RealWorldCreationDate = DateTime.Now;
+            newDepositAccount.CompanyCalendarCreationDate = new DateTime(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            newDepositAccount.BranchCode = decodedToken.BranchCode;
+            newDepositAccount.CreatedBy = decodedToken.UserName;
+            newDepositAccount.CreatorId = decodedToken.UserId;
+            newDepositAccount.OpeningDate = new DateTime(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            if(newDepositAccount.PeriodType==PeriodTypeEnum.Year)
+                newDepositAccount.MatureDate = (newDepositAccount.OpeningDate).AddYears(newDepositAccount.Period).AddDays(-1);
+            else if(newDepositAccount.PeriodType == PeriodTypeEnum.Month)
+                newDepositAccount.MatureDate = (newDepositAccount.OpeningDate).AddMonths(newDepositAccount.Period).AddDays(-1);
             else
-            {
-                if (depositScheme == null) throw new NotFoundExceptionHandler("Deposit Scheme Not Found");
-                else if (client == null) throw new NotFoundExceptionHandler("Client Not Found");
-                else if (minimumInterestRate > givenInterestRate) throw new Exception($"Provided Interest Rate should be greater than Minimum Interest Rate.Interest Rate should be more than {minimumInterestRate}");
-                else if (givenInterestRate > maximumInterestRate) throw new Exception($"Provided Interest Rate Should be less than Maximum Interest Rate. Interest Rate should be less than {maximumInterestRate}");
-                else if (
-                ((int)createDepositAccountDto.AccountType == 1 && createDepositAccountDto.JointClientId >= 1)
-                || ((int)createDepositAccountDto.AccountType == 2 && createDepositAccountDto.JointClientId < 1)
-                || ((int)createDepositAccountDto.AccountType == 2 && createDepositAccountDto.JointClientId == null))
-                    throw new Exception("Provide Joint Client Details if you are trying to open joint account otherwise leave the field blank");
-                else if (createDepositAccountDto.ClientId == createDepositAccountDto.JointClientId)
-                    throw new Exception("Client Details and Joint Client Details should no be same");
-                else throw new Exception("Failed to perform the operation");
-            }
-
+                newDepositAccount.MatureDate = (newDepositAccount.OpeningDate).AddDays(newDepositAccount.Period-1);
         }
 
-        public async Task<ResponseDto> UpdateDepositAccountService(UpdateDepositAccountDto updateDepositAccountDto, string modifiedBy)
+        public async Task<ResponseDto> CreateDepositAccountService(CreateDepositAccountDto createDepositAccountDto, TokenDto decodedToken)
         {
-            var status = await _depositSchemeRepository.UpdateDepositAccount(updateDepositAccountDto, modifiedBy);
-            if (status >= 1)
+            
+            DepositAccount newDepositAccount = _mapper.Map<DepositAccount>(createDepositAccountDto);
+            await AddClientInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
+            await AddDepositSchemeInDepositAccount(createDepositAccountDto, newDepositAccount);
+            await AddInterestAndMaturePostingAccountInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
+            await AddReferredByEmployeeInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
+            await AddBasicDetailsInDepositAccount(newDepositAccount, decodedToken);
+            List<Client> jointClients =
+            createDepositAccountDto.AccountType==AccountTypeEnum.Joint
+            ?
+            await GetAllJointClientDetails(createDepositAccountDto.JointClientIds, decodedToken)
+            :
+            null;
+            var depositAccountId = await _depositSchemeRepository.CreateDepositAccount(newDepositAccount);
+            if(depositAccountId>=1)
+            {
+                if(createDepositAccountDto.AccountType==AccountTypeEnum.Joint)
+                    await CreateJointAccountService(jointClients, newDepositAccount);
                 return new ResponseDto()
                 {
-                    Message = "Updated Successfully",
-                    Status = true,
-                    StatusCode = "200"
-                };
-
-            return new ResponseDto()
-            {
-                Message = "Update Failed",
-                Status = false,
-                StatusCode = "500"
-            };
-
-        }
-
-        private async Task<DepositAccountDto> GetDepositAccountDto(DepositAccount depositAccount)
-        {
-            DepositAccountDto depositAccountDto = _mapper.Map<DepositAccountDto>(depositAccount);
-            AccountTypeEnum accountTypeEnum = (AccountTypeEnum)depositAccount.AccountType;
-            depositAccountDto.AccountType = Enum.GetName(typeof(AccountTypeEnum), accountTypeEnum);
-            if (depositAccount.PeriodType >= 1)
-            {
-                PeriodTypeEnum periodTypeEnum = (PeriodTypeEnum)depositAccount.PeriodType;
-                depositAccountDto.PeriodType = Enum.GetName(typeof(PeriodTypeEnum), periodTypeEnum);
-            }
-            AccountStatusEnum accountStatusEnum = (AccountStatusEnum)depositAccount.Status;
-            depositAccountDto.Status = Enum.GetName(typeof(AccountStatusEnum), accountStatusEnum);
-            // GET ALL DEPOSIT SCHEME DETAILS
-            ResponseDepositScheme depositSchemeWithLedgerDetails = _mapper.Map<ResponseDepositScheme>(depositAccount.DepositScheme);
-            var ledgerAsInterest = await _mainLedgerRepository.GetLedger(depositAccount.DepositScheme.LedgerAsInterestAccountId);
-            var ledgerAsLiability = await _mainLedgerRepository.GetLedger(depositAccount.DepositScheme.LedgerAsLiabilityAccountId);
-            depositSchemeWithLedgerDetails.LiabilityAccount = ledgerAsLiability;
-            depositSchemeWithLedgerDetails.InterestAccount = ledgerAsInterest;
-            depositAccountDto.DepositScheme = GetDepositSchemeDto(depositSchemeWithLedgerDetails);
-            //////////////////////////////////////////////////
-            depositAccountDto.Client = _mapper.Map<ClientDto>(await _clientRepo.GetClientById(depositAccount.ClientId));
-            if (depositAccount.JointClientId >= 1)
-            {
-                depositAccountDto.JointClient = _mapper.Map<ClientDto>(await _clientRepo.GetClientById((int)depositAccount.JointClientId));
-            }
-
-            return depositAccountDto;
-        }
-        public async Task<DepositAccountDto> GetDepositAccountByIdService(int id)
-        {
-            var depositAccount = await _depositSchemeRepository.GetDepositAccountById(id);
-            return await GetDepositAccountDto(depositAccount);
-        }
-
-        public async Task<DepositAccountDto> GetDepositAccountByAccountNumberService(string accountNumber)
-        {
-            var depositAccount = await _depositSchemeRepository.GetDepositAccountByAccountNumber(accountNumber);
-            return await GetDepositAccountDto(depositAccount);
-        }
-
-        public async Task<List<DepositAccountDto>> GetAllDepositAccountService()
-        {
-            List<DepositAccountDto> depositAccountDtos = new List<DepositAccountDto>();
-            var depositAccounts = await _depositSchemeRepository.GetDepositAccountListAsync();
-            if (depositAccounts.Count >= 1 && depositAccounts != null)
-            {
-                foreach (var account in depositAccounts)
-                {
-                    depositAccountDtos.Add(await GetDepositAccountDto(account));
-                }
-            }
-            return depositAccountDtos;
-        }
-
-        public async Task<List<DepositAccountDto>> GetAllDepositAccountByDepositSchemeService(int depositSchemeId)
-        {
-            List<DepositAccountDto> depositAccountDtos = new List<DepositAccountDto>();
-            var depositAccounts = await _depositSchemeRepository.GetDepositAccountByDepositScheme(depositSchemeId);
-            if (depositAccounts.Count >= 1 && depositAccounts != null)
-            {
-                foreach (var account in depositAccounts)
-                {
-                    depositAccountDtos.Add(await GetDepositAccountDto(account));
-                }
-            }
-            return depositAccountDtos;
-        }
-
-        // FLEXIBLE INTEREST AND INTEREST CHANGING FUNCTIONS
-
-        public async Task<ResponseDto> UpdateInterestRateAccordingToFlexibleInterestRateService(FlexibleInterestRateSetupDto flexibleInterestRateSetupDto)
-        {
-            // Validation
-            // 1. If Given Interest Rate is between Minimum and Maximum Interest Rate
-            var depositScheme = await _depositSchemeRepository.GetDepositScheme(flexibleInterestRateSetupDto.DepositSchemeId);
-            if (depositScheme != null && depositScheme.Id >= 1 && depositScheme.MinimumInterestRate <= flexibleInterestRateSetupDto.InterestRate && depositScheme.MaximumInterestRate >= flexibleInterestRateSetupDto.InterestRate)
-            {
-                FlexibleInterestRate flexibleInterestRate = _mapper.Map<FlexibleInterestRate>(flexibleInterestRateSetupDto);
-                var createFlexibleInterestRateStatus = await _depositSchemeRepository.CreateFlexibleInterestRate(flexibleInterestRate);
-                if (createFlexibleInterestRateStatus <= 0) throw new Exception("Unable to Create Flexible Interest Rate");
-                var updateInterestRateAccordingToFlexibleInterestRateStatus = await _depositSchemeRepository.UpdateInterestRateAccordingToFlexibleInterestRate(flexibleInterestRate);
-                if (updateInterestRateAccordingToFlexibleInterestRateStatus <= 0) throw new Exception("Unable to Update the Interest Rate");
-                return new ResponseDto()
-                {
-                    Message = "Update Successfully",
-                    Status = true,
-                    StatusCode = "500"
+                    Message=$"Successfully created '{newDepositAccount.AccountNumber}' account number",
+                    Status=true,
+                    StatusCode="200"
                 };
             }
-            else if(depositScheme==null || depositScheme.Id<=0)
-                throw new Exception("Deposit Scheme Not Found");
-            else if(depositScheme.MinimumInterestRate > flexibleInterestRateSetupDto.InterestRate)
-                throw new Exception($"Interest Rate Should be greater than Minimum Interest Rate. Minimum Interest Rate in your condition is: {depositScheme.MinimumInterestRate}");
-            else if(depositScheme.MaximumInterestRate < flexibleInterestRateSetupDto.InterestRate)
-                throw new Exception($"Interest Rate Should be less than Maximum Interest Rate. Maximum Interest Rate in your condition is: {depositScheme.MaximumInterestRate}");
-            else
-                throw new Exception("Something Worng Happend");
+            throw new Exception("Unable to Create Deposit Account");
         }
-
-        public async Task<ResponseDto> IncrementOrDecrementOfInterestRateService(UpdateInterestRateByDepositSchemeDto updateInterestRateByDepositSchemeDto)
+        private async Task CreateJointAccountService(List<Client> jointClients, DepositAccount depositAccount)
         {
-            var updateStatus = await _depositSchemeRepository.IncrementOrDecrementOfInterestRate(updateInterestRateByDepositSchemeDto);
-            if (updateStatus >= 1)
-                return new ResponseDto()
+            List<JointAccount> jointAccounts = new List<JointAccount>();
+            DateTime RealWorldStartDate = DateTime.Now;
+            DateTime CompanyCalendarStartDate = depositAccount.CompanyCalendarCreationDate;
+            foreach (var jointClient in jointClients)
+            {
+                var jointAccount = new JointAccount()
                 {
-                    Message = "Update Successfully",
-                    Status = true,
-                    StatusCode = "200"
+                    JointClient = jointClient,
+                    DepositAccount = depositAccount,
+                    RealWorldStartDate = RealWorldStartDate,
+                    CompanyCalendarStartDate=CompanyCalendarStartDate
                 };
-            return new ResponseDto()
-            {
-                Message = "Update Failed",
-                Status = false,
-                StatusCode = "500"
-            };
-        }
-
-        public async Task<ResponseDto> ChangeInterestRateAccordingToPastInterestRateService(ChangeInterestRateByDepositSchemeDto changeInterestRateByDepositSchemeDto)
-        {
-            // Validation
-            // 1. If New Interest Rate is between Minimum and Maximum Interest Rate
-            var depositScheme = await _depositSchemeRepository.GetDepositScheme(changeInterestRateByDepositSchemeDto.DepositSchemeId);
-            if (
-             depositScheme != null && depositScheme.Id >= 1 &&
-             depositScheme.MinimumInterestRate <= changeInterestRateByDepositSchemeDto.NewInterestRate
-             && depositScheme.MaximumInterestRate >= changeInterestRateByDepositSchemeDto.NewInterestRate)
-            {
-                var updateStatus = await _depositSchemeRepository.ChangeInterestRateAccordingToPastInterestRate(changeInterestRateByDepositSchemeDto);
-                if(updateStatus>=1) return new ResponseDto(){Message="Update Successfull", Status=true, StatusCode="200"};
-                return new ResponseDto(){Message="Update Failed", Status=false, StatusCode="500"};
-
+                jointAccounts.Add(jointAccount);
             }
-            else if(depositScheme==null || depositScheme.Id<=0)
-                throw new Exception("Deposit Scheme Not Found");
-            else if(depositScheme.MinimumInterestRate > changeInterestRateByDepositSchemeDto.NewInterestRate)
-                throw new Exception($"New Interest Rate Should be greater than Minimum Interest Rate. Minimum Interest Rate in your condition is: {depositScheme.MinimumInterestRate}");
-            else if(depositScheme.MaximumInterestRate < changeInterestRateByDepositSchemeDto.NewInterestRate)
-                throw new Exception($"New Interest Rate Should be less than Maximum Interest Rate. Maximum Interest Rate in your condition is: {depositScheme.MaximumInterestRate}");
-            else
-                throw new Exception("Something Worng Happend");
+            await _depositSchemeRepository.CreateJointAccount(jointAccounts, depositAccount);
         }
+
+        public async Task<List<DepositAccountWrapper>> GetAllNonClosedDepositAccountService()
+        {
+            var allNonClosedDepositAccounts = await _depositSchemeRepository.GetAllNonClosedDepositAccounts();
+            if(allNonClosedDepositAccounts==null || allNonClosedDepositAccounts.Count<1)
+                return new List<DepositAccountWrapper>();
+            return allNonClosedDepositAccounts;
+        }
+
+        public async Task<DepositAccountWrapper> GetNonClosedDepositAccountById(int depositAccountId)
+        {
+            var depositAccountWrapper = await _depositSchemeRepository.GetNonCloseDepositAccountById(depositAccountId);
+            return depositAccountWrapper;
+        }
+        
+
+        // public async Task<ResponseDto> UpdateDepositAccountService(UpdateDepositAccountDto updateDepositAccountDto, string modifiedBy)
+        // {
+        //     var status = await _depositSchemeRepository.UpdateDepositAccount(updateDepositAccountDto, modifiedBy);
+        //     if (status >= 1)
+        //         return new ResponseDto()
+        //         {
+        //             Message = "Updated Successfully",
+        //             Status = true,
+        //             StatusCode = "200"
+        //         };
+
+        //     return new ResponseDto()
+        //     {
+        //         Message = "Update Failed",
+        //         Status = false,
+        //         StatusCode = "500"
+        //     };
+
+        // }
+
+        // private async Task<DepositAccountDto> GetDepositAccountDto(DepositAccount depositAccount)
+        // {
+        //     DepositAccountDto depositAccountDto = _mapper.Map<DepositAccountDto>(depositAccount);
+        //     AccountTypeEnum accountTypeEnum = (AccountTypeEnum)depositAccount.AccountType;
+        //     depositAccountDto.AccountType = Enum.GetName(typeof(AccountTypeEnum), accountTypeEnum);
+        //     if (depositAccount.PeriodType >= 1)
+        //     {
+        //         PeriodTypeEnum periodTypeEnum = (PeriodTypeEnum)depositAccount.PeriodType;
+        //         depositAccountDto.PeriodType = Enum.GetName(typeof(PeriodTypeEnum), periodTypeEnum);
+        //     }
+        //     AccountStatusEnum accountStatusEnum = (AccountStatusEnum)depositAccount.Status;
+        //     depositAccountDto.Status = Enum.GetName(typeof(AccountStatusEnum), accountStatusEnum);
+        //     // GET ALL DEPOSIT SCHEME DETAILS
+        //     ResponseDepositScheme depositSchemeWithLedgerDetails = _mapper.Map<ResponseDepositScheme>(depositAccount.DepositScheme);
+        //     var ledgerAsInterest = await _mainLedgerRepository.GetLedger(depositAccount.DepositScheme.LedgerAsInterestAccountId);
+        //     var ledgerAsLiability = await _mainLedgerRepository.GetLedger(depositAccount.DepositScheme.LedgerAsLiabilityAccountId);
+        //     depositSchemeWithLedgerDetails.LiabilityAccount = ledgerAsLiability;
+        //     depositSchemeWithLedgerDetails.InterestAccount = ledgerAsInterest;
+        //     depositAccountDto.DepositScheme = GetDepositSchemeDto(depositSchemeWithLedgerDetails);
+        //     //////////////////////////////////////////////////
+        //     depositAccountDto.Client = _mapper.Map<ClientDto>(await _clientRepo.GetClientById(depositAccount.ClientId));
+        //     if (depositAccount.JointClientId >= 1)
+        //     {
+        //         depositAccountDto.JointClient = _mapper.Map<ClientDto>(await _clientRepo.GetClientById((int)depositAccount.JointClientId));
+        //     }
+
+        //     return depositAccountDto;
+        // }
+        // public async Task<DepositAccountDto> GetDepositAccountByIdService(int id)
+        // {
+        //     var depositAccount = await _depositSchemeRepository.GetDepositAccountById(id);
+        //     return await GetDepositAccountDto(depositAccount);
+        // }
+
+        // public async Task<DepositAccountDto> GetDepositAccountByAccountNumberService(string accountNumber)
+        // {
+        //     var depositAccount = await _depositSchemeRepository.GetDepositAccountByAccountNumber(accountNumber);
+        //     return await GetDepositAccountDto(depositAccount);
+        // }
+
+        // public async Task<List<DepositAccountDto>> GetAllDepositAccountService()
+        // {
+        //     List<DepositAccountDto> depositAccountDtos = new List<DepositAccountDto>();
+        //     var depositAccounts = await _depositSchemeRepository.GetDepositAccountListAsync();
+        //     if (depositAccounts.Count >= 1 && depositAccounts != null)
+        //     {
+        //         foreach (var account in depositAccounts)
+        //         {
+        //             depositAccountDtos.Add(await GetDepositAccountDto(account));
+        //         }
+        //     }
+        //     return depositAccountDtos;
+        // }
+
+        // public async Task<List<DepositAccountDto>> GetAllDepositAccountByDepositSchemeService(int depositSchemeId)
+        // {
+        //     List<DepositAccountDto> depositAccountDtos = new List<DepositAccountDto>();
+        //     var depositAccounts = await _depositSchemeRepository.GetDepositAccountByDepositScheme(depositSchemeId);
+        //     if (depositAccounts.Count >= 1 && depositAccounts != null)
+        //     {
+        //         foreach (var account in depositAccounts)
+        //         {
+        //             depositAccountDtos.Add(await GetDepositAccountDto(account));
+        //         }
+        //     }
+        //     return depositAccountDtos;
+        // }
+
+        // // FLEXIBLE INTEREST AND INTEREST CHANGING FUNCTIONS
+
+        // public async Task<ResponseDto> UpdateInterestRateAccordingToFlexibleInterestRateService(FlexibleInterestRateSetupDto flexibleInterestRateSetupDto)
+        // {
+        //     // Validation
+        //     // 1. If Given Interest Rate is between Minimum and Maximum Interest Rate
+        //     var depositScheme = await _depositSchemeRepository.GetDepositScheme(flexibleInterestRateSetupDto.DepositSchemeId);
+        //     if (depositScheme != null && depositScheme.Id >= 1 && depositScheme.MinimumInterestRate <= flexibleInterestRateSetupDto.InterestRate && depositScheme.MaximumInterestRate >= flexibleInterestRateSetupDto.InterestRate)
+        //     {
+        //         FlexibleInterestRate flexibleInterestRate = _mapper.Map<FlexibleInterestRate>(flexibleInterestRateSetupDto);
+        //         var createFlexibleInterestRateStatus = await _depositSchemeRepository.CreateFlexibleInterestRate(flexibleInterestRate);
+        //         if (createFlexibleInterestRateStatus <= 0) throw new Exception("Unable to Create Flexible Interest Rate");
+        //         var updateInterestRateAccordingToFlexibleInterestRateStatus = await _depositSchemeRepository.UpdateInterestRateAccordingToFlexibleInterestRate(flexibleInterestRate);
+        //         if (updateInterestRateAccordingToFlexibleInterestRateStatus <= 0) throw new Exception("Unable to Update the Interest Rate");
+        //         return new ResponseDto()
+        //         {
+        //             Message = "Update Successfully",
+        //             Status = true,
+        //             StatusCode = "500"
+        //         };
+        //     }
+        //     else if(depositScheme==null || depositScheme.Id<=0)
+        //         throw new Exception("Deposit Scheme Not Found");
+        //     else if(depositScheme.MinimumInterestRate > flexibleInterestRateSetupDto.InterestRate)
+        //         throw new Exception($"Interest Rate Should be greater than Minimum Interest Rate. Minimum Interest Rate in your condition is: {depositScheme.MinimumInterestRate}");
+        //     else if(depositScheme.MaximumInterestRate < flexibleInterestRateSetupDto.InterestRate)
+        //         throw new Exception($"Interest Rate Should be less than Maximum Interest Rate. Maximum Interest Rate in your condition is: {depositScheme.MaximumInterestRate}");
+        //     else
+        //         throw new Exception("Something Worng Happend");
+        // }
+
+        // public async Task<ResponseDto> IncrementOrDecrementOfInterestRateService(UpdateInterestRateByDepositSchemeDto updateInterestRateByDepositSchemeDto)
+        // {
+        //     var updateStatus = await _depositSchemeRepository.IncrementOrDecrementOfInterestRate(updateInterestRateByDepositSchemeDto);
+        //     if (updateStatus >= 1)
+        //         return new ResponseDto()
+        //         {
+        //             Message = "Update Successfully",
+        //             Status = true,
+        //             StatusCode = "200"
+        //         };
+        //     return new ResponseDto()
+        //     {
+        //         Message = "Update Failed",
+        //         Status = false,
+        //         StatusCode = "500"
+        //     };
+        // }
+
+        // public async Task<ResponseDto> ChangeInterestRateAccordingToPastInterestRateService(ChangeInterestRateByDepositSchemeDto changeInterestRateByDepositSchemeDto)
+        // {
+        //     // Validation
+        //     // 1. If New Interest Rate is between Minimum and Maximum Interest Rate
+        //     var depositScheme = await _depositSchemeRepository.GetDepositScheme(changeInterestRateByDepositSchemeDto.DepositSchemeId);
+        //     if (
+        //      depositScheme != null && depositScheme.Id >= 1 &&
+        //      depositScheme.MinimumInterestRate <= changeInterestRateByDepositSchemeDto.NewInterestRate
+        //      && depositScheme.MaximumInterestRate >= changeInterestRateByDepositSchemeDto.NewInterestRate)
+        //     {
+        //         var updateStatus = await _depositSchemeRepository.ChangeInterestRateAccordingToPastInterestRate(changeInterestRateByDepositSchemeDto);
+        //         if(updateStatus>=1) return new ResponseDto(){Message="Update Successfull", Status=true, StatusCode="200"};
+        //         return new ResponseDto(){Message="Update Failed", Status=false, StatusCode="500"};
+
+        //     }
+        //     else if(depositScheme==null || depositScheme.Id<=0)
+        //         throw new Exception("Deposit Scheme Not Found");
+        //     else if(depositScheme.MinimumInterestRate > changeInterestRateByDepositSchemeDto.NewInterestRate)
+        //         throw new Exception($"New Interest Rate Should be greater than Minimum Interest Rate. Minimum Interest Rate in your condition is: {depositScheme.MinimumInterestRate}");
+        //     else if(depositScheme.MaximumInterestRate < changeInterestRateByDepositSchemeDto.NewInterestRate)
+        //         throw new Exception($"New Interest Rate Should be less than Maximum Interest Rate. Maximum Interest Rate in your condition is: {depositScheme.MaximumInterestRate}");
+        //     else
+        //         throw new Exception("Something Worng Happend");
+        // }
     }
 }

@@ -4,6 +4,7 @@ using MicroFinance.Dtos.DepositSetup;
 using MicroFinance.ErrorManage;
 using MicroFinance.Services;
 using MicroFinance.Services.DepositSetup;
+using MicroFinance.Token;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,45 +16,52 @@ namespace MicroFinance.Controllers.DepositSetup
     {
         private readonly ILogger<DepositSchemeController> _logger;
         private readonly IDepositSchemeService _depositSchemeService;
+        private readonly ITokenService _tokenService;
 
-        public DepositSchemeController(ILogger<DepositSchemeController> logger, IDepositSchemeService depositSchemeService)
+        public DepositSchemeController
+        (
+            ILogger<DepositSchemeController> logger,
+            IDepositSchemeService depositSchemeService,
+            ITokenService tokenService
+        )
         {
             _logger = logger;
             _depositSchemeService = depositSchemeService;
+            _tokenService = tokenService;
 
         }
 
-        [HttpPost]
+        private TokenDto GetDecodedToken()
+        {
+            string token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var decodedToken = _tokenService.DecodeJWT(token);
+            return decodedToken;
+        }
+
+        [HttpPost("createDepositScheme")]
         public async Task<ActionResult<ResponseDto>> CreateDepositScheme(CreateDepositSchemeDto createDepositSchemeDto)
         {
-
-            var userName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-            return await _depositSchemeService.CreateDepositSchemeService(createDepositSchemeDto, userName);
-
+            var decodedToken = GetDecodedToken();
+            return await _depositSchemeService.CreateDepositSchemeService(createDepositSchemeDto, decodedToken);
         }
 
-        [HttpPut]
+        [HttpPut("updateDepositScheme")]
         public async Task<ActionResult<ResponseDto>> UpdateDepositScheme(UpdateDepositSchemeDto updateDepositSchemeDto)
         {
-
-            var userName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-            return await _depositSchemeService.UpdateDepositSchemeService(updateDepositSchemeDto, userName);
-
+            var decodedToken = GetDecodedToken();
+            return await _depositSchemeService.UpdateDepositSchemeService(updateDepositSchemeDto, decodedToken);
         }
 
-        [HttpGet]
+        [HttpGet("getAllDepositScheme")]
         public async Task<ActionResult<List<DepositSchemeDto>>> GetAllDepositScheme()
         {
-
-            var userName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-            return await _depositSchemeService.GetAllDepositSchemeService();
-
+           return await _depositSchemeService.GetAllDepositSchemeService();
         }
 
-        [HttpGet("id")]
+        [HttpGet("getDepositSchemeById")]
         public async Task<ActionResult<DepositSchemeDto>> GetDepositSchemeById([FromQuery] int id)
         {
-            return Ok(await _depositSchemeService.GetDepositSchemeService(id));
+            return Ok(await _depositSchemeService.GetDepositSchemeByIdService(id));
         }
 
 

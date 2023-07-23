@@ -52,6 +52,13 @@ namespace MicroFinance.Controllers.ClientSetup
             return await _clientService.GetAllClientsService();
         }
 
+        [HttpGet("getAllActiveClients")]
+        public async Task<ActionResult<List<ClientDto>>> GetActiveClientByBranchCode()
+        {
+            var decodedToken = GetDecodedToken();
+            return await _clientService.GetActiveClientsByBranchCodeService(decodedToken.BranchCode);
+        }
+
         [HttpGet("getClientByClientId")]
         public async Task<ActionResult<ClientDto>> GetClientByClientId([FromQuery] string clientId)
         {

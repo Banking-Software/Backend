@@ -39,11 +39,14 @@ namespace MicroFinance.Repository.ClientSetup
                 client.ClientId = client.Id.ToString().PadLeft(5, '0');
                 var statusUpdate = await _dbContext.SaveChangesAsync();
                 if(statusUpdate<1) throw new Exception("Client Creation failed");
+                _logger.LogInformation($"{DateTime.Now}: {client.ClientId} has been assiged to newly created client");
                 return client.ClientId;
             }
             catch (Exception ex)
             {
                 _dbContext.Clients.Remove(client);
+                _logger.LogError($"{DateTime.Now}: Failed to assign a unique ClientId. Newly Created Client is deleted");
+                _logger.LogError($"{DateTime.Now}:{ex.Message}");
                 throw new Exception(ex.Message);
             }
         }
@@ -56,6 +59,7 @@ namespace MicroFinance.Repository.ClientSetup
             int result = await _dbContext.SaveChangesAsync();
             if(result<1)
                 throw new Exception("Unable to Create a Client");
+            _logger.LogInformation($"{DateTime.Now}: New Client has been created by employee {client.CreatedBy}. Sending to assign unique clientId...");
             return await AddClientId(client);
         }
 
@@ -77,10 +81,27 @@ namespace MicroFinance.Repository.ClientSetup
         public async Task<int> UpdateClient(Client updateClient)
         {
             var existingClient = await _dbContext.Clients.FindAsync(updateClient.Id);
+            if(updateClient.IsActive && !existingClient.IsActive)
+            {
+                _logger.LogInformation($"{DateTime.Now}: Activating inactive client {updateClient.ClientId} by employee {updateClient.ModifiedBy}");
+            }
+            else if(!updateClient.IsActive && existingClient.IsActive)
+            {
+                _logger.LogInformation($"{DateTime.Now}: Deactivating active client {updateClient.ClientId} by employee {updateClient.ModifiedBy}");
+            }
             _dbContext.Entry(existingClient).State = EntityState.Detached;
             _dbContext.Clients.Attach(updateClient);
             _dbContext.Entry(updateClient).State = EntityState.Modified;
-            return await _dbContext.SaveChangesAsync();
+            var status =  await _dbContext.SaveChangesAsync();
+            if(status>=1)
+            {
+                _logger.LogInformation($"{DateTime.Now}: client {updateClient.ClientId} update successfully by employee {updateClient.ModifiedBy}");
+            }
+            else
+            {
+                _logger.LogError($"{DateTime.Now}: Failed to update the Client");
+            }
+            return status;
         }
 
        
@@ -117,6 +138,17 @@ namespace MicroFinance.Repository.ClientSetup
             .Include(c=>c.KYMType)
             .ToListAsync();
             return clients;
+        }
+        public async Task<List<Client>> GetActiveClientsByBranchCode(string branchCode)
+        {
+            return await _dbContext.Clients
+            .Where(c=>c.IsActive && c.BranchCode==branchCode)
+            .Include(c => c.ShareType)
+            .Include(c => c.ClientType)
+            .Include(c => c.ClientGroup)
+            .Include(c => c.ClientUnit)
+            .Include(c=>c.KYMType)
+            .ToListAsync();
         }
         public async Task<List<Client>> GetClientsByGroup(int groupId)
         {

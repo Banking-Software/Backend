@@ -82,7 +82,7 @@ namespace MicroFinance.Controllers.CompanyProfile
             return await _companyProfile.UpdateCompanyProfileService(updateCompanyProfileDto);
         }
 
-        [HttpPut("getCompanyProfile")]
+        [HttpGet("getCompanyProfile")]
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         public async Task<ActionResult<CompanyProfileDto>> GetCompanyProfile()

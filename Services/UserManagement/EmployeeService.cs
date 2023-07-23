@@ -44,11 +44,18 @@ namespace MicroFinance.Services.UserManagement
         public async Task<TokenResponseDto> LoginService(UserLoginDto userLoginDto)
         {
             var user = await _employeeRepo.GetUserByUsername(userLoginDto.UserName);
-            if (user != null)
+            if(user==null)
+            {
+                _logger.LogError($"{DateTime.Now} Attempting to login with invalid user > {userLoginDto.UserName}");
+                throw new UnAuthorizedExceptionHandler("UnAuthorized");
+            }
+            var branchCode = await _companyProfile.GetBranchServiceByBranchCodeService(user.Employee.BranchCode);
+            if (branchCode.IsActive)
             {
                 var loginResult = await _employeeRepo.Login(user, userLoginDto.Password, userLoginDto.StayLogin);
                 if (loginResult.Succeeded)
                 {
+
                     _logger.LogInformation($"{DateTime.Now} User Logged In > {userLoginDto.UserName}");
                     var tokenData = new TokenDto()
                     {
@@ -64,8 +71,8 @@ namespace MicroFinance.Services.UserManagement
                 }
                 _logger.LogError($"{DateTime.Now} Invalid Login {loginResult.ToString()} > {userLoginDto.UserName}");
             }
-            _logger.LogError($"{DateTime.Now} Attempting to login with invalid user > {userLoginDto.UserName}");
-            throw new UnAuthorizedExceptionHandler("UnAuthorized");
+            throw new Exception("Your branch is In-active at the moment, please try again later");
+           
         }
 
         public async Task<ResponseDto> RegisterService(UserRegisterDto userRegisterDto, string createdBy)

@@ -1,6 +1,7 @@
 using MicroFinance.Dtos.RecordsWithCode;
 using MicroFinance.Services;
 using MicroFinance.Services.RecordsWithCode;
+using MicroFinance.Token;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +13,7 @@ namespace MicroFinance.Controllers.RecordsWithCode
     {
         private readonly IRecordsWithCodeService _recordsWitCodeService;
 
-        public RecordsWithCodeController(IRecordsWithCodeService recordsWitCodeService)
+        public RecordsWithCodeController(IRecordsWithCodeService recordsWitCodeService, ITokenService tokenService, ILogger<RecordsWithCodeController> logger)
         {
             _recordsWitCodeService = recordsWitCodeService;
         }

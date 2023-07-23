@@ -9,7 +9,7 @@ namespace MicroFinance.Dtos.ClientSetup
         public string ClientId { get; set; }
         public bool IsActive { get; set; }
         public string CreatedBy { get; set; }
-        public string CreatorBranchCode { get; set; }
+        public string BranchCode { get; set; }
         public string CreatorId { get; set; }
         public DateTime CreatedOn { get; set; }
         public bool? IsModified { get; set; }

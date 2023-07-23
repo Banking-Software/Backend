@@ -1,4 +1,4 @@
-namespace MicroFinance.Enums
+namespace MicroFinance.Enums.Deposit.Account
 {
     public enum AccountTypeEnum
     {

@@ -60,7 +60,7 @@ namespace MicroFinance.Services.ClientSetup
                 client.ClientUnit = newClient.ClientUnitId != null ? await _clientRepo.GetClientUnitById((int)newClient.ClientUnitId) : null;
                 client.CreatedBy = decodedToken.UserName;
                 client.CreatorId = decodedToken.UserId;
-                client.CreatorBranchCode = decodedToken.BranchCode;
+                client.BranchCode = decodedToken.BranchCode;
                 client.CreatedOn = DateTime.Now;
                 client = await UploadClientImages(newClient, client);
                 string clientId = await _clientRepo.CreateClient(client);
@@ -77,7 +77,12 @@ namespace MicroFinance.Services.ClientSetup
         public async Task<ResponseDto> UpdateClientService(UpdateClientDto updateClientDto, TokenDto decodedToken)
         {
             Client existingClient = await _clientRepo.GetClientById(updateClientDto.Id);
-            if
+            if(!existingClient.IsActive && !updateClientDto.IsActive)
+            {
+                _logger.LogInformation($"{DateTime.Now}: {decodedToken.UserName} tried to make changes on inactive client {updateClientDto.ClientId}");
+                throw new UnAuthorizedExceptionHandler("You are not authorized to update on in-active client");
+            }
+            else if
             (
                 existingClient != null
                 &&
@@ -111,6 +116,13 @@ namespace MicroFinance.Services.ClientSetup
             List<Client> allClients = await _clientRepo.GetAllClients();
             if (allClients != null && allClients.Count >= 1)
                 return _mapper.Map<List<ClientDto>>(allClients);
+            return new List<ClientDto>();
+        }
+        public async Task<List<ClientDto>> GetActiveClientsByBranchCodeService(string branchCode)
+        {
+            List<Client> activeClientByBranch = await _clientRepo.GetActiveClientsByBranchCode(branchCode);
+            if(activeClientByBranch!=null && activeClientByBranch.Count>=1)
+                return _mapper.Map<List<ClientDto>>(activeClientByBranch);
             return new List<ClientDto>();
         }
 
@@ -330,7 +342,7 @@ namespace MicroFinance.Services.ClientSetup
         {
             updateClient.CreatedBy = existingClient.CreatedBy;
             updateClient.CreatedOn = existingClient.CreatedOn;
-            updateClient.CreatorBranchCode = existingClient.CreatorBranchCode;
+            updateClient.BranchCode = existingClient.BranchCode;
             updateClient.CreatorId = existingClient.CreatorId;
             updateClient.IsModified = true;
             updateClient.ModifiedBy = decodedToken.UserName;

@@ -3,6 +3,7 @@ using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.ClientSetup;
 using MicroFinance.Models.CompanyProfile;
 using MicroFinance.Models.DepositSetup;
+using MicroFinance.Models.DepositSetup.HelperTable;
 using MicroFinance.Models.RecordsWithCode;
 using MicroFinance.Models.Share;
 using MicroFinance.Models.Transactions;
@@ -69,14 +70,16 @@ namespace MicroFinance.DBContext
         
 
         // START: SHARE
-        // public DbSet<ShareType> ShareTypes { get; set; }
-
-
+        public DbSet<ShareAccount> ShareAccounts { get; set; }
         // START: Deposit
 
         public DbSet<DepositScheme> DepositSchemes { get; set; }
-        public DbSet<PostingScheme> PostingSchemes { get; set; }
+        public DbSet<DepositPostingScheme> DepositPostingSchemes { get; set; }
+        public DbSet<DepositAccountStatus> DepositAccountStatuses { get; set; }
+        public DbSet<DepositAccountType> DepositAccountTypes { get; set; }
+        public DbSet<DepositSchemeCalculationType> DepositSchemeCalculationTypes { get; set; }
         public DbSet<DepositAccount> DepositAccounts { get; set; }
+        public DbSet<JointAccount> JointAccounts { get; set; }
         public DbSet<FlexibleInterestRate> FlexibleInterestRates { get; set; }
 
         // // START: TRANSACTION

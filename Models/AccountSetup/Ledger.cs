@@ -28,11 +28,9 @@ namespace MicroFinance.Models.AccountSetup
         public decimal? CurrentBalance { get; set; }        
         [Required]
         public bool IsBank { get; set; }
-        
+        public virtual ICollection<DepositScheme> DepositSchemes { get; set; }
         public virtual BankSetup BankSetup{ get; set; }
         public virtual ICollection<SubLedger> SubLedger { get; set; } 
-        public virtual DepositScheme LiabilityAccount { get; set; }
-        public virtual DepositScheme InterestAccount { get; set; }
         public virtual ICollection<Client> Client {get; set;}
     }
 }

@@ -91,25 +91,19 @@ using (var scope = app.Services.CreateScope())
 
             var superAdminDbContext = services.GetRequiredService<SuperAdminDbContext>();
             await superAdminDbContext.Database.MigrateAsync();
-
             var superAdminUserManager = services.GetRequiredService<UserManager<SuperAdmin>>();
             await UserDbContextSeed.SeedSuperAdminRoleAsync(superAdminDbContext, superAdminUserManager);
-
             var userDbContext = services.GetRequiredService<UserDbContext>();
             await userDbContext.Database.MigrateAsync();
-
             var dbContext = services.GetRequiredService<ApplicationDbContext>();
             await dbContext.Database.MigrateAsync();
 
             await LedgerDbContextSeed.SeedMainLedgerAsync(dbContext);
             await ClientDbContextSeed.SeedClientInfoAsync(dbContext);
             await RecordsWithCode.SeedRecordsWithCode(dbContext);
-
-            //await DepositDbContextSeed.SeedPostSchemeAsync(dbContext);
-            
+            await DepositDbContextSeed.SeedDepositAsync(dbContext);
             success=true;
             currentRetry=4;
-
         }
         catch (Exception ex)
         {

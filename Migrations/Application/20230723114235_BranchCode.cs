@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MicroFinance.Migrations.Application
 {
     /// <inheritdoc />
-    public partial class Sub : Migration
+    public partial class BranchCode : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -55,13 +55,37 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "Calendars",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    Month = table.Column<int>(type: "int", nullable: false),
+                    MonthName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NumberOfDay = table.Column<int>(type: "int", nullable: false),
+                    RunningDay = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsLocked = table.Column<bool>(type: "bit", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Calendars", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Casts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Code = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    NepaliName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EnglishName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -132,8 +156,10 @@ namespace MicroFinance.Migrations.Application
                     EstablishedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PhoneNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompanyEmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CompanyLogo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FromDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    FromDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LogoFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    LogoFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogoFileType = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -153,13 +179,62 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "DepositAccountStatuses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DepositAccountStatuses", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DepositAccountTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DepositAccountTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DepositPostingSchemes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DepositPostingSchemes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DepositSchemeCalculationTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DepositSchemeCalculationTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Districts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Code = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    NepaliName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EnglishName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -173,7 +248,8 @@ namespace MicroFinance.Migrations.Application
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Code = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    NepaliName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EnglishName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -187,23 +263,12 @@ namespace MicroFinance.Migrations.Application
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Code = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    NepaliName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EnglishName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MaritalStatuses", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PostingSchemes",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PostingSchemes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -213,7 +278,8 @@ namespace MicroFinance.Migrations.Application
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Code = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    NepaliName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EnglishName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -320,10 +386,7 @@ namespace MicroFinance.Migrations.Application
                     PermanentToleVillageNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PermanentWardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PermanentWardNumberNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PermanentDistrict = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PermanentDistrictCode = table.Column<int>(type: "int", nullable: true),
-                    PermanentDistrictNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PermanentState = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PermanentStateCode = table.Column<int>(type: "int", nullable: true),
                     TemporaryVdcMunicipality = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TemporaryVdcMunicipalityNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -331,11 +394,8 @@ namespace MicroFinance.Migrations.Application
                     TemporaryToleVillageNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TemporaryWardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TemporaryWardNumberNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TemporaryDistrict = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TemporaryDistrictCode = table.Column<int>(type: "int", nullable: true),
-                    TemporaryDistrictNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TemporaryState = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TemporaryStateCode = table.Column<int>(type: "int", nullable: true),
+                    TemporaryStateCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientMobileNumber1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientMobileNumber2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientTelephoneNumber1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -358,9 +418,7 @@ namespace MicroFinance.Migrations.Application
                     ClientMiddleName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientLastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ClientNepaliName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClientCast = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientCastCode = table.Column<int>(type: "int", nullable: true),
-                    ClientGender = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientGenderCode = table.Column<int>(type: "int", nullable: true),
                     ClientDateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ClientOccupation = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -370,7 +428,6 @@ namespace MicroFinance.Migrations.Application
                     ClientNationality = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientPanNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientEducationStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClientMaritalStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientMartialStatusCode = table.Column<int>(type: "int", nullable: true),
                     ClientNationalityIdStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientVotingId = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -387,6 +444,18 @@ namespace MicroFinance.Migrations.Application
                     NomineeAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NomineeCitizenshipNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NomineeContactNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientPhotoFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    ClientPhotoFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientPhotoFileType = table.Column<int>(type: "int", nullable: true),
+                    ClientCitizenshipFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    ClientCitizenshipFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientCitizenshipFileType = table.Column<int>(type: "int", nullable: true),
+                    ClientSignatureFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    ClientSignatureFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientSignatureFileType = table.Column<int>(type: "int", nullable: true),
+                    NomineePhotoFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    NomineePhotoFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NomineePhotoFileType = table.Column<int>(type: "int", nullable: true),
                     ClientTypeId = table.Column<int>(type: "int", nullable: false),
                     ClientShareTypeInfoId = table.Column<int>(type: "int", nullable: true),
                     ClientGroupId = table.Column<int>(type: "int", nullable: true),
@@ -395,7 +464,7 @@ namespace MicroFinance.Migrations.Application
                     ClientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatorBranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsModified = table.Column<bool>(type: "bit", nullable: true),
@@ -435,52 +504,6 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "DepositSchemes",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    NameNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DepositType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Symbol = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MinimumBalance = table.Column<int>(type: "int", nullable: false),
-                    InterestRateOnMinimumBalance = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    InterestRate = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    MinimumInterestRate = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    MaximumInterestRate = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    Calculation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PostingSchemeId = table.Column<int>(type: "int", nullable: false),
-                    ClosingCharge = table.Column<int>(type: "int", nullable: true),
-                    LedgerAsLiabilityAccountId = table.Column<int>(type: "int", nullable: false),
-                    LedgerAsInterestAccountId = table.Column<int>(type: "int", nullable: false),
-                    FineAmount = table.Column<int>(type: "int", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DepositSchemes", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DepositSchemes_Ledgers_LedgerAsInterestAccountId",
-                        column: x => x.LedgerAsInterestAccountId,
-                        principalTable: "Ledgers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_DepositSchemes_Ledgers_LedgerAsLiabilityAccountId",
-                        column: x => x.LedgerAsLiabilityAccountId,
-                        principalTable: "Ledgers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_DepositSchemes_PostingSchemes_PostingSchemeId",
-                        column: x => x.PostingSchemeId,
-                        principalTable: "PostingSchemes",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "SubLedgers",
                 columns: table => new
                 {
@@ -503,39 +526,126 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "ShareAccounts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AccountNumber = table.Column<int>(type: "int", nullable: false),
+                    CurrentShareBalance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CurrentNumberOfKitta = table.Column<int>(type: "int", nullable: false),
+                    StartOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShareAccounts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ShareAccounts_Clients_AccountNumber",
+                        column: x => x.AccountNumber,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DepositSchemes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SchemeName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SchemeNameNepali = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SchemeTypeId = table.Column<int>(type: "int", nullable: false),
+                    Symbol = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    MinimumBalance = table.Column<int>(type: "int", nullable: false),
+                    InterestRateOnMinimumBalance = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    InterestRate = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    MinimumInterestRate = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    MaximumInterestRate = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    Calculation = table.Column<int>(type: "int", nullable: false),
+                    PostingScheme = table.Column<int>(type: "int", nullable: false),
+                    InterestSubLedgerId = table.Column<int>(type: "int", nullable: false),
+                    DepositSubledgerId = table.Column<int>(type: "int", nullable: false),
+                    TaxSubledgerId = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RealWorldCreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompanyCalendarCreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifierId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifierBranchCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RealWorldModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompanyCalendarModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DepositSchemes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DepositSchemes_Ledgers_SchemeTypeId",
+                        column: x => x.SchemeTypeId,
+                        principalTable: "Ledgers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_DepositSchemes_SubLedgers_DepositSubledgerId",
+                        column: x => x.DepositSubledgerId,
+                        principalTable: "SubLedgers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_DepositSchemes_SubLedgers_InterestSubLedgerId",
+                        column: x => x.InterestSubLedgerId,
+                        principalTable: "SubLedgers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_DepositSchemes_SubLedgers_TaxSubledgerId",
+                        column: x => x.TaxSubledgerId,
+                        principalTable: "SubLedgers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DepositAccounts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DepositSchemeId = table.Column<int>(type: "int", nullable: false),
-                    AccountNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    AccountNumber = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     OpeningDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Period = table.Column<int>(type: "int", nullable: true),
-                    PeriodType = table.Column<int>(type: "int", nullable: true),
+                    Period = table.Column<int>(type: "int", nullable: false),
+                    PeriodType = table.Column<int>(type: "int", nullable: false),
                     AccountType = table.Column<int>(type: "int", nullable: false),
-                    JointClientId = table.Column<int>(type: "int", nullable: true),
-                    MatureDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    InterestRate = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    MinimumBalance = table.Column<int>(type: "int", nullable: false),
-                    PrincipalAmount = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
-                    InterestAmount = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
-                    ReferredBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    InterestPostingAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MatureInterestPostingAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MatureDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    InterestRate = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    PrincipalAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    InterestAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    ReferredByEmployeeId = table.Column<int>(type: "int", nullable: false),
+                    Relation = table.Column<int>(type: "int", nullable: true),
+                    NomineeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     IsSMSServiceActive = table.Column<bool>(type: "bit", nullable: false),
-                    DailyDepositAmount = table.Column<int>(type: "int", nullable: true),
-                    TotalDepositDay = table.Column<int>(type: "int", nullable: true),
-                    TotalDepositAmount = table.Column<int>(type: "int", nullable: true),
-                    TotalReturnAmount = table.Column<int>(type: "int", nullable: true),
-                    TotalInterestAmount = table.Column<int>(type: "int", nullable: true),
+                    ExpectedDailyDepositAmount = table.Column<int>(type: "int", nullable: true),
+                    ExpectedTotalDepositDay = table.Column<int>(type: "int", nullable: true),
+                    ExpectedTotalDepositAmount = table.Column<int>(type: "int", nullable: true),
+                    ExpectedTotalReturnAmount = table.Column<int>(type: "int", nullable: true),
+                    ExpectedTotalInterestAmount = table.Column<int>(type: "int", nullable: true),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    InterestPostingAccountNumberId = table.Column<int>(type: "int", nullable: true),
+                    MatureInterestPostingAccountNumberId = table.Column<int>(type: "int", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RealWorldCreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompanyCalendarCreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    ModifierId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifierBranchCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RealWorldModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompanyCalendarModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -546,9 +656,14 @@ namespace MicroFinance.Migrations.Application
                         principalTable: "Clients",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_DepositAccounts_Clients_JointClientId",
-                        column: x => x.JointClientId,
-                        principalTable: "Clients",
+                        name: "FK_DepositAccounts_DepositAccounts_InterestPostingAccountNumberId",
+                        column: x => x.InterestPostingAccountNumberId,
+                        principalTable: "DepositAccounts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_DepositAccounts_DepositAccounts_MatureInterestPostingAccountNumberId",
+                        column: x => x.MatureInterestPostingAccountNumberId,
+                        principalTable: "DepositAccounts",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_DepositAccounts_DepositSchemes_DepositSchemeId",
@@ -580,6 +695,34 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "JointAccounts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DepositAccountId = table.Column<int>(type: "int", nullable: false),
+                    JointClientId = table.Column<int>(type: "int", nullable: false),
+                    RealWorldStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RealWorldEndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompanyCalendarStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompanyCalendarEndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JointAccounts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_JointAccounts_Clients_JointClientId",
+                        column: x => x.JointClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_JointAccounts_DepositAccounts_DepositAccountId",
+                        column: x => x.DepositAccountId,
+                        principalTable: "DepositAccounts",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Transaction",
                 columns: table => new
                 {
@@ -597,7 +740,8 @@ namespace MicroFinance.Migrations.Application
                         name: "FK_Transaction_DepositAccounts_DepositAccountId",
                         column: x => x.DepositAccountId,
                         principalTable: "DepositAccounts",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -652,6 +796,12 @@ namespace MicroFinance.Migrations.Application
                 name: "IX_Branches_BranchCode",
                 table: "Branches",
                 column: "BranchCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Calendars_Year_Month",
+                table: "Calendars",
+                columns: new[] { "Year", "Month" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -714,7 +864,8 @@ namespace MicroFinance.Migrations.Application
                 name: "IX_DepositAccounts_AccountNumber",
                 table: "DepositAccounts",
                 column: "AccountNumber",
-                unique: true);
+                unique: true,
+                filter: "[AccountNumber] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DepositAccounts_ClientId",
@@ -727,32 +878,49 @@ namespace MicroFinance.Migrations.Application
                 column: "DepositSchemeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DepositAccounts_JointClientId",
+                name: "IX_DepositAccounts_InterestPostingAccountNumberId",
                 table: "DepositAccounts",
-                column: "JointClientId");
+                column: "InterestPostingAccountNumberId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DepositSchemes_LedgerAsInterestAccountId",
+                name: "IX_DepositAccounts_MatureInterestPostingAccountNumberId",
+                table: "DepositAccounts",
+                column: "MatureInterestPostingAccountNumberId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DepositSchemes_DepositSubledgerId",
                 table: "DepositSchemes",
-                column: "LedgerAsInterestAccountId",
+                column: "DepositSubledgerId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DepositSchemes_LedgerAsLiabilityAccountId",
+                name: "IX_DepositSchemes_InterestSubLedgerId",
                 table: "DepositSchemes",
-                column: "LedgerAsLiabilityAccountId",
+                column: "InterestSubLedgerId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DepositSchemes_Name",
+                name: "IX_DepositSchemes_SchemeName",
                 table: "DepositSchemes",
-                column: "Name",
+                column: "SchemeName",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DepositSchemes_PostingSchemeId",
+                name: "IX_DepositSchemes_SchemeTypeId",
                 table: "DepositSchemes",
-                column: "PostingSchemeId");
+                column: "SchemeTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DepositSchemes_Symbol",
+                table: "DepositSchemes",
+                column: "Symbol",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DepositSchemes_TaxSubledgerId",
+                table: "DepositSchemes",
+                column: "TaxSubledgerId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_DepositTransaction_TransactionId",
@@ -778,6 +946,16 @@ namespace MicroFinance.Migrations.Application
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_JointAccounts_DepositAccountId",
+                table: "JointAccounts",
+                column: "DepositAccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JointAccounts_JointClientId",
+                table: "JointAccounts",
+                column: "JointClientId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Ledgers_GroupTypeId_Name",
                 table: "Ledgers",
                 columns: new[] { "GroupTypeId", "Name" },
@@ -791,10 +969,9 @@ namespace MicroFinance.Migrations.Application
                 filter: "[LedgerCode] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PostingSchemes_Name",
-                table: "PostingSchemes",
-                column: "Name",
-                unique: true);
+                name: "IX_ShareAccounts_AccountNumber",
+                table: "ShareAccounts",
+                column: "AccountNumber");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SubLedgers_LedgerId",
@@ -830,6 +1007,9 @@ namespace MicroFinance.Migrations.Application
                 name: "Branches");
 
             migrationBuilder.DropTable(
+                name: "Calendars");
+
+            migrationBuilder.DropTable(
                 name: "Casts");
 
             migrationBuilder.DropTable(
@@ -837,6 +1017,18 @@ namespace MicroFinance.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "DebitOrCredits");
+
+            migrationBuilder.DropTable(
+                name: "DepositAccountStatuses");
+
+            migrationBuilder.DropTable(
+                name: "DepositAccountTypes");
+
+            migrationBuilder.DropTable(
+                name: "DepositPostingSchemes");
+
+            migrationBuilder.DropTable(
+                name: "DepositSchemeCalculationTypes");
 
             migrationBuilder.DropTable(
                 name: "DepositTransaction");
@@ -851,13 +1043,16 @@ namespace MicroFinance.Migrations.Application
                 name: "Genders");
 
             migrationBuilder.DropTable(
+                name: "JointAccounts");
+
+            migrationBuilder.DropTable(
                 name: "MaritalStatuses");
 
             migrationBuilder.DropTable(
-                name: "States");
+                name: "ShareAccounts");
 
             migrationBuilder.DropTable(
-                name: "SubLedgers");
+                name: "States");
 
             migrationBuilder.DropTable(
                 name: "BankTypes");
@@ -887,10 +1082,10 @@ namespace MicroFinance.Migrations.Application
                 name: "ClientUnits");
 
             migrationBuilder.DropTable(
-                name: "Ledgers");
+                name: "SubLedgers");
 
             migrationBuilder.DropTable(
-                name: "PostingSchemes");
+                name: "Ledgers");
 
             migrationBuilder.DropTable(
                 name: "GroupTypes");

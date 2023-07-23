@@ -1,14 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using MicroFinance.Enums;
+using MicroFinance.Enums.Deposit.Account;
 
 namespace MicroFinance.Dtos.DepositSetup
 {
-    public class CreateDepositAccountDto
+    public class UpdateDepositAccountDto
     {
-        public int DepositSchemeId { get; set; }
-        public string AccountNumber { get; set; }
-        public int ClientId { get; set; }
-        public DateTime OpeningDate { get; set; }
+         public int Id { get; set; }
         public int? Period { get; set; }
         public PeriodTypeEnum? PeriodType { get; set; }
         public AccountTypeEnum AccountType { get; set; }
@@ -18,9 +15,6 @@ namespace MicroFinance.Dtos.DepositSetup
         [Range(0, 100, ErrorMessage = "Interest must be a decimal value between 0 and 100.")]
         [RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "Interest must have up to two decimal places.")]
         public decimal InterestRate { get; set; }
-        public int MinimumBalance { get; set; }
-        public string ReferredBy { get; set; }
-        public string InterestPostingAccountNumber { get; set; }
         public string? MatureInterestPostingAccountNumber { get; set; }
         public string? Description { get; set; }
         public AccountStatusEnum Status { get; set; }

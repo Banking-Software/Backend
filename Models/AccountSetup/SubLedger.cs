@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MicroFinance.Models.DepositSetup;
 
 namespace MicroFinance.Models.AccountSetup
 {
@@ -13,5 +14,8 @@ namespace MicroFinance.Models.AccountSetup
         public string? Description { get; set; }
         public int LedgerId { get; set; }
         public virtual Ledger Ledger { get; set; }
+        public virtual DepositScheme InterestSchemes { get; set; }
+        public virtual DepositScheme DepositSchemes { get; set; }
+        public virtual DepositScheme TaxSchemes { get; set; }
     }
 }

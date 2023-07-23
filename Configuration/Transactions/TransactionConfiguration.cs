@@ -8,10 +8,10 @@ namespace MicroFinance.Configuration.Transactions
     {
         public void Configure(EntityTypeBuilder<Transaction> builder)
         {
-            builder.HasOne(t=>t.DepositAccount)
-            .WithMany(da=>da.Transactions)
-            .HasForeignKey(t=>t.DepositAccountId).IsRequired(false)
-            .OnDelete(DeleteBehavior.ClientSetNull);
+            // builder.HasOne(t=>t.DepositAccount)
+            // .WithMany(da=>da.Transactions)
+            // .HasForeignKey(t=>t.DepositAccountId).IsRequired(false)
+            // .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }

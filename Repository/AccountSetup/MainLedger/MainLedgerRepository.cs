@@ -260,10 +260,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         {
             return await _dbContext.BankTypes.FindAsync(id);
         }
-
-
         // Operation related to Subledger
-
         public async Task<int> CreateSubLedger(SubLedger subLedger)
         {
             await _dbContext.SubLedgers.AddAsync(subLedger);
@@ -289,6 +286,19 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<int> CreateMultipleSubLedger(List<SubLedger> subLedgers)
+        {
+           await _dbContext.SubLedgers.AddRangeAsync(subLedgers);
+           var createStatus = await _dbContext.SaveChangesAsync();
+           if(createStatus>=1)
+           {
+                foreach (var subledger in subLedgers)
+                {
+                    await UpdateSubLedgerCode(subledger.Id);
+                }
+           }
+           return createStatus;
+        }
         public async Task<int> EditSubledger(SubLedger subLedger)
         {
             var existingSubLedger = await _dbContext.SubLedgers.FindAsync(subLedger.Id);
@@ -307,6 +317,10 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         public async Task<SubLedger> GetSubLedgerById(int id)
         {
             return await _dbContext.SubLedgers.Include(sl => sl.Ledger).Where(sl => sl.Id == id).FirstOrDefaultAsync();
+        }
+        public async Task<SubLedger> GetSubLedgerByNameAndLedgerId(string subLedgerName, int ledgerId)
+        {
+            return await _dbContext.SubLedgers.Where(sl=>sl.Name==subLedgerName&&sl.LedgerId==ledgerId).SingleOrDefaultAsync();
         }
 
         public async Task<List<SubLedger>> GetSubLedgers()
