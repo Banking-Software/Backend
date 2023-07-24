@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.DepositSetup;
+using MicroFinance.Dtos.DepositSetup.Account;
 using MicroFinance.Models.Wrapper;
 using MicroFinance.Services;
 using MicroFinance.Services.DepositSetup;
@@ -59,13 +60,13 @@ namespace MicroFinance.Controllers.DepositSetup
         // }
 
         [HttpGet("getAllNonCloseDepositAccount")]
-        public async Task<ActionResult<List<DepositAccountWrapper>>> GetAllDepositAccount()
+        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetAllDepositAccount()
         {
             return Ok(await _depositService.GetAllNonClosedDepositAccountService());
         }
 
         [HttpGet("getNonCloseDepositAccountById")]
-        public async Task<ActionResult<List<DepositAccountWrapper>>> GetAllDepositAccount([FromQuery] int depositAccountId)
+        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetAllDepositAccount([FromQuery] int depositAccountId)
         {
             return Ok(await _depositService.GetNonClosedDepositAccountById(depositAccountId));
         }

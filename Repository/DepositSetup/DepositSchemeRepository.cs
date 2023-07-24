@@ -183,28 +183,21 @@ namespace MicroFinance.Repository.DepositSetup
         }
          public async Task<List<DepositAccountWrapper>> GetAllNonClosedDepositAccounts()
          {
-            var depositAccounts = await _depositDbContext.DepositAccounts
-            .Include(da=>da.Client)
-            .Include(da=>da.DepositScheme)
-            .Include(da=>da.InterestPostingAccountNumber)
-            .Include(da=>da.InterestPostingAccountNumber)
-            .Where(da=>da.Status!=AccountStatusEnum.Close)
-            .ToListAsync();
-            List<DepositAccountWrapper> depositAccountWrappers = new List<DepositAccountWrapper>();
-            foreach (var depositAccount in depositAccounts)
+           var depositAccountWrappers = await _depositDbContext.DepositAccounts
+            .Include(da => da.Client)
+            .Include(da => da.DepositScheme)
+            .Include(da => da.InterestPostingAccountNumber)
+            .Include(da => da.InterestPostingAccountNumber)
+            .Where(da => da.Status != AccountStatusEnum.Close)
+            .Select(da => new DepositAccountWrapper
             {
-                DepositAccountWrapper depositWrapper = new DepositAccountWrapper();
-                depositWrapper.DepositAccount = depositAccount;
-                if(depositAccount.AccountType==AccountTypeEnum.Joint)
-                {
-                    var jointAccounts = await _depositDbContext.JointAccounts
-                    .Include(ja=>ja.JointClient)
-                    .Where(ja=>ja.DepositAccountId==depositAccount.Id && ja.RealWorldEndDate==null && ja.CompanyCalendarEndDate==null)
-                    .ToListAsync();
-                    depositWrapper.JointAccount = jointAccounts;
-                }
-                depositAccountWrappers.Add(depositWrapper);
-            }
+                DepositAccount = da,
+                JointAccount = _depositDbContext.JointAccounts
+                    .Include(ja => ja.JointClient)
+                    .Where(ja => ja.DepositAccountId == da.Id && ja.RealWorldEndDate == null && ja.CompanyCalendarEndDate == null)
+                    .ToList()
+            })
+            .ToListAsync();
             return depositAccountWrappers;
          }
         public async Task<DepositAccountWrapper> GetNonCloseDepositAccountById(int id)

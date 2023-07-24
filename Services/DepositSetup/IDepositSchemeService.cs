@@ -1,5 +1,6 @@
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.DepositSetup;
+using MicroFinance.Dtos.DepositSetup.Account;
 using MicroFinance.Models.Wrapper;
 
 namespace MicroFinance.Services.DepositSetup
@@ -15,8 +16,8 @@ namespace MicroFinance.Services.DepositSetup
 
         // // Deposit Account
         Task<ResponseDto> CreateDepositAccountService(CreateDepositAccountDto createDepositAccountDto, TokenDto decodedToken);
-        Task<List<DepositAccountWrapper>> GetAllNonClosedDepositAccountService();
-        Task<DepositAccountWrapper> GetNonClosedDepositAccountById(int depositAccountId);
+        Task<List<DepositAccountWrapperDto>> GetAllNonClosedDepositAccountService();
+        Task<DepositAccountWrapperDto> GetNonClosedDepositAccountById(int depositAccountId);
         // Task<ResponseDto> UpdateDepositAccountService(UpdateDepositAccountDto updateDepositAccountDto, string modifiedBy);
         // Task<AccountNumberDto> GetUniqueAccountNumberService(int depositSchemeId); 
         // Task<DepositAccountDto> GetDepositAccountByIdService(int id);

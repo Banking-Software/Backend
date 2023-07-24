@@ -1,5 +1,6 @@
 using AutoMapper;
 using MicroFinance.Dtos.DepositSetup;
+using MicroFinance.Dtos.DepositSetup.Account;
 using MicroFinance.Models.DepositSetup;
 
 namespace MicroFinance.Profiles
@@ -32,12 +33,10 @@ namespace MicroFinance.Profiles
 
             // Deposit Account
             CreateMap<DepositAccount, DepositAccountDto>()
-            .ForMember(dest => dest.DepositScheme, opt => opt.Ignore())
-            .ForMember(dest=>dest.Client, opt=>opt.Ignore())
-            .ForMember(dest=>dest.JointClient, opt=>opt.Ignore())
-            .ForMember(dest=>dest.PeriodType, opt=>opt.Ignore())
-            .ForMember(dest=>dest.AccountType, opt=>opt.Ignore())
-            .ForMember(dest=>dest.Status, opt=>opt.Ignore());
+            .ForMember(dest=>dest.InterestPostingAccountNumber, opt=>opt.Ignore())
+            .ForMember(dest=>dest.MatureInterestPostingAccountNumber, opt=>opt.Ignore());
+
+            CreateMap<JointAccount, JointAccountDto>();
 
             // Flexible Interest Rate
 

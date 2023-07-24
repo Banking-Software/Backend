@@ -1,6 +1,8 @@
 using AutoMapper;
 using MicroFinance.Dtos;
+using MicroFinance.Dtos.ClientSetup;
 using MicroFinance.Dtos.DepositSetup;
+using MicroFinance.Dtos.DepositSetup.Account;
 using MicroFinance.Enums.Deposit.Account;
 using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.ClientSetup;
@@ -50,7 +52,7 @@ namespace MicroFinance.Services.DepositSetup
             var depositSubledgerName = createDepositScheme.DepositSubledger ?? createDepositScheme.SchemeName + " " + "Deposit";
             var interestSubledgerName = createDepositScheme.InterestSubledger ?? createDepositScheme.SchemeName + " " + "Interest";
             var taxSublegderName = createDepositScheme.TaxSubledger ?? createDepositScheme.SchemeName + " " + "Tax";
-             // Deposit SubLedger
+            // Deposit SubLedger
             int depositLedgerId = (int)createDepositScheme.SchemeType;
             Ledger depsoitLedgerSchemeType = await _mainLedgerRepository.GetLedger(depositLedgerId);
             SubLedger depositSubledger = new SubLedger() { Name = depositSubledgerName, Ledger = depsoitLedgerSchemeType, Description = $"Subledger created while creating Deposit Scheme {createDepositScheme.SchemeName}" };
@@ -63,20 +65,20 @@ namespace MicroFinance.Services.DepositSetup
             List<SubLedger> allSublegders = new List<SubLedger>() { depositSubledger, interestSubledger, taxSubledger };
             int subledgerCreateStatus = await _mainLedgerRepository.CreateMultipleSubLedger(allSublegders);
             if (subledgerCreateStatus < 1) throw new Exception("Unable to create the Scheme. Subledger creation failed");
-            return new List<SubLedger>(){depositSubledger, interestSubledger, taxSubledger};
+            return new List<SubLedger>() { depositSubledger, interestSubledger, taxSubledger };
 
         }
         public async Task<ResponseDto> CreateDepositSchemeService(CreateDepositSchemeDto createDepositScheme, TokenDto decodedToken)
         {
             var depositSchemeWithSameName = await _depositSchemeRepository.GetDepositSchemeByName(createDepositScheme.SchemeName);
             var depositSchemeWithSameSymbol = await _depositSchemeRepository.GetDepositSchemeBySymbol(createDepositScheme.Symbol);
-            if (depositSchemeWithSameName != null || depositSchemeWithSameSymbol!=null)
+            if (depositSchemeWithSameName != null || depositSchemeWithSameSymbol != null)
                 throw new Exception("Deposit Scheme with same name or symbol exist");
-            
+
             var companyCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
             var depositScheme = _mapper.Map<DepositScheme>(createDepositScheme);
             List<SubLedger> subLedgersForDepositScheme = await CreateSubLedgerForDepositScheme(createDepositScheme);
-            depositScheme.SchemeType = await _mainLedgerRepository.GetLedger((int) createDepositScheme.SchemeType);
+            depositScheme.SchemeType = await _mainLedgerRepository.GetLedger((int)createDepositScheme.SchemeType);
             depositScheme.DepositSubLedger = subLedgersForDepositScheme[0];
             depositScheme.InterestSubledger = subLedgersForDepositScheme[1];
             depositScheme.TaxSubledger = subLedgersForDepositScheme[2];
@@ -173,7 +175,7 @@ namespace MicroFinance.Services.DepositSetup
             {
                 throw new Exception($"Provided Deposit Scheme '{depositScheme?.SchemeName}' active status is '{depositScheme?.IsActive}'");
             }
-            if(createDepositAccountDto.InterestRate<depositScheme.MinimumInterestRate || createDepositAccountDto.InterestRate>depositScheme.MaximumInterestRate)
+            if (createDepositAccountDto.InterestRate < depositScheme.MinimumInterestRate || createDepositAccountDto.InterestRate > depositScheme.MaximumInterestRate)
             {
                 throw new Exception($"MinimumInterestRate<=InterestRate<=MaximumInterestRate constraint doesnot match. Available minimum Interest Rate is {depositScheme.MinimumInterestRate} and maximum interest rate is {depositScheme.MaximumInterestRate}");
             }
@@ -231,17 +233,17 @@ namespace MicroFinance.Services.DepositSetup
             newDepositAccount.CreatedBy = decodedToken.UserName;
             newDepositAccount.CreatorId = decodedToken.UserId;
             newDepositAccount.OpeningDate = new DateTime(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
-            if(newDepositAccount.PeriodType==PeriodTypeEnum.Year)
+            if (newDepositAccount.PeriodType == PeriodTypeEnum.Year)
                 newDepositAccount.MatureDate = (newDepositAccount.OpeningDate).AddYears(newDepositAccount.Period).AddDays(-1);
-            else if(newDepositAccount.PeriodType == PeriodTypeEnum.Month)
+            else if (newDepositAccount.PeriodType == PeriodTypeEnum.Month)
                 newDepositAccount.MatureDate = (newDepositAccount.OpeningDate).AddMonths(newDepositAccount.Period).AddDays(-1);
             else
-                newDepositAccount.MatureDate = (newDepositAccount.OpeningDate).AddDays(newDepositAccount.Period-1);
+                newDepositAccount.MatureDate = (newDepositAccount.OpeningDate).AddDays(newDepositAccount.Period - 1);
         }
 
         public async Task<ResponseDto> CreateDepositAccountService(CreateDepositAccountDto createDepositAccountDto, TokenDto decodedToken)
         {
-            
+
             DepositAccount newDepositAccount = _mapper.Map<DepositAccount>(createDepositAccountDto);
             await AddClientInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
             await AddDepositSchemeInDepositAccount(createDepositAccountDto, newDepositAccount);
@@ -249,21 +251,21 @@ namespace MicroFinance.Services.DepositSetup
             await AddReferredByEmployeeInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
             await AddBasicDetailsInDepositAccount(newDepositAccount, decodedToken);
             List<Client> jointClients =
-            createDepositAccountDto.AccountType==AccountTypeEnum.Joint
+            createDepositAccountDto.AccountType == AccountTypeEnum.Joint
             ?
             await GetAllJointClientDetails(createDepositAccountDto.JointClientIds, decodedToken)
             :
             null;
             var depositAccountId = await _depositSchemeRepository.CreateDepositAccount(newDepositAccount);
-            if(depositAccountId>=1)
+            if (depositAccountId >= 1)
             {
-                if(createDepositAccountDto.AccountType==AccountTypeEnum.Joint)
+                if (createDepositAccountDto.AccountType == AccountTypeEnum.Joint)
                     await CreateJointAccountService(jointClients, newDepositAccount);
                 return new ResponseDto()
                 {
-                    Message=$"Successfully created '{newDepositAccount.AccountNumber}' account number",
-                    Status=true,
-                    StatusCode="200"
+                    Message = $"Successfully created '{newDepositAccount.AccountNumber}' account number",
+                    Status = true,
+                    StatusCode = "200"
                 };
             }
             throw new Exception("Unable to Create Deposit Account");
@@ -280,27 +282,53 @@ namespace MicroFinance.Services.DepositSetup
                     JointClient = jointClient,
                     DepositAccount = depositAccount,
                     RealWorldStartDate = RealWorldStartDate,
-                    CompanyCalendarStartDate=CompanyCalendarStartDate
+                    CompanyCalendarStartDate = CompanyCalendarStartDate
                 };
                 jointAccounts.Add(jointAccount);
             }
             await _depositSchemeRepository.CreateJointAccount(jointAccounts, depositAccount);
         }
 
-        public async Task<List<DepositAccountWrapper>> GetAllNonClosedDepositAccountService()
+        private Task<DepositAccountWrapperDto> MapDepositAccountWrapperToDepositAccountWrapperDto(DepositAccountWrapper depositAccountWrapper)
         {
-            var allNonClosedDepositAccounts = await _depositSchemeRepository.GetAllNonClosedDepositAccounts();
-            if(allNonClosedDepositAccounts==null || allNonClosedDepositAccounts.Count<1)
-                return new List<DepositAccountWrapper>();
-            return allNonClosedDepositAccounts;
+            DepositAccountWrapperDto depositAccountWrapperDto = new DepositAccountWrapperDto();
+            var depositAccount = depositAccountWrapper.DepositAccount;
+            var jointAccounts = depositAccountWrapper?.JointAccount;
+            var client = depositAccountWrapper.DepositAccount.Client;
+            var depositScheme = depositAccountWrapper.DepositAccount.DepositScheme;
+            depositAccountWrapperDto.DepositAccount = _mapper.Map<DepositAccountDto>(depositAccount);
+            depositAccountWrapperDto.Client = _mapper.Map<ClientDto>(client);
+            depositAccountWrapperDto.DepositScheme = _mapper.Map<DepositSchemeDto>(depositScheme);
+
+            if (jointAccounts != null && jointAccounts.Count >= 1)
+                depositAccountWrapperDto.JointClients = _mapper.Map<List<JointAccountDto>>(jointAccounts);
+            depositAccountWrapperDto.DepositAccount.InterestPostingAccountNumber = depositAccount.InterestPostingAccountNumber?.AccountNumber;
+            depositAccountWrapperDto.DepositAccount.MatureInterestPostingAccountNumber = depositAccount.MatureInterestPostingAccountNumber?.AccountNumber;
+            return Task.FromResult(depositAccountWrapperDto);
         }
 
-        public async Task<DepositAccountWrapper> GetNonClosedDepositAccountById(int depositAccountId)
+        public async Task<List<DepositAccountWrapperDto>> GetAllNonClosedDepositAccountService()
+        {
+            var allNonClosedDepositAccounts = await _depositSchemeRepository.GetAllNonClosedDepositAccounts();
+            if (allNonClosedDepositAccounts == null || allNonClosedDepositAccounts.Count < 1)
+                return new List<DepositAccountWrapperDto>();
+            List<DepositAccountWrapperDto> allDepositAccountWrapperDto = new List<DepositAccountWrapperDto>();
+            foreach (var depositAccountWrapper in allNonClosedDepositAccounts)
+            {
+                var depositAccountWrapperDto = await MapDepositAccountWrapperToDepositAccountWrapperDto(depositAccountWrapper);
+                allDepositAccountWrapperDto.Add(depositAccountWrapperDto);
+            }
+            return allDepositAccountWrapperDto;
+        }
+
+        public async Task<DepositAccountWrapperDto> GetNonClosedDepositAccountById(int depositAccountId)
         {
             var depositAccountWrapper = await _depositSchemeRepository.GetNonCloseDepositAccountById(depositAccountId);
-            return depositAccountWrapper;
+            if(depositAccountWrapper!=null && depositAccountWrapper.DepositAccount!=null)
+                return await MapDepositAccountWrapperToDepositAccountWrapperDto(depositAccountWrapper);
+            throw new Exception("No data found");
         }
-        
+
 
         // public async Task<ResponseDto> UpdateDepositAccountService(UpdateDepositAccountDto updateDepositAccountDto, string modifiedBy)
         // {
