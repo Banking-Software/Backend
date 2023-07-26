@@ -28,7 +28,8 @@ namespace MicroFinance.Profiles
             .ForMember(dest=>dest.BankType, opt=>opt.Ignore());
 
             CreateMap<BankSetup, BankSetupDto>()
-            .ForMember(dest=>dest.BankType, opt=> opt.MapFrom(src=>src.BankType.Name));
+            .ForMember(dest=>dest.BankType, opt=> opt.MapFrom(src=>src.BankType.Name))
+            .ForMember(dest=>dest.LedgerName, opt=>opt.MapFrom(src=>src.Ledger.Name));
             
             CreateMap<BankType, BankTypeDto>().ReverseMap();
             // END

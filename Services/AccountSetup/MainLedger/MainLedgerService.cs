@@ -322,7 +322,6 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
         public async Task<BankSetupDto> GetBankSetupByIdService(int id)
         {
             var bankSetup = await _mainLedgerRepository.GetBankSetupById(id);
-
             if (bankSetup != null)
                 return _mapper.Map<BankSetupDto>(bankSetup);
 

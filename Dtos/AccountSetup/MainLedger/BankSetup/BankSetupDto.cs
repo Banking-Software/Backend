@@ -13,5 +13,7 @@ namespace MicroFinance.Dtos.AccountSetup.MainLedger
         public string BankType { get; set; }
         public decimal? InterestRate { get; set; }
         public string BranchCode { get; set; }
+        public int LedgerId { get; set; }
+        public string LedgerName { get; set; }
     }
 }

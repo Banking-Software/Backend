@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MicroFinance.Models.Transactions;
 
 namespace MicroFinance.Models.AccountSetup
 {
@@ -28,5 +29,7 @@ namespace MicroFinance.Models.AccountSetup
         public string BranchCode { get; set; }
         [Column(TypeName ="decimal(18,4)")]
         public decimal TotalInterestBalance { get; set; }
+
+        public virtual ICollection<DepositAccountTransaction> DepositAccountTransactions { get; set; }
     }
 }

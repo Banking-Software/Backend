@@ -5,6 +5,7 @@ using MicroFinance.Exceptions;
 using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.ClientSetup;
 using MicroFinance.Repository.ClientSetup;
+using MicroFinance.Role;
 
 namespace MicroFinance.Services.ClientSetup
 {
@@ -77,7 +78,7 @@ namespace MicroFinance.Services.ClientSetup
         public async Task<ResponseDto> UpdateClientService(UpdateClientDto updateClientDto, TokenDto decodedToken)
         {
             Client existingClient = await _clientRepo.GetClientById(updateClientDto.Id);
-            if(!existingClient.IsActive && !updateClientDto.IsActive)
+            if (!existingClient.IsActive && !updateClientDto.IsActive)
             {
                 _logger.LogInformation($"{DateTime.Now}: {decodedToken.UserName} tried to make changes on inactive client {updateClientDto.ClientId}");
                 throw new UnAuthorizedExceptionHandler("You are not authorized to update on in-active client");
@@ -93,6 +94,7 @@ namespace MicroFinance.Services.ClientSetup
                 ||
                 (!updateClientDto.IsShareAllowed && updateClientDto.ShareType == null)
                 )
+                && (decodedToken.Role == UserRole.Officer.ToString() || existingClient.BranchCode == decodedToken.BranchCode)
             )
             {
                 var updateClient = _mapper.Map<Client>(updateClientDto);
@@ -111,61 +113,119 @@ namespace MicroFinance.Services.ClientSetup
             throw new BadRequestExceptionHandler("No Data Found for given client");
         }
 
-        public async Task<List<ClientDto>> GetAllClientsService()
+        public async Task<List<ClientDto>> GetAllClientsService(TokenDto decodedToken)
         {
             List<Client> allClients = await _clientRepo.GetAllClients();
+            List<ClientDto> clientDtos = new List<ClientDto>();
             if (allClients != null && allClients.Count >= 1)
-                return _mapper.Map<List<ClientDto>>(allClients);
-            return new List<ClientDto>();
+            {
+                foreach (var client in allClients)
+                {
+                    if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == UserRole.Officer.ToString())
+                    {
+                        clientDtos.Add(_mapper.Map<ClientDto>(client));
+                    }
+                }
+
+            }
+            return clientDtos;
         }
         public async Task<List<ClientDto>> GetActiveClientsByBranchCodeService(string branchCode)
         {
             List<Client> activeClientByBranch = await _clientRepo.GetActiveClientsByBranchCode(branchCode);
-            if(activeClientByBranch!=null && activeClientByBranch.Count>=1)
+            if (activeClientByBranch != null && activeClientByBranch.Count >= 1)
                 return _mapper.Map<List<ClientDto>>(activeClientByBranch);
             return new List<ClientDto>();
         }
 
-        public async Task<List<ClientDto>> GetClientByAssignedShareTypeService(int shareTypeId)
+        public async Task<List<ClientDto>> GetClientByAssignedShareTypeService(int shareTypeId, TokenDto decodedToken)
         {
             if (shareTypeId == 16 || shareTypeId == 17)
             {
                 List<Client> clientsByShareType = await _clientRepo.GetClientByAssignedShareType(shareTypeId);
+                List<ClientDto> clientDtos = new List<ClientDto>();
                 if (clientsByShareType != null && clientsByShareType.Count >= 1)
-                    return _mapper.Map<List<ClientDto>>(clientsByShareType);
-                return new List<ClientDto>();
+                {
+                    foreach (var client in clientsByShareType)
+                    {
+                        if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == UserRole.Officer.ToString())
+                        {
+                            clientDtos.Add(_mapper.Map<ClientDto>(client));
+                        }
+                    }
+                }
+                return clientDtos;
             }
             throw new BadRequestExceptionHandler("Provided id of Share type is not allowed");
         }
 
-        public async Task<ClientDto> GetClientByClientIdService(string clientId)
+        public async Task<ClientDto> GetClientByClientIdService(string clientId, TokenDto decodedToken)
         {
             Client clientByClientId = await _clientRepo.GetClientByClientId(clientId);
-            if (clientByClientId != null) return _mapper.Map<ClientDto>(clientByClientId);
+            if
+            (
+                clientByClientId != null
+                &&
+                (clientByClientId.BranchCode == decodedToken.BranchCode || decodedToken.Role == UserRole.Officer.ToString())
+            )
+            {
+                return _mapper.Map<ClientDto>(clientByClientId);
+            }
+
             throw new NotFoundExceptionHandler("No Data Found");
         }
 
-        public async Task<List<ClientDto>> GetClientByGroupAndUnitService(int groupId, int unitId)
+        public async Task<List<ClientDto>> GetClientByGroupAndUnitService(int groupId, int unitId, TokenDto decodedToken)
         {
             List<Client> clientsByGroupAndUnit = await _clientRepo.GetClientByGroupAndUnit(groupId, unitId);
             if (clientsByGroupAndUnit != null && clientsByGroupAndUnit.Count >= 1)
-                return _mapper.Map<List<ClientDto>>(clientsByGroupAndUnit);
+            {
+                List<ClientDto> clientDtos = new List<ClientDto>();
+                foreach (var client in clientsByGroupAndUnit)
+                {
+                    if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == UserRole.Officer.ToString())
+                    {
+                        clientDtos.Add(_mapper.Map<ClientDto>(client));
+                    }
+                }
+                return clientDtos;
+            }
             throw new NotFoundExceptionHandler("No Data Found");
         }
 
-        public async Task<List<ClientDto>> GetClientsByGroupService(int groupId)
+        public async Task<List<ClientDto>> GetClientsByGroupService(int groupId, TokenDto decodedToken)
         {
             List<Client> clientsByGroup = await _clientRepo.GetClientsByGroup(groupId);
             if (clientsByGroup != null && clientsByGroup.Count >= 1)
-                return _mapper.Map<List<ClientDto>>(clientsByGroup);
+            {
+                List<ClientDto> clientDtos = new List<ClientDto>();
+                foreach (var client in clientsByGroup)
+                {
+                    if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == UserRole.Officer.ToString())
+                    {
+                        clientDtos.Add(_mapper.Map<ClientDto>(client));
+                    }
+                }
+                return clientDtos;
+            }
             throw new NotFoundExceptionHandler("No Data Found");
         }
 
-        public async Task<List<ClientDto>> GetClientsByUnitService(int unitId)
+        public async Task<List<ClientDto>> GetClientsByUnitService(int unitId, TokenDto decodedToken)
         {
             List<Client> clientsByUnit = await _clientRepo.GetClientByUnit(unitId);
             if (clientsByUnit != null && clientsByUnit.Count >= 1)
-                return _mapper.Map<List<ClientDto>>(clientsByUnit);
+            {
+                List<ClientDto> clientDtos = new List<ClientDto>();
+                foreach (var client in clientsByUnit)
+                {
+                    if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == UserRole.Officer.ToString())
+                    {
+                        clientDtos.Add(_mapper.Map<ClientDto>(client));
+                    }
+                }
+                return clientDtos;
+            }
             throw new NotFoundExceptionHandler("No Data Found");
         }
 

@@ -101,37 +101,6 @@ namespace MicroFinance.Repository.DepositSetup
 
         }
 
-        // public async Task<List<ResponseDepositScheme>> GetDepositSchemeByPostingScheme(int id)
-        // {
-        //     var depositSchemesByPostingScheme = await _depositDbContext
-        //     .DepositSchemes
-        //     .Include(ds => ds.PostingScheme)
-        //     .Where(ds => ds.PostingSchemeId == id)
-        //     .ToListAsync();
-
-        //     var depositSchemeWithLedgerDetails = new List<ResponseDepositScheme>();
-        //     foreach (var scheme in depositSchemesByPostingScheme)
-        //     {
-        //         ResponseDepositScheme temp = _mapper.Map<ResponseDepositScheme>(scheme);
-        //         var ledgerAsInterest = await _mainLedgerRepository.GetLedger(scheme.LedgerAsInterestAccountId);
-        //         var ledgerAsLiability = await _mainLedgerRepository.GetLedger(scheme.LedgerAsLiabilityAccountId);
-        //         //await Task.WhenAll(ledgerAsInterest, ledgerAsLiability);
-        //         temp.InterestAccount = ledgerAsInterest;
-        //         temp.LiabilityAccount = ledgerAsLiability;
-        //         depositSchemeWithLedgerDetails.Add(temp);
-        //     }
-        //     return depositSchemeWithLedgerDetails;
-        // }
-
-        // public async Task<PostingScheme> GetPositingScheme(int id)
-        // {
-        //     var positngScheme = await _depositDbContext
-        //     .PostingSchemes
-        //     .FindAsync(id);
-
-        //     return positngScheme;
-        // }
-
 
         // DEPOSIT ACCOUNT
         private async Task<int> CreateDepositAccountNumber(DepositAccount depositAccount)
@@ -181,6 +150,15 @@ namespace MicroFinance.Repository.DepositSetup
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<int> UpdateDepositAccount(DepositAccount updateDepositAccount)
+        {
+            var existingDepositAccount = await _depositDbContext.DepositAccounts.FindAsync(updateDepositAccount.Id);
+            _depositDbContext.Entry(existingDepositAccount).State = EntityState.Detached;
+            _depositDbContext.DepositAccounts.Attach(updateDepositAccount);
+            _depositDbContext.Entry(existingDepositAccount).State = EntityState.Modified;
+            return await _depositDbContext.SaveChangesAsync();
+        }
          public async Task<List<DepositAccountWrapper>> GetAllNonClosedDepositAccounts()
          {
            var depositAccountWrappers = await _depositDbContext.DepositAccounts
@@ -200,7 +178,7 @@ namespace MicroFinance.Repository.DepositSetup
             .ToListAsync();
             return depositAccountWrappers;
          }
-        public async Task<DepositAccountWrapper> GetNonCloseDepositAccountById(int id)
+        public async Task<DepositAccountWrapper> GetNonClosedDepositAccount(int id)
         {
             DepositAccountWrapper nonCloseDepositAccountWrapper = new DepositAccountWrapper();
             var depositAccount = await _depositDbContext.DepositAccounts
@@ -224,78 +202,14 @@ namespace MicroFinance.Repository.DepositSetup
             return nonCloseDepositAccountWrapper;
         }
 
-        // public async Task<int> UpdateDepositAccount(UpdateDepositAccountDto updateDepositAccount, string modifiedBy)
-        // {
-        //     var depositAccount = await _depositDbContext.DepositAccounts.Include(da => da.DepositScheme).Where(da => da.Id == updateDepositAccount.Id).SingleOrDefaultAsync();
-        //     if (depositAccount == null) throw new NotFoundExceptionHandler("Given Deposit Account Not Found");
-        //     if (depositAccount.DepositScheme.MinimumInterestRate > updateDepositAccount.InterestRate || updateDepositAccount.InterestRate > depositAccount.DepositScheme.MaximumInterestRate)
-        //         throw new Exception("Interest Rate should be between Minimum Interest Rate and Maximum Interest Rate");
-
-        //     depositAccount.Period = updateDepositAccount?.Period;
-        //     depositAccount.PeriodType = (int)updateDepositAccount?.PeriodType;
-        //     depositAccount.AccountType = (int)updateDepositAccount.AccountType;
-        //     if (updateDepositAccount.JointClientId >= 1)
-        //     {
-        //         var jointClient = await _depositDbContext.Clients.FindAsync(updateDepositAccount.JointClientId);
-        //         if (jointClient == null) throw new NotFoundExceptionHandler("Joint Client Not Found");
-        //         depositAccount.JointClient = jointClient;
-        //     }
-        //     depositAccount.MatureDate = updateDepositAccount?.MatureDate;
-        //     depositAccount.InterestAmount = updateDepositAccount.InterestRate;
-        //     if (updateDepositAccount.MatureInterestPostingAccountNumber != null)
-        //     {
-        //         var checkMatureAccountNumber = await _depositDbContext.DepositAccounts.Where(da => da.AccountNumber == updateDepositAccount.MatureInterestPostingAccountNumber).SingleOrDefaultAsync();
-        //         if (checkMatureAccountNumber == null) throw new NotFoundExceptionHandler("Provided Mature Interest Rate Posting Account Number Not Found");
-        //         depositAccount.MatureInterestPostingAccountNumber = updateDepositAccount.MatureInterestPostingAccountNumber;
-        //     }
-        //     depositAccount.Description = updateDepositAccount.Description;
-        //     depositAccount.Status = (int)updateDepositAccount.Status;
-        //     depositAccount.IsSMSServiceActive = updateDepositAccount.IsSMSServiceActive;
-        //     depositAccount.DailyDepositAmount = updateDepositAccount.DailyDepositAmount;
-        //     depositAccount.TotalDepositDay = updateDepositAccount.TotalDepositDay;
-        //     depositAccount.TotalDepositAmount = updateDepositAccount.TotalDepositAmount;
-        //     depositAccount.TotalReturnAmount = updateDepositAccount.TotalReturnAmount;
-        //     depositAccount.TotalInterestAmount = updateDepositAccount.TotalInterestAmount;
-        //     depositAccount.ModifiedBy = modifiedBy;
-        //     depositAccount.ModifiedOn = DateTime.Now;
-
-        //     return await _depositDbContext.SaveChangesAsync();
-
-        // }
-
-        // public async Task<List<DepositAccount>> GetDepositAccountListAsync()
-        // {
-        //     var depositAccounts = await _depositDbContext.DepositAccounts
-        //     .Include(da => da.DepositScheme)
-        //     .ThenInclude(ds => ds.PostingScheme)
-        //     .ToListAsync();
-        //     return depositAccounts;
-        // }
-
-        // public async Task<DepositAccount> GetDepositAccountByAccountNumber(string accountNumber)
-        // {
-        //     var depositAccount = await _depositDbContext.DepositAccounts
-        //     .Include(da => da.DepositScheme)
-        //     .ThenInclude(ds => ds.PostingScheme)
-        //     .Where(da => da.AccountNumber == accountNumber)
-        //     .SingleOrDefaultAsync();
-        //     return depositAccount;
-        // }
-
-        // public async Task<List<DepositAccount>> GetDepositAccountByDepositScheme(int depositSchemeId)
-        // {
-        //     var depositAccount = await _depositDbContext.DepositAccounts
-        //     .Include(da => da.DepositScheme)
-        //     .ThenInclude(ds => ds.PostingScheme)
-        //     .Where(da => da.DepositSchemeId == depositSchemeId).ToListAsync();
-        //     return depositAccount;
-        // }
-
-        public async Task<DepositAccount> GetDepositAccountById(int id)
+        public async Task<DepositAccount> GetNonClosedDepositAccountById(int id)
         {
             var depositAccount = await _depositDbContext.DepositAccounts
-            .Include(da => da.DepositScheme)
-            .Where(da => da.Id == id)
+            .Include(da=>da.Client)
+            .Include(da=>da.DepositScheme)
+            .Include(da=>da.InterestPostingAccountNumber)
+            .Include(da=>da.InterestPostingAccountNumber)
+            .Where(da => da.Id == id && da.Status!=AccountStatusEnum.Close)
             .SingleOrDefaultAsync();
             return depositAccount;
         }
@@ -313,6 +227,44 @@ namespace MicroFinance.Repository.DepositSetup
             .SingleOrDefaultAsync();
         }
 
+        public async Task<DepositAccountWrapper> GetNonClosedDepositAccountByAccountNumber(string accountNumber)
+        {
+            var depositAccountWrappers = await _depositDbContext.DepositAccounts
+            .Include(da => da.Client)
+            .Include(da => da.DepositScheme)
+            .Include(da => da.InterestPostingAccountNumber)
+            .Include(da => da.InterestPostingAccountNumber)
+            .Where(da => da.Status != AccountStatusEnum.Close && da.AccountNumber==accountNumber)
+            .Select(da => new DepositAccountWrapper
+            {
+                DepositAccount = da,
+                JointAccount = _depositDbContext.JointAccounts
+                    .Include(ja => ja.JointClient)
+                    .Where(ja => ja.DepositAccountId == da.Id && ja.RealWorldEndDate == null && ja.CompanyCalendarEndDate == null)
+                    .ToList()
+            }).SingleOrDefaultAsync();
+            return depositAccountWrappers;
+        }
+
+        public async Task<List<DepositAccountWrapper>> GetNonClosedDepositAccountByDepositScheme(int depositSchemeId)
+        {
+            var depositAccountWrappers = await _depositDbContext.DepositAccounts
+            .Include(da => da.Client)
+            .Include(da => da.DepositScheme)
+            .Include(da => da.InterestPostingAccountNumber)
+            .Include(da => da.InterestPostingAccountNumber)
+            .Where(da => da.Status != AccountStatusEnum.Close && da.DepositSchemeId == depositSchemeId)
+            .Select(da => new DepositAccountWrapper
+            {
+                DepositAccount = da,
+                JointAccount = _depositDbContext.JointAccounts
+                    .Include(ja => ja.JointClient)
+                    .Where(ja => ja.DepositAccountId == da.Id && ja.RealWorldEndDate == null && ja.CompanyCalendarEndDate == null)
+                    .ToList()
+            })
+            .ToListAsync();
+            return depositAccountWrappers;
+        }
         // public async Task<int> CreateFlexibleInterestRate(FlexibleInterestRate flexibleInterestRate)
         // {
         //     await _depositDbContext.FlexibleInterestRates.AddAsync(flexibleInterestRate);

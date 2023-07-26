@@ -31,6 +31,8 @@ namespace MicroFinance.Services.UserManagement
         Task<EmployeeDto> GetEmployeeByEmail(string email);
         Task<EmployeeDto> GetEmployeeById(int id);
         Task<List<EmployeeDto>> GetEmployess();
+        Task<List<LimitedEmployeeInfoDto>> GetAllEmployeeFromUserBranch(TokenDto decodedToken);
+        Task<LimitedEmployeeInfoDto> GetEmployeeByIdFromUserBranch(int id, TokenDto decodedToken);
         // END
     }
 }

@@ -13,9 +13,20 @@ namespace MicroFinance.DBContext
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        private readonly ILoggerFactory _logger;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ILoggerFactory logger) : base(options)
         {
-            
+            _logger = logger;
+        }
+
+         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder
+                .UseLoggerFactory(_logger)
+                .EnableSensitiveDataLogging()
+                .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name });
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -83,8 +94,10 @@ namespace MicroFinance.DBContext
         public DbSet<FlexibleInterestRate> FlexibleInterestRates { get; set; }
 
         // // START: TRANSACTION
-        // public DbSet<Transaction> Transactions { get; set; }
-        // public DbSet<DepositTransaction> DepositTransactions { get; set; }
+        public DbSet<BaseTransaction> Transactions { get; set; }
+        public DbSet<DepositAccountTransaction> DepositAccountTransactions { get; set; }
+        public DbSet<LedgerTransaction> LedgerTransactions { get; set; }
+        public DbSet<SubLedgerTransaction> SubLedgerTransactions { get; set; }
     
     }
 }

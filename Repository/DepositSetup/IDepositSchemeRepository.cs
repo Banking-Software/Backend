@@ -18,13 +18,13 @@ namespace MicroFinance.Repository.DepositSetup
 
         Task<int> CreateDepositAccount(DepositAccount depositAccount);
         Task<int> CreateJointAccount(List<JointAccount> jointAccounts, DepositAccount depositAccount);
-        // Task<int> UpdateDepositAccount(UpdateDepositAccountDto updateDepositAccount, string modifiedBy);
+        Task<int> UpdateDepositAccount(DepositAccount updateDepositAccount);
         Task<List<DepositAccountWrapper>> GetAllNonClosedDepositAccounts();
-        Task<DepositAccountWrapper> GetNonCloseDepositAccountById(int id);
-        // Task<DepositAccount> GetDepositAccountByAccountNumber(string accountNumber);
-        // Task<List<DepositAccount>> GetDepositAccountByDepositScheme(int depositSchemeId);
+        Task<DepositAccountWrapper> GetNonClosedDepositAccount(int id);
+        Task<DepositAccountWrapper> GetNonClosedDepositAccountByAccountNumber(string accountNumber);
+        Task<List<DepositAccountWrapper>> GetNonClosedDepositAccountByDepositScheme(int depositSchemeId);
         Task<DepositAccount> GetDepositAccountByDepositSchemeIdAndClientId(int depositSchemeId, int clientId);
-        Task<DepositAccount> GetDepositAccountById(int id);
+        Task<DepositAccount> GetNonClosedDepositAccountById(int id);
 
         // // Flexible Interest Rate
 

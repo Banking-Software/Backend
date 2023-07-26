@@ -468,6 +468,46 @@ namespace MicroFinance.Services.UserManagement
 
         }
 
+        public  async Task<List<LimitedEmployeeInfoDto>> GetAllEmployeeFromUserBranch(TokenDto decodedToken)
+        {
+            var employees = await _employeeRepo.GetEmployees();
+            List<LimitedEmployeeInfoDto> employeesFromSameBranch = new List<LimitedEmployeeInfoDto>();
+            if (employees.Count < 1 || employees == null) throw new Exception("No Employee Found");
+            foreach (var employee in employees)
+            {
+                if(employee.BranchCode==decodedToken.BranchCode)
+                {
+                    var employeeDetail = new LimitedEmployeeInfoDto()
+                    {
+                        Id = employee.Id,
+                        Name= employee.Name,
+                        Email=employee.Email,
+                        PhoneNumber=employee.PhoneNumber,
+                        BranchCode=employee.BranchCode
+                    };
+                    employeesFromSameBranch.Add(employeeDetail);
+                }
+            }
+            if(employeesFromSameBranch.Count<1) throw new Exception("No Employee Data Found for your branch");
+            return employeesFromSameBranch;
+        }
+        public async Task<LimitedEmployeeInfoDto> GetEmployeeByIdFromUserBranch(int id, TokenDto decodedToken)
+        {
+            var employee = await _employeeRepo.GetEmployeeById(id);
+            if (employee == null || employee.BranchCode!=decodedToken.BranchCode)
+                throw new UnAuthorizedExceptionHandler("Not authorized to act on given employee");
+
+            
+            return new LimitedEmployeeInfoDto()
+            {
+                Id = employee.Id,
+                Name= employee.Name,
+                Email=employee.Email,
+                PhoneNumber=employee.PhoneNumber,
+                BranchCode=employee.BranchCode
+            };
+        }
+
 
 
 

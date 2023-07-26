@@ -49,60 +49,43 @@ namespace MicroFinance.Controllers.DepositSetup
 
         }
 
-        // [HttpPut]
-        // public async Task<ActionResult<ResponseDto>> UpdateDepositScheme(UpdateDepositAccountDto updateDepositAccountDto)
-        // {
-
-        //     var userName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-        //     LogInformation("UpdateDepositScheme", userName);
-        //     return Ok(await _depositService.UpdateDepositAccountService(updateDepositAccountDto, userName));
-
-        // }
-
-        [HttpGet("getAllNonCloseDepositAccount")]
-        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetAllDepositAccount()
+        [HttpPut]
+        public async Task<ActionResult<ResponseDto>> UpdateNonClosedDepositAccount(UpdateDepositAccountDto updateDepositAccountDto)
         {
-            return Ok(await _depositService.GetAllNonClosedDepositAccountService());
+
+            var decodedToken = GetDecodedToken();
+
+            return Ok(await _depositService.UpdateNonClosedDepositAccountService(updateDepositAccountDto, decodedToken));
+
         }
 
-        [HttpGet("getNonCloseDepositAccountById")]
-        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetAllDepositAccount([FromQuery] int depositAccountId)
+        [HttpGet("getAllNonClosedDepositAccount")]
+        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetAllNonClosedDepositAccount()
         {
-            return Ok(await _depositService.GetNonClosedDepositAccountById(depositAccountId));
+            var decodedToken = GetDecodedToken();
+            return Ok(await _depositService.GetAllNonClosedDepositAccountService(decodedToken));
         }
 
-        // [HttpGet("id")]
-        // public async Task<ActionResult<DepositAccountDto>> GetDepositAccountById([FromQuery] int id)
-        // {
-        //     var userName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-        //     LogInformation("GetDepositAccountById", userName);
-        //     return Ok(await _depositService.GetDepositAccountByIdService(id));
-        // }
+        [HttpGet("getNonClosedDepositAccountById")]
+        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetNonClosedDepositAccountById([FromQuery] int depositAccountId)
+        {
+            var decodedToken = GetDecodedToken();
+            return Ok(await _depositService.GetNonClosedDepositAccountByIdService(depositAccountId, decodedToken));
+        }
 
-        // [HttpGet("uniqueAccountNumber")]
-        // public async Task<ActionResult<AccountNumberDto>> GetUniqueAccountNumber([FromQuery] int depositSchemeId)
-        // {
-        //     var userName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-        //     LogInformation("GetUniqueAccountNumber", userName);
-        //     return Ok(await _depositService.GetUniqueAccountNumberService(depositSchemeId));
-        // }
+        [HttpGet("getNonClosedDepositAccountByDepositSchemeId")]
+        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetAllNonClosedDepositAccountByDepositScheme([FromQuery] int depositSchemeId)
+        {
+            var decodedToken = GetDecodedToken();
+            return Ok(await _depositService.GetNonClosedDepositAccountByDepositSchemeService(depositSchemeId, decodedToken));
+        }
 
-        // [HttpGet("accountNumber")]
-        // public async Task<ActionResult<DepositAccountDto>> GetDepositAccountByAccountNumber([FromQuery] string accountNumber)
-        // {
-        //     var userName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-        //     LogInformation("GetDepositAccountByAccountNumber", userName);
-        //     return Ok(await _depositService.GetDepositAccountByAccountNumberService(accountNumber));
-        // }
-
-        // [HttpGet("byDepositScheme")]
-        // public async Task<ActionResult<List<DepositAccountDto>>> GetDepositAccountsByDepositScheme([FromQuery] int depositSchemeId)
-        // {
-        //     var userName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-        //     LogInformation("GetDepositAccountsByDepositScheme", userName);
-        //     return Ok(await _depositService.GetAllDepositAccountByDepositSchemeService(depositSchemeId));
-        // }
-
+        [HttpGet("getNonClosedDepositAccountByAccountNumber")]
+        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetAllNonClosedDepositAccountByAccountNumber([FromQuery] string accountNumber)
+        {
+            var decodedToken = GetDecodedToken();
+            return Ok(await _depositService.GetNonClosedDepositAccountByAccountNumberService(accountNumber, decodedToken));
+        }
         // [HttpPost("flexibleInterestRate")]
         // public async Task<ActionResult<ResponseDto>> UpdateInterestRateAccordingToFlexibleInterestRate(FlexibleInterestRateSetupDto flexibleInterestRateSetupDto)
         // {
@@ -126,7 +109,5 @@ namespace MicroFinance.Controllers.DepositSetup
         //     LogInformation("IncrementOrDecrementOfInterestRateBasedOnDepositScheme", userName);
         //     return Ok(await _depositService.IncrementOrDecrementOfInterestRateService(updateInterestRateByDepositSchemeDto));
         // }
-
-
     }
 }

@@ -11,6 +11,7 @@ using MicroFinance.Models.Wrapper;
 using MicroFinance.Repository.AccountSetup.MainLedger;
 using MicroFinance.Repository.ClientSetup;
 using MicroFinance.Repository.DepositSetup;
+using MicroFinance.Role;
 using MicroFinance.Services.CompanyProfile;
 using MicroFinance.Services.UserManagement;
 
@@ -154,6 +155,142 @@ namespace MicroFinance.Services.DepositSetup
             throw new Exception("No Deposit Scheme Found");
         }
 
+        // DEPOSIT ACCOUNT
+
+        public async Task<ResponseDto> CreateDepositAccountService(CreateDepositAccountDto createDepositAccountDto, TokenDto decodedToken)
+        {
+
+            DepositAccount newDepositAccount = _mapper.Map<DepositAccount>(createDepositAccountDto);
+            await AddClientInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
+            await AddDepositSchemeInDepositAccount(createDepositAccountDto, newDepositAccount);
+            await AddInterestAndMaturePostingAccountInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
+            await AddReferredByEmployeeInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
+            await AddBasicDetailsInDepositAccount(newDepositAccount, decodedToken);
+            List<Client> jointClients =
+            createDepositAccountDto.AccountType == AccountTypeEnum.Joint
+            ?
+            await GetAllJointClientDetails(createDepositAccountDto.JointClientIds, decodedToken)
+            :
+            null;
+            var depositAccountId = await _depositSchemeRepository.CreateDepositAccount(newDepositAccount);
+            if (depositAccountId >= 1)
+            {
+                if (createDepositAccountDto.AccountType == AccountTypeEnum.Joint)
+                    await CreateJointAccountService(jointClients, newDepositAccount);
+                return new ResponseDto()
+                {
+                    Message = $"Successfully created '{newDepositAccount.AccountNumber}' account number",
+                    Status = true,
+                    StatusCode = "200"
+                };
+            }
+            throw new Exception("Unable to Create Deposit Account");
+        }
+
+        public async Task<ResponseDto> UpdateNonClosedDepositAccountService(UpdateDepositAccountDto updateDepositAccountDto, TokenDto decodedToken)
+        {
+            var existingDepositAccount = await _depositSchemeRepository.GetNonClosedDepositAccountById(updateDepositAccountDto.Id);
+            if(existingDepositAccount==null)
+                throw new Exception("No Data Found");
+            if(decodedToken.Role!=UserRole.Officer.ToString() && existingDepositAccount.BranchCode!=decodedToken.BranchCode)
+                throw new Exception("You are authorized to update other branch details");
+            if(existingDepositAccount.Status==AccountStatusEnum.Close)
+                throw new Exception("You are not authorized to update the closed account");
+            if(updateDepositAccountDto.InterestRate<existingDepositAccount.DepositScheme.MinimumInterestRate && updateDepositAccountDto.InterestRate>existingDepositAccount.DepositScheme.MaximumInterestRate)
+                throw new Exception("MinimumInterestRate<=InterestRate<=MaximumInterestRate  constraint doesnot match");
+            existingDepositAccount.InterestRate = updateDepositAccountDto.InterestRate;
+            existingDepositAccount.Status = updateDepositAccountDto.Status;
+            existingDepositAccount.Description = updateDepositAccountDto.Description;
+            existingDepositAccount.NomineeName = updateDepositAccountDto.NomineeName;
+            existingDepositAccount.Relation = updateDepositAccountDto.Relation;
+            existingDepositAccount.IsSMSServiceActive = updateDepositAccountDto.IsSMSServiceActive;
+            existingDepositAccount.ExpectedDailyDepositAmount = updateDepositAccountDto.ExpectedDailyDepositAmount;
+            existingDepositAccount.ExpectedTotalDepositAmount = updateDepositAccountDto.ExpectedTotalDepositAmount;
+            existingDepositAccount.ExpectedTotalDepositDay = updateDepositAccountDto.ExpectedTotalDepositDay;
+            existingDepositAccount.ExpectedTotalInterestAmount = updateDepositAccountDto.ExpectedTotalInterestAmount;
+            existingDepositAccount.ExpectedTotalReturnAmount = updateDepositAccountDto.ExpectedTotalReturnAmount;
+            if(updateDepositAccountDto.InterestPostingAccountId!=null && !updateDepositAccountDto.InterestPostingAccountId.Equals(existingDepositAccount?.InterestPostingAccountNumberId))
+            {
+                var interestPostingAccount = await _depositSchemeRepository.GetNonClosedDepositAccountById((int) updateDepositAccountDto.InterestPostingAccountId);
+                existingDepositAccount.InterestPostingAccountNumber = (interestPostingAccount!=null && interestPostingAccount.BranchCode==decodedToken.BranchCode)?interestPostingAccount:throw new Exception("No Account Found for Interest Posting");
+            }
+            else if(updateDepositAccountDto.InterestPostingAccountId==null)
+                existingDepositAccount.InterestPostingAccountNumber = null;
+            if(updateDepositAccountDto.MatureInterestPostingAccountId!=null && !updateDepositAccountDto.MatureInterestPostingAccountId.Equals(existingDepositAccount?.MatureInterestPostingAccountNumberId))
+            {
+                var maturePostingAccount = await _depositSchemeRepository.GetNonClosedDepositAccountById((int) updateDepositAccountDto.MatureInterestPostingAccountId);
+                existingDepositAccount.MatureInterestPostingAccountNumber=(maturePostingAccount!=null && maturePostingAccount.BranchCode==decodedToken.BranchCode)?maturePostingAccount:throw new Exception("No Account Found for mature interest posting");
+            }
+            else if(updateDepositAccountDto.MatureInterestPostingAccountId==null)
+                existingDepositAccount.MatureInterestPostingAccountNumber=null;
+            var updateStatus = await _depositSchemeRepository.UpdateDepositAccount(existingDepositAccount);
+            if(updateStatus>=1)
+            {
+                return new ResponseDto()
+                {
+                    Message="Successfully updated deposit account",
+                    Status=true,
+                    StatusCode="200"
+                };
+            }
+            throw new Exception("Update Failed");
+        }
+        public async Task<List<DepositAccountWrapperDto>> GetAllNonClosedDepositAccountService(TokenDto decodedToken)
+        {
+            var allNonClosedDepositAccounts = await _depositSchemeRepository.GetAllNonClosedDepositAccounts();
+            if (allNonClosedDepositAccounts == null || allNonClosedDepositAccounts.Count < 1)
+                return new List<DepositAccountWrapperDto>();
+            List<DepositAccountWrapperDto> allDepositAccountWrapperDto = new List<DepositAccountWrapperDto>();
+            foreach (var depositAccountWrapper in allNonClosedDepositAccounts)
+            {
+                if (decodedToken.Role==UserRole.Officer.ToString() || depositAccountWrapper.DepositAccount.BranchCode == decodedToken.BranchCode)
+                {
+                    var depositAccountWrapperDto = await MapDepositAccountWrapperToDepositAccountWrapperDto(depositAccountWrapper);
+                    allDepositAccountWrapperDto.Add(depositAccountWrapperDto);
+                }
+            }
+            return allDepositAccountWrapperDto;
+        }
+
+        public async Task<DepositAccountWrapperDto> GetNonClosedDepositAccountByIdService(int depositAccountId, TokenDto decodedToken)
+        {
+            var depositAccountWrapper = await _depositSchemeRepository.GetNonClosedDepositAccount(depositAccountId);
+            if (depositAccountWrapper != null && depositAccountWrapper.DepositAccount != null)
+            {
+                if (decodedToken.Role==UserRole.Officer.ToString() || depositAccountWrapper.DepositAccount.BranchCode == decodedToken.BranchCode)
+                    return await MapDepositAccountWrapperToDepositAccountWrapperDto(depositAccountWrapper);
+            }
+
+            throw new Exception("No data found");
+        }
+
+        public async Task<DepositAccountWrapperDto> GetNonClosedDepositAccountByAccountNumberService(string accountNumber, TokenDto decodedToken)
+        {
+            var depositAccountWrapper = await _depositSchemeRepository.GetNonClosedDepositAccountByAccountNumber(accountNumber);
+            if (depositAccountWrapper != null && depositAccountWrapper.DepositAccount != null)
+            {
+                if (decodedToken.Role==UserRole.Officer.ToString() || depositAccountWrapper.DepositAccount.BranchCode == decodedToken.BranchCode)
+                    return await MapDepositAccountWrapperToDepositAccountWrapperDto(depositAccountWrapper);
+            }
+            throw new Exception("No data found");
+            
+        }
+        public async Task<List<DepositAccountWrapperDto>> GetNonClosedDepositAccountByDepositSchemeService(int depositSchemeId, TokenDto decodedToken)
+        {
+            var depositAccountWrappers = await _depositSchemeRepository.GetNonClosedDepositAccountByDepositScheme(depositSchemeId);
+            List<DepositAccountWrapperDto> depositAccountWrappersDto = new List<DepositAccountWrapperDto>();
+            if(depositAccountWrappers!=null && depositAccountWrappers.Count>=1)
+            {
+                foreach (var depositAccountWrapper in depositAccountWrappers)
+                {
+                    if(decodedToken.Role==UserRole.Officer.ToString() || depositAccountWrapper.DepositAccount.BranchCode==decodedToken.BranchCode)
+                    {
+                        depositAccountWrappersDto.Add(await MapDepositAccountWrapperToDepositAccountWrapperDto(depositAccountWrapper));
+                    }
+                }
+            }
+            return depositAccountWrappersDto;
+        }
 
         private async Task AddClientInDepositAccount(CreateDepositAccountDto createDepositAccountDto, DepositAccount newDepositAccount, TokenDto decodedToken)
         {
@@ -186,14 +323,14 @@ namespace MicroFinance.Services.DepositSetup
         {
             if (createDepositAccountDto.InterestPostingAccountId != null)
             {
-                var interestPostingAccountNumber = await _depositSchemeRepository.GetDepositAccountById((int)createDepositAccountDto.InterestPostingAccountId);
+                var interestPostingAccountNumber = await _depositSchemeRepository.GetNonClosedDepositAccountById((int)createDepositAccountDto.InterestPostingAccountId);
                 if (interestPostingAccountNumber == null || interestPostingAccountNumber.BranchCode != decodedToken.BranchCode)
                     throw new Exception("InterestPostingAccountNumber: Cannot Find Account Number under your branch");
                 newDepositAccount.InterestPostingAccountNumber = interestPostingAccountNumber;
             }
             if (createDepositAccountDto.MatureInterestPostingAccountId != null)
             {
-                var matureInterestPostingAccountNumber = await _depositSchemeRepository.GetDepositAccountById((int)createDepositAccountDto.MatureInterestPostingAccountId);
+                var matureInterestPostingAccountNumber = await _depositSchemeRepository.GetNonClosedDepositAccountById((int)createDepositAccountDto.MatureInterestPostingAccountId);
                 if (matureInterestPostingAccountNumber == null || matureInterestPostingAccountNumber.BranchCode != decodedToken.BranchCode)
                     throw new Exception("MatureInterestPositingAccountNumber: Cannot Find Account Number under your branch");
                 newDepositAccount.MatureInterestPostingAccountNumber = matureInterestPostingAccountNumber;
@@ -241,35 +378,6 @@ namespace MicroFinance.Services.DepositSetup
                 newDepositAccount.MatureDate = (newDepositAccount.OpeningDate).AddDays(newDepositAccount.Period - 1);
         }
 
-        public async Task<ResponseDto> CreateDepositAccountService(CreateDepositAccountDto createDepositAccountDto, TokenDto decodedToken)
-        {
-
-            DepositAccount newDepositAccount = _mapper.Map<DepositAccount>(createDepositAccountDto);
-            await AddClientInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
-            await AddDepositSchemeInDepositAccount(createDepositAccountDto, newDepositAccount);
-            await AddInterestAndMaturePostingAccountInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
-            await AddReferredByEmployeeInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
-            await AddBasicDetailsInDepositAccount(newDepositAccount, decodedToken);
-            List<Client> jointClients =
-            createDepositAccountDto.AccountType == AccountTypeEnum.Joint
-            ?
-            await GetAllJointClientDetails(createDepositAccountDto.JointClientIds, decodedToken)
-            :
-            null;
-            var depositAccountId = await _depositSchemeRepository.CreateDepositAccount(newDepositAccount);
-            if (depositAccountId >= 1)
-            {
-                if (createDepositAccountDto.AccountType == AccountTypeEnum.Joint)
-                    await CreateJointAccountService(jointClients, newDepositAccount);
-                return new ResponseDto()
-                {
-                    Message = $"Successfully created '{newDepositAccount.AccountNumber}' account number",
-                    Status = true,
-                    StatusCode = "200"
-                };
-            }
-            throw new Exception("Unable to Create Deposit Account");
-        }
         private async Task CreateJointAccountService(List<Client> jointClients, DepositAccount depositAccount)
         {
             List<JointAccount> jointAccounts = new List<JointAccount>();
@@ -307,27 +415,9 @@ namespace MicroFinance.Services.DepositSetup
             return Task.FromResult(depositAccountWrapperDto);
         }
 
-        public async Task<List<DepositAccountWrapperDto>> GetAllNonClosedDepositAccountService()
-        {
-            var allNonClosedDepositAccounts = await _depositSchemeRepository.GetAllNonClosedDepositAccounts();
-            if (allNonClosedDepositAccounts == null || allNonClosedDepositAccounts.Count < 1)
-                return new List<DepositAccountWrapperDto>();
-            List<DepositAccountWrapperDto> allDepositAccountWrapperDto = new List<DepositAccountWrapperDto>();
-            foreach (var depositAccountWrapper in allNonClosedDepositAccounts)
-            {
-                var depositAccountWrapperDto = await MapDepositAccountWrapperToDepositAccountWrapperDto(depositAccountWrapper);
-                allDepositAccountWrapperDto.Add(depositAccountWrapperDto);
-            }
-            return allDepositAccountWrapperDto;
-        }
+     
 
-        public async Task<DepositAccountWrapperDto> GetNonClosedDepositAccountById(int depositAccountId)
-        {
-            var depositAccountWrapper = await _depositSchemeRepository.GetNonCloseDepositAccountById(depositAccountId);
-            if(depositAccountWrapper!=null && depositAccountWrapper.DepositAccount!=null)
-                return await MapDepositAccountWrapperToDepositAccountWrapperDto(depositAccountWrapper);
-            throw new Exception("No data found");
-        }
+
 
 
         // public async Task<ResponseDto> UpdateDepositAccountService(UpdateDepositAccountDto updateDepositAccountDto, string modifiedBy)

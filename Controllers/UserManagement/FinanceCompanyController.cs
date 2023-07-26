@@ -234,5 +234,21 @@ namespace MicroFinance.Controllers.UserManagement
             return Ok(employees);
 
         }
+
+        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        [HttpGet("getAllEmployeeFromUserBranch")]
+        public async Task<ActionResult<EmployeeDto>> GetAllEmployeeFromUserBranch()
+        {
+            var decodedToken = GetDecodedToken();
+            return Ok(await _employeeService.GetAllEmployeeFromUserBranch(decodedToken));
+        }
+
+        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        [HttpGet("getEmployeeByIdFromUserBranch")]
+        public async Task<ActionResult<EmployeeDto>> GetEmployeeByIdFromUserBranch([FromQuery] int employeeId)
+        {
+            var decodedToken = GetDecodedToken();
+            return Ok(await _employeeService.GetEmployeeByIdFromUserBranch(employeeId, decodedToken));
+        }
     }
 }

@@ -49,7 +49,8 @@ namespace MicroFinance.Controllers.ClientSetup
         [HttpGet("getAllClients")]
         public async Task<ActionResult<List<ClientDto>>> GetAllClients()
         {
-            return await _clientService.GetAllClientsService();
+            var decodedToken = GetDecodedToken();
+            return await _clientService.GetAllClientsService(decodedToken);
         }
 
         [HttpGet("getAllActiveClients")]
@@ -62,30 +63,35 @@ namespace MicroFinance.Controllers.ClientSetup
         [HttpGet("getClientByClientId")]
         public async Task<ActionResult<ClientDto>> GetClientByClientId([FromQuery] string clientId)
         {
-            return await _clientService.GetClientByClientIdService(clientId);
+            var decodedToken = GetDecodedToken();
+            return await _clientService.GetClientByClientIdService(clientId,decodedToken);
         }
 
         [HttpGet("getClientByGroup")]
         public async Task<ActionResult<List<ClientDto>>> GetClientByGroup([FromQuery] int groupId)
         {
-            return await _clientService.GetClientsByGroupService(groupId);
+            var decodedToken = GetDecodedToken();
+            return await _clientService.GetClientsByGroupService(groupId, decodedToken);
         }
 
         [HttpGet("getClientByUnit")]
         public async Task<ActionResult<List<ClientDto>>> GetClientByUnit([FromQuery] int unitId)
         {
-            return await _clientService.GetClientsByUnitService(unitId);
+            var decodedToken = GetDecodedToken();
+            return await _clientService.GetClientsByUnitService(unitId, decodedToken);
         }
         [HttpGet("getClientByGroupAndUnit")]
         public async Task<ActionResult<List<ClientDto>>> GetClientByGroupAndUnit([FromQuery] int groupId, [FromQuery] int unitId)
         {
-            return await _clientService.GetClientByGroupAndUnitService(groupId,unitId);
+            var decodedToken = GetDecodedToken();
+            return await _clientService.GetClientByGroupAndUnitService(groupId,unitId, decodedToken);
         }
 
         [HttpGet("getClientByShareType")]
         public async Task<ActionResult<List<ClientDto>>> GetClientByShareType([FromQuery] int shareId)
         {
-            return await _clientService.GetClientByAssignedShareTypeService(shareId);
+            var decodedToken = GetDecodedToken();
+            return await _clientService.GetClientByAssignedShareTypeService(shareId, decodedToken);
         }
 
         [HttpGet("getAllClientTypes")]
