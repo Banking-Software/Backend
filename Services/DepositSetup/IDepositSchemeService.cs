@@ -16,6 +16,7 @@ namespace MicroFinance.Services.DepositSetup
 
         // // Deposit Account
         Task<ResponseDto> CreateDepositAccountService(CreateDepositAccountDto createDepositAccountDto, TokenDto decodedToken);
+        Task<string> GenerateMatureDateOfDepositAccountService(GenerateMatureDateDto generateMatureDateDto);
         Task<List<DepositAccountWrapperDto>> GetAllNonClosedDepositAccountService(TokenDto decodedToken);
         Task<DepositAccountWrapperDto> GetNonClosedDepositAccountByIdService(int depositAccountId, TokenDto decodedToken);
         Task<ResponseDto> UpdateNonClosedDepositAccountService(UpdateDepositAccountDto updateDepositAccountDto, TokenDto decodedToken);

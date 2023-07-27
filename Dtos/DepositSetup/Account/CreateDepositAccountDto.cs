@@ -11,6 +11,8 @@ namespace MicroFinance.Dtos.DepositSetup
         [Required]
         public int ClientId { get; set; }
         [Required]
+        public string OpeningDate { get; set; }
+        [Required]
         public int Period { get; set; }
         [Required]
         public PeriodTypeEnum PeriodType { get; set; }

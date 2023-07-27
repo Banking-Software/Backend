@@ -8,11 +8,11 @@ namespace MicroFinance.Dtos.DepositSetup
     public class DepositAccountDto : BaseDepositDto
     {
         public string AccountNumber { get; set; }
-        public DateTime OpeningDate { get; set; }
+        public string OpeningDate { get; set; }
         public int Period { get; set; }
         public PeriodTypeEnum PeriodType { get; set; }
         public AccountTypeEnum AccountType { get; set; }
-        public DateTime MatureDate { get; set; }
+        public string MatureDate { get; set; }
         public decimal InterestRate { get; set; }
         public decimal PrincipalAmount { get; set; } = 0;
         public decimal InterestAmount { get; set; } = 0;

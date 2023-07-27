@@ -22,6 +22,7 @@ namespace MicroFinance.Repository.CompanyProfile
         Task<int> CreateCalender(List<Calendar> calendars);
         Task<int> UpdateCalender(UpdateCalenderDto updateCalender, Dictionary<string, string> userClaim);
         Task<Calendar> GetCalendarById(int id);
+        Task<Calendar> GetCalendarByYearAndMonth(int year, int month);
         Task<Calendar> GetActiveCalender();
         Task<List<Calendar>> GetAllCalendars();
         Task<List<Calendar>> GetCalendarByYear(int year);

@@ -8,7 +8,7 @@ namespace MicroFinance.Dtos.DepositSetup.Account
         public ClientDto JointClient { get; set; }
         public DateTime RealWorldStartDate { get; set; }
         public DateTime? RealWorldEndDate { get; set; }
-        public DateTime CompanyCalendarStartDate { get; set; }
-        public DateTime? CompanyCalendarEndDate { get; set; }
+        public string CompanyCalendarStartDate { get; set; }
+        public string? CompanyCalendarEndDate { get; set; }
     }
 }

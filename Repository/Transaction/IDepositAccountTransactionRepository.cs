@@ -6,6 +6,6 @@ namespace MicroFinance.Repository.Transaction
     public interface IDepositAccountTransactionRepository
     {
         Task<string> MakeDeposit(MakeDepositWrapper depositWrapper);
-        Task<string> MakeWithDrawal(DepositAccountTransaction withDrawalTransaction);
+        Task<string> MakeWithDrawal(MakeWithDrawalWrapper withDrawalWrapper);
     }
 }

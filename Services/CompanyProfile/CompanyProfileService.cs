@@ -227,5 +227,15 @@ namespace MicroFinance.Services.CompanyProfile
             }
             throw new Exception("No Active Calender Exist");
         }
+
+         public async Task<CalendarDto> GetCalendarByYearAndMonthService(int year, int month)
+         {
+            var calendarByYearAndMonth = await _companyProfile.GetCalendarByYearAndMonth(year, month);
+            if(calendarByYearAndMonth!=null)
+            {
+                return _mapper.Map<CalendarDto>(calendarByYearAndMonth);
+            }
+            throw new Exception($"Unable Get Calendar for year {year} and month {month}");
+         }
     }
 }

@@ -31,7 +31,7 @@ namespace MicroFinance.Controllers.Transactions
         }
 
         [HttpPost("makeDeposit")]
-        public async Task<ActionResult<ResponseDto>> MakeDeposit(MakeDepositTransactionDto makeDepositTransactionDto)
+        public async Task<ActionResult<ResponseDto>> MakeDeposit([FromForm] MakeDepositTransactionDto makeDepositTransactionDto)
         {
             var decodedToken = GetDecodedToken();
             return Ok(await _depositAccountTransactionService.MakeDepositTransactionService(makeDepositTransactionDto, decodedToken));

@@ -87,7 +87,7 @@ namespace MicroFinance.Services.DepositSetup
             depositScheme.CreatorId = decodedToken.UserId;
             depositScheme.BranchCode = decodedToken.BranchCode;
             depositScheme.RealWorldCreationDate = DateTime.Now;
-            depositScheme.CompanyCalendarCreationDate = new DateTime(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            depositScheme.CompanyCalendarCreationDate = $"{companyCalendar.Year}/{companyCalendar.Month}/{companyCalendar.RunningDay}";
             var depositSchemeId = await _depositSchemeRepository.CreateDepositScheme(depositScheme);
             return new ResponseDto()
             {
@@ -124,7 +124,7 @@ namespace MicroFinance.Services.DepositSetup
             existingDepositScheme.ModifierId = decodedToken.UserId;
             existingDepositScheme.ModifierBranchCode = decodedToken.BranchCode;
             existingDepositScheme.RealWorldModificationDate = DateTime.Now;
-            existingDepositScheme.CompanyCalendarModificationDate = new DateTime(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            existingDepositScheme.CompanyCalendarModificationDate = $"{companyCalendar.Year}/{companyCalendar.Month}/{companyCalendar.RunningDay}";
             var updateStatus = await _depositSchemeRepository.UpdateDepositScheme(existingDepositScheme);
             if (updateStatus < 1)
                 throw new Exception("Failed to update the Deposit Scheme");
@@ -187,6 +187,8 @@ namespace MicroFinance.Services.DepositSetup
             throw new Exception("Unable to Create Deposit Account");
         }
 
+       
+        
         public async Task<ResponseDto> UpdateNonClosedDepositAccountService(UpdateDepositAccountDto updateDepositAccountDto, TokenDto decodedToken)
         {
             var existingDepositAccount = await _depositSchemeRepository.GetNonClosedDepositAccountById(updateDepositAccountDto.Id);
@@ -235,6 +237,35 @@ namespace MicroFinance.Services.DepositSetup
             }
             throw new Exception("Update Failed");
         }
+
+        public async Task<string> GenerateMatureDateOfDepositAccountService(GenerateMatureDateDto generateMatureDateDto)
+        {
+            var openingDate = (generateMatureDateDto.OpeningDate).Split("/");
+            ReceivedCalendarDto receivedCalendarDto = new ReceivedCalendarDto()
+            {
+                CurrentYear=Int32.Parse(openingDate[0]),
+                CurrentMonth = Int32.Parse(openingDate[1]),
+                CurrentDay = Int32.Parse(openingDate[2])
+            };
+            if
+            (
+                receivedCalendarDto.CurrentYear.ToString().Length<4 
+                || receivedCalendarDto.CurrentMonth<1 
+                || receivedCalendarDto.CurrentMonth>12 
+                || receivedCalendarDto.CurrentDay<1 
+                || receivedCalendarDto.CurrentDay>32
+            ) throw new Exception("Invalid Opening Date. Please refer formar YYYY/MM/DD as 2080/01/01");
+            var matureDate = "";
+            if(generateMatureDateDto.PeriodType == PeriodTypeEnum.Year)
+                matureDate = await GenerateMatureDateYearWise(generateMatureDateDto, receivedCalendarDto);
+            else if(generateMatureDateDto.PeriodType==PeriodTypeEnum.Month)
+                matureDate = await GenerateMatureDateMonthWise(generateMatureDateDto, receivedCalendarDto);
+            else
+                matureDate = await GenerateMatureDateDayWise(generateMatureDateDto, receivedCalendarDto);
+            if(string.IsNullOrEmpty(matureDate)) throw new Exception("Not able to Generate Mature Date");
+            return matureDate;
+        }
+
         public async Task<List<DepositAccountWrapperDto>> GetAllNonClosedDepositAccountService(TokenDto decodedToken)
         {
             var allNonClosedDepositAccounts = await _depositSchemeRepository.GetAllNonClosedDepositAccounts();
@@ -365,24 +396,25 @@ namespace MicroFinance.Services.DepositSetup
         {
             var companyCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
             newDepositAccount.RealWorldCreationDate = DateTime.Now;
-            newDepositAccount.CompanyCalendarCreationDate = new DateTime(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            newDepositAccount.CompanyCalendarCreationDate =$"{companyCalendar.Year}/{companyCalendar.Month}/{companyCalendar.RunningDay}";
             newDepositAccount.BranchCode = decodedToken.BranchCode;
             newDepositAccount.CreatedBy = decodedToken.UserName;
             newDepositAccount.CreatorId = decodedToken.UserId;
-            newDepositAccount.OpeningDate = new DateTime(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
-            if (newDepositAccount.PeriodType == PeriodTypeEnum.Year)
-                newDepositAccount.MatureDate = (newDepositAccount.OpeningDate).AddYears(newDepositAccount.Period).AddDays(-1);
-            else if (newDepositAccount.PeriodType == PeriodTypeEnum.Month)
-                newDepositAccount.MatureDate = (newDepositAccount.OpeningDate).AddMonths(newDepositAccount.Period).AddDays(-1);
-            else
-                newDepositAccount.MatureDate = (newDepositAccount.OpeningDate).AddDays(newDepositAccount.Period - 1);
+            //newDepositAccount.OpeningDate 
+            GenerateMatureDateDto generateMatureDateDto = new GenerateMatureDateDto()
+            {
+                OpeningDate = newDepositAccount.OpeningDate,
+                Period = newDepositAccount.Period,
+                PeriodType = newDepositAccount.PeriodType
+            };
+            newDepositAccount.MatureDate = await GenerateMatureDateOfDepositAccountService(generateMatureDateDto);
         }
 
         private async Task CreateJointAccountService(List<Client> jointClients, DepositAccount depositAccount)
         {
             List<JointAccount> jointAccounts = new List<JointAccount>();
             DateTime RealWorldStartDate = DateTime.Now;
-            DateTime CompanyCalendarStartDate = depositAccount.CompanyCalendarCreationDate;
+            string CompanyCalendarStartDate = depositAccount.CompanyCalendarCreationDate;
             foreach (var jointClient in jointClients)
             {
                 var jointAccount = new JointAccount()
@@ -414,6 +446,67 @@ namespace MicroFinance.Services.DepositSetup
             depositAccountWrapperDto.DepositAccount.MatureInterestPostingAccountNumber = depositAccount.MatureInterestPostingAccountNumber?.AccountNumber;
             return Task.FromResult(depositAccountWrapperDto);
         }
+
+         private async Task<string> GenerateMatureDateYearWise(GenerateMatureDateDto generateMatureDateDto, ReceivedCalendarDto receivedCalendarDto)
+        {
+            int matureYear = receivedCalendarDto.CurrentYear + generateMatureDateDto.Period;
+            if(receivedCalendarDto.CurrentMonth==1)
+                matureYear-=1;
+            int matureMonth = receivedCalendarDto.CurrentMonth;
+            int matureDay = receivedCalendarDto.CurrentDay-1;
+            if(receivedCalendarDto.CurrentDay==1)
+            {
+                if(receivedCalendarDto.CurrentMonth==1)
+                    matureMonth = 12;
+                else
+                    matureMonth-=1;
+                matureDay = (await _companyProfileService.GetCalendarByYearAndMonthService(receivedCalendarDto.CurrentYear, matureMonth)).NumberOfDay;
+            }
+            return $"{matureYear}/{matureMonth}/{matureDay}";
+        }
+        private async Task<string> GenerateMatureDateMonthWise(GenerateMatureDateDto generateMatureDateDto, ReceivedCalendarDto receivedCalendarDto)
+        {
+            int matureYear = receivedCalendarDto.CurrentYear + (receivedCalendarDto.CurrentMonth + generateMatureDateDto.Period) / 12;
+            int matureMonth = (receivedCalendarDto.CurrentMonth + generateMatureDateDto.Period) % 12;
+            int matureDay = receivedCalendarDto.CurrentDay -1;
+            if(generateMatureDateDto.Period<=12 && matureMonth>12)
+            {
+                matureYear+=1;
+                matureMonth-=12;
+            }
+            if(receivedCalendarDto.CurrentDay==1)
+            {
+                matureMonth-=1;
+                matureDay = (await _companyProfileService.GetCalendarByYearAndMonthService(receivedCalendarDto.CurrentYear, matureMonth)).NumberOfDay;
+            }
+            return $"{matureYear}/{matureMonth}/{matureDay}";
+        }
+        private async Task<string> GenerateMatureDateDayWise(GenerateMatureDateDto generateMatureDateDto, ReceivedCalendarDto receivedCalendarDto)
+        {
+            int extraYear = generateMatureDateDto.Period / 365;
+            int remainingDays = generateMatureDateDto.Period % 365;
+            int extraMonth = remainingDays / 30;
+            int extraDay = remainingDays % 30;
+            int matureYear = receivedCalendarDto.CurrentYear + extraYear;
+            int matureMonth = receivedCalendarDto.CurrentMonth + extraMonth;
+            int matureDay = receivedCalendarDto.CurrentDay + extraDay -1;
+            if(matureDay>30)
+            {
+                matureMonth+=matureDay / 30;
+                matureDay %= 30;
+            }
+            if(matureMonth > 12)
+            {
+                matureYear +=matureMonth / 12;
+                matureMonth %= 12;
+            }
+            int totalNumberOfDaysInCurrentMonth = (await _companyProfileService.GetCalendarByYearAndMonthService(receivedCalendarDto.CurrentYear, matureMonth)).NumberOfDay;
+            if(matureDay>totalNumberOfDaysInCurrentMonth)
+                matureDay = totalNumberOfDaysInCurrentMonth;
+            
+            return $"{matureYear}/{matureMonth}/{matureDay}";
+        }
+
 
      
 

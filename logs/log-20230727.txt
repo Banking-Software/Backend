@@ -2789,3 +2789,426 @@ WHERE [Id] = @p30;
 2023-07-27 01:40:51.311 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
 2023-07-27 01:40:51.312 +05:45 [INF] HTTP POST /Transaction/makeDeposit responded 200 in 15756.8183 ms
 2023-07-27 01:40:51.313 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit application/json 208 - 200 - application/json;+charset=utf-8 15766.5135ms
+2023-07-27 08:13:05.560 +05:45 [ERR] 7/27/2023 8:13:05 AM: Microsoft.Data.SqlClient.SqlException (0x80131904): A connection was successfully established with the server, but then an error occurred during the pre-login handshake. (provider: TCP Provider, error: 0 - No such file or directory)
+ ---> System.ComponentModel.Win32Exception (2): No such file or directory
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParserStateObject.ReadSniError(TdsParserStateObject stateObj, UInt32 error)
+   at Microsoft.Data.SqlClient.TdsParserStateObject.ReadSniSyncOverAsync()
+   at Microsoft.Data.SqlClient.TdsParserStateObject.TryReadNetworkPacket()
+   at Microsoft.Data.SqlClient.TdsParser.ConsumePreLoginHandshake(SqlConnectionEncryptOption encrypt, Boolean trustServerCert, Boolean integratedSecurity, Boolean& marsCapable, Boolean& fedAuthRequired, Boolean tlsFirst)
+   at Microsoft.Data.SqlClient.TdsParser.Connect(ServerInfo serverInfo, SqlInternalConnectionTds connHandler, Boolean ignoreSniOpenTimeout, Int64 timerExpire, SqlConnectionString connectionOptions, Boolean withFailover)
+   at Microsoft.Data.SqlClient.SqlInternalConnectionTds.AttemptOneLogin(ServerInfo serverInfo, String newPassword, SecureString newSecurePassword, Boolean ignoreSniOpenTimeout, TimeoutTimer timeout, Boolean withFailover)
+   at Microsoft.Data.SqlClient.SqlInternalConnectionTds.LoginNoFailover(ServerInfo serverInfo, String newPassword, SecureString newSecurePassword, Boolean redirectedUserInstance, SqlConnectionString connectionOptions, SqlCredential credential, TimeoutTimer timeout)
+   at Microsoft.Data.SqlClient.SqlInternalConnectionTds.OpenLoginEnlist(TimeoutTimer timeout, SqlConnectionString connectionOptions, SqlCredential credential, String newPassword, SecureString newSecurePassword, Boolean redirectedUserInstance)
+   at Microsoft.Data.SqlClient.SqlInternalConnectionTds..ctor(DbConnectionPoolIdentity identity, SqlConnectionString connectionOptions, SqlCredential credential, Object providerInfo, String newPassword, SecureString newSecurePassword, Boolean redirectedUserInstance, SqlConnectionString userConnectionOptions, SessionData reconnectSessionData, Boolean applyTransientFaultHandling, String accessToken, DbConnectionPool pool)
+   at Microsoft.Data.SqlClient.SqlConnectionFactory.CreateConnection(DbConnectionOptions options, DbConnectionPoolKey poolKey, Object poolGroupProviderInfo, DbConnectionPool pool, DbConnection owningConnection, DbConnectionOptions userOptions)
+   at Microsoft.Data.ProviderBase.DbConnectionFactory.CreatePooledConnection(DbConnectionPool pool, DbConnection owningObject, DbConnectionOptions options, DbConnectionPoolKey poolKey, DbConnectionOptions userOptions)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.CreateObject(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.UserCreateRequest(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.WaitForPendingOpen()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.HistoryRepository.ExistsAsync(CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)
+   at Program.<Main>$(String[] args) in /media/ashish/New Volume/FinTechProject/MicroFinance/Program.cs:line 94
+ClientConnectionId:543b5c66-0ba6-418a-950c-5f1bc02d3419
+Error Number:2,State:0,Class:20
+2023-07-27 08:13:05.823 +05:45 [ERR] 7/27/2023 8:13:05 AM: Microsoft.Data.SqlClient.SqlException (0x80131904): A connection was successfully established with the server, but then an error occurred during the pre-login handshake. (provider: TCP Provider, error: 0 - No such file or directory)
+ ---> System.ComponentModel.Win32Exception (2): No such file or directory
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   at Microsoft.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry, SqlConnectionOverrides overrides)
+   at Microsoft.Data.SqlClient.SqlConnection.InternalOpenAsync(CancellationToken cancellationToken)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.HistoryRepository.ExistsAsync(CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)
+   at Program.<Main>$(String[] args) in /media/ashish/New Volume/FinTechProject/MicroFinance/Program.cs:line 94
+ClientConnectionId:543b5c66-0ba6-418a-950c-5f1bc02d3419
+Error Number:2,State:0,Class:20
+2023-07-27 08:13:05.888 +05:45 [ERR] 7/27/2023 8:13:05 AM: Microsoft.Data.SqlClient.SqlException (0x80131904): A connection was successfully established with the server, but then an error occurred during the pre-login handshake. (provider: TCP Provider, error: 0 - No such file or directory)
+ ---> System.ComponentModel.Win32Exception (2): No such file or directory
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   at Microsoft.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry, SqlConnectionOverrides overrides)
+   at Microsoft.Data.SqlClient.SqlConnection.InternalOpenAsync(CancellationToken cancellationToken)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.HistoryRepository.ExistsAsync(CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)
+   at Program.<Main>$(String[] args) in /media/ashish/New Volume/FinTechProject/MicroFinance/Program.cs:line 94
+ClientConnectionId:543b5c66-0ba6-418a-950c-5f1bc02d3419
+Error Number:2,State:0,Class:20
+2023-07-27 08:13:05.950 +05:45 [ERR] 7/27/2023 8:13:05 AM: Microsoft.Data.SqlClient.SqlException (0x80131904): A connection was successfully established with the server, but then an error occurred during the pre-login handshake. (provider: TCP Provider, error: 0 - No such file or directory)
+ ---> System.ComponentModel.Win32Exception (2): No such file or directory
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   at Microsoft.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry, SqlConnectionOverrides overrides)
+   at Microsoft.Data.SqlClient.SqlConnection.InternalOpenAsync(CancellationToken cancellationToken)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.HistoryRepository.ExistsAsync(CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)
+   at Program.<Main>$(String[] args) in /media/ashish/New Volume/FinTechProject/MicroFinance/Program.cs:line 94
+ClientConnectionId:543b5c66-0ba6-418a-950c-5f1bc02d3419
+Error Number:2,State:0,Class:20
+2023-07-27 08:13:06.163 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-07-27 08:13:06.976 +05:45 [INF] Now listening on: https://localhost:5001
+2023-07-27 08:13:06.976 +05:45 [INF] Now listening on: http://localhost:5000
+2023-07-27 08:13:06.977 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-07-27 08:13:06.978 +05:45 [INF] Hosting environment: Development
+2023-07-27 08:13:06.978 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/MicroFinance/
+2023-07-27 08:13:13.968 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/index.html - -
+2023-07-27 08:13:14.354 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/index.html - - - 200 - text/html;charset=utf-8 392.7642ms
+2023-07-27 08:13:14.638 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - -
+2023-07-27 08:13:15.262 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - - - 200 - application/json;charset=utf-8 623.9134ms
+2023-07-27 08:25:58.358 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit multipart/form-data;+boundary=----WebKitFormBoundaryH5Vyu5rrA4wUkREI 1006
+2023-07-27 08:26:00.300 +05:45 [INF] CORS policy execution successful.
+2023-07-27 08:26:00.373 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-07-27 08:26:00.439 +05:45 [INF] Route matched with {action = "MakeDeposit", controller = "Transaction"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.ResponseDto]] MakeDeposit(MicroFinance.Dtos.Transactions.MakeDepositTransactionDto) on controller MicroFinance.Controllers.Transactions.TransactionController (MicroFinance).
+2023-07-27 08:26:04.932 +05:45 [INF] Executed action MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance) in 4480.1214ms
+2023-07-27 08:26:04.943 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-07-27 08:26:04.952 +05:45 [ERR] HTTP POST /Transaction/makeDeposit responded 500 in 4581.0110 ms
+System.ArgumentNullException: IDX10000: The parameter 'token' cannot be a 'null' or an empty object.  (Parameter 'token')
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ReadJwtToken(String token)
+   at MicroFinance.Token.TokenService.DecodeJWT(String token) in /media/ashish/New Volume/FinTechProject/MicroFinance/Token/TokenService.cs:line 52
+   at MicroFinance.Controllers.Transactions.TransactionController.GetDecodedToken() in /media/ashish/New Volume/FinTechProject/MicroFinance/Controllers/Transactions/TransactionController.cs:line 29
+   at MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit(MakeDepositTransactionDto makeDepositTransactionDto) in /media/ashish/New Volume/FinTechProject/MicroFinance/Controllers/Transactions/TransactionController.cs:line 36
+   at lambda_method30(Closure , Object )
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|6_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+2023-07-27 08:26:05.075 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit multipart/form-data;+boundary=----WebKitFormBoundaryH5Vyu5rrA4wUkREI 1006 - 401 - application/json 6717.5271ms
+2023-07-27 08:26:32.936 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73
+2023-07-27 08:26:32.952 +05:45 [INF] CORS policy execution successful.
+2023-07-27 08:26:33.383 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-07-27 08:26:33.389 +05:45 [INF] Route matched with {action = "Login", controller = "FinanceCompany"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.UserManagement.TokenResponseDto]] Login(MicroFinance.Dtos.UserManagement.UserLoginDto) on controller MicroFinance.Controllers.UserManagement.FinanceCompanyController (MicroFinance).
+2023-07-27 08:26:38.846 +05:45 [INF] Executed DbCommand (351ms) [Parameters=[@__userName_0='?' (Size = 256)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedBy], [a].[CreatedOn], [a].[DepositLimit], [a].[Email], [a].[EmailConfirmed], [a].[EmployeeId], [a].[IsActive], [a].[LoanLimit], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[ModifiedBy], [a].[ModifiedOn], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [e].[Id], [e].[BranchCode], [e].[CitizenShipFileData], [e].[CitizenShipFileName], [e].[CitizenShipFileType], [e].[CreatedBy], [e].[CreatedOn], [e].[DateOfJoining], [e].[Designation], [e].[Email], [e].[Facilities], [e].[GenderCode], [e].[Grade], [e].[ModifiedBy], [e].[ModifiedOn], [e].[Name], [e].[OtherFacilities], [e].[PANNumber], [e].[PFAllowed], [e].[PhoneNumber], [e].[ProfilePicFileData], [e].[ProfilePicFileName], [e].[ProfilePicFileType], [e].[ProvidentPostingAccount], [e].[SalaryAmount], [e].[SalaryPostingAccount], [e].[SignatureFileData], [e].[SignatureFileName], [e].[SignatureFileType], [e].[Tax]
+FROM [AspNetUsers] AS [a]
+LEFT JOIN [Employees] AS [e] ON [a].[EmployeeId] = [e].[Id]
+WHERE [a].[UserName] = @__userName_0
+2023-07-27 08:26:39.422 +05:45 [INF] Executed DbCommand (25ms) [Parameters=[@__userName_0='?' (Size = 256)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedBy], [a].[CreatedOn], [a].[DepositLimit], [a].[Email], [a].[EmailConfirmed], [a].[EmployeeId], [a].[IsActive], [a].[LoanLimit], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[ModifiedBy], [a].[ModifiedOn], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [e].[Id], [e].[BranchCode], [e].[CitizenShipFileData], [e].[CitizenShipFileName], [e].[CitizenShipFileType], [e].[CreatedBy], [e].[CreatedOn], [e].[DateOfJoining], [e].[Designation], [e].[Email], [e].[Facilities], [e].[GenderCode], [e].[Grade], [e].[ModifiedBy], [e].[ModifiedOn], [e].[Name], [e].[OtherFacilities], [e].[PANNumber], [e].[PFAllowed], [e].[PhoneNumber], [e].[ProfilePicFileData], [e].[ProfilePicFileName], [e].[ProfilePicFileType], [e].[ProvidentPostingAccount], [e].[SalaryAmount], [e].[SalaryPostingAccount], [e].[SignatureFileData], [e].[SignatureFileName], [e].[SignatureFileType], [e].[Tax]
+FROM [AspNetUsers] AS [a]
+LEFT JOIN [Employees] AS [e] ON [a].[EmployeeId] = [e].[Id]
+WHERE [a].[UserName] = @__userName_0
+2023-07-27 08:26:39.933 +05:45 [WRN] Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+2023-07-27 08:26:39.978 +05:45 [WRN] No store type was specified for the decimal property 'CurrentShareBalance' on entity type 'ShareAccount'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-07-27 08:26:40.205 +05:45 [INF] Executed DbCommand (26ms) [Parameters=[@__branchCode_0='000' (Size = 450)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [b].[Id], [b].[BranchCode], [b].[BranchName], [b].[CreatedBy], [b].[CreatedOn], [b].[IsActive], [b].[ModifiedBy], [b].[ModifiedOn]
+FROM [Branches] AS [b]
+WHERE [b].[BranchCode] = @__branchCode_0
+2023-07-27 08:26:40.297 +05:45 [INF] 7/27/2023 8:26:40 AM User Logged In > admin
+2023-07-27 08:26:40.348 +05:45 [INF] Executed DbCommand (6ms) [Parameters=[@__userId_0='?' (Size = 450)], CommandType='"Text"', CommandTimeout='30']
+SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0
+2023-07-27 08:26:40.754 +05:45 [INF] Executing OkObjectResult, writing value of type 'MicroFinance.Dtos.UserManagement.TokenResponseDto'.
+2023-07-27 08:26:40.775 +05:45 [INF] Executed action MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance) in 7385.1074ms
+2023-07-27 08:26:40.777 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-07-27 08:26:40.779 +05:45 [INF] HTTP POST /FinanceCompany/login responded 200 in 7395.8901 ms
+2023-07-27 08:26:40.807 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73 - 200 - application/json;+charset=utf-8 7870.5151ms
+2023-07-27 08:26:59.113 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit multipart/form-data;+boundary=----WebKitFormBoundarymkMQO4k4rl0pa1tm 1006
+2023-07-27 08:26:59.147 +05:45 [INF] CORS policy execution successful.
+2023-07-27 08:26:59.151 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-07-27 08:26:59.153 +05:45 [INF] Route matched with {action = "MakeDeposit", controller = "Transaction"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.ResponseDto]] MakeDeposit(MicroFinance.Dtos.Transactions.MakeDepositTransactionDto) on controller MicroFinance.Controllers.Transactions.TransactionController (MicroFinance).
+2023-07-27 08:27:01.357 +05:45 [INF] Executed DbCommand (36ms) [Parameters=[@__id_0='1'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [d].[Id], [d].[AccountNumber], [d].[AccountType], [d].[BranchCode], [d].[ClientId], [d].[CompanyCalendarCreationDate], [d].[CompanyCalendarModificationDate], [d].[CreatedBy], [d].[CreatorId], [d].[DepositSchemeId], [d].[Description], [d].[ExpectedDailyDepositAmount], [d].[ExpectedTotalDepositAmount], [d].[ExpectedTotalDepositDay], [d].[ExpectedTotalInterestAmount], [d].[ExpectedTotalReturnAmount], [d].[InterestAmount], [d].[InterestPostingAccountNumberId], [d].[InterestRate], [d].[IsActive], [d].[IsSMSServiceActive], [d].[MatureDate], [d].[MatureInterestPostingAccountNumberId], [d].[ModifiedBy], [d].[ModifierBranchCode], [d].[ModifierId], [d].[NomineeName], [d].[OpeningDate], [d].[Period], [d].[PeriodType], [d].[PrincipalAmount], [d].[RealWorldCreationDate], [d].[RealWorldModificationDate], [d].[ReferredByEmployeeId], [d].[Relation], [d].[Status], [c].[Id], [c].[BranchCode], [c].[ClientAccountPurposeNepali], [c].[ClientCastCode], [c].[ClientCitizenShipIssueDate], [c].[ClientCitizenShipIssueDistrict], [c].[ClientCitizenshipFileData], [c].[ClientCitizenshipFileName], [c].[ClientCitizenshipFileType], [c].[ClientCitizenshipNumber], [c].[ClientDateOfBirth], [c].[ClientEducationStatus], [c].[ClientEmail], [c].[ClientFatherInLaw], [c].[ClientFatherName], [c].[ClientFatherNameNepali], [c].[ClientFirstName], [c].[ClientGenderCode], [c].[ClientGrandFatherName], [c].[ClientGrandFatherNameNepali], [c].[ClientGroupId], [c].[ClientId], [c].[ClientIfMemberOfOtherParty], [c].[ClientIncomeSource], [c].[ClientLastName], [c].[ClientMartialStatusCode], [c].[ClientMiddleName], [c].[ClientMobileNumber1], [c].[ClientMobileNumber2], [c].[ClientMotherInLaw], [c].[ClientMotherName], [c].[ClientMotherNameNepali], [c].[ClientNameOfDaughters], [c].[ClientNameOfSons], [c].[ClientNationality], [c].[ClientNationalityIdStatus], [c].[ClientNepaliName], [c].[ClientOccupation], [c].[ClientOtherInfo], [c].[ClientOtherInfo2], [c].[ClientPanNumber], [c].[ClientPhotoFileData], [c].[ClientPhotoFileName], [c].[ClientPhotoFileType], [c].[ClientShareTypeInfoId], [c].[ClientSignatureFileData], [c].[ClientSignatureFileName], [c].[ClientSignatureFileType], [c].[ClientSpouseName], [c].[ClientSpouseOccupation], [c].[ClientTelephoneNumber1], [c].[ClientTelephoneNumber2], [c].[ClientTypeId], [c].[ClientUnitId], [c].[ClientVotingId], [c].[ClientWebsite], [c].[CreatedBy], [c].[CreatedOn], [c].[CreatorId], [c].[IsActive], [c].[IsKYMUpdated], [c].[IsModified], [c].[IsShareAllowed], [c].[KYMTypeId], [c].[ModificationCount], [c].[ModifiedBy], [c].[ModifiedOn], [c].[ModifierId], [c].[NomineeAddress], [c].[NomineeCitizenshipNumber], [c].[NomineeContactNumber], [c].[NomineeIntroducedBy], [c].[NomineeName], [c].[NomineeNepaliName], [c].[NomineeNepaliRelation], [c].[NomineePhotoFileData], [c].[NomineePhotoFileName], [c].[NomineePhotoFileType], [c].[NomineeRelation], [c].[PermanentDistrictCode], [c].[PermanentStateCode], [c].[PermanentToleVillage], [c].[PermanentToleVillageNepali], [c].[PermanentVdcMunicipality], [c].[PermanentVdcMunicipalityNepali], [c].[PermanentWardNumber], [c].[PermanentWardNumberNepali], [c].[RegistrationDate], [c].[TemporaryDistrictCode], [c].[TemporaryStateCode], [c].[TemporaryToleVillage], [c].[TemporaryToleVillageNepali], [c].[TemporaryVdcMunicipality], [c].[TemporaryVdcMunicipalityNepali], [c].[TemporaryWardNumber], [c].[TemporaryWardNumberNepali], [d0].[Id], [d0].[BranchCode], [d0].[Calculation], [d0].[CompanyCalendarCreationDate], [d0].[CompanyCalendarModificationDate], [d0].[CreatedBy], [d0].[CreatorId], [d0].[DepositSubledgerId], [d0].[InterestRate], [d0].[InterestRateOnMinimumBalance], [d0].[InterestSubLedgerId], [d0].[IsActive], [d0].[MaximumInterestRate], [d0].[MinimumBalance], [d0].[MinimumInterestRate], [d0].[ModifiedBy], [d0].[ModifierBranchCode], [d0].[ModifierId], [d0].[PostingScheme], [d0].[RealWorldCreationDate], [d0].[RealWorldModificationDate], [d0].[SchemeName], [d0].[SchemeNameNepali], [d0].[SchemeTypeId], [d0].[Symbol], [d0].[TaxSubledgerId], [d1].[Id], [d1].[AccountNumber], [d1].[AccountType], [d1].[BranchCode], [d1].[ClientId], [d1].[CompanyCalendarCreationDate], [d1].[CompanyCalendarModificationDate], [d1].[CreatedBy], [d1].[CreatorId], [d1].[DepositSchemeId], [d1].[Description], [d1].[ExpectedDailyDepositAmount], [d1].[ExpectedTotalDepositAmount], [d1].[ExpectedTotalDepositDay], [d1].[ExpectedTotalInterestAmount], [d1].[ExpectedTotalReturnAmount], [d1].[InterestAmount], [d1].[InterestPostingAccountNumberId], [d1].[InterestRate], [d1].[IsActive], [d1].[IsSMSServiceActive], [d1].[MatureDate], [d1].[MatureInterestPostingAccountNumberId], [d1].[ModifiedBy], [d1].[ModifierBranchCode], [d1].[ModifierId], [d1].[NomineeName], [d1].[OpeningDate], [d1].[Period], [d1].[PeriodType], [d1].[PrincipalAmount], [d1].[RealWorldCreationDate], [d1].[RealWorldModificationDate], [d1].[ReferredByEmployeeId], [d1].[Relation], [d1].[Status]
+FROM [DepositAccounts] AS [d]
+INNER JOIN [Clients] AS [c] ON [d].[ClientId] = [c].[Id]
+INNER JOIN [DepositSchemes] AS [d0] ON [d].[DepositSchemeId] = [d0].[Id]
+LEFT JOIN [DepositAccounts] AS [d1] ON [d].[InterestPostingAccountNumberId] = [d1].[Id]
+WHERE [d].[Status] <> 3 AND [d].[Id] = @__id_0
+2023-07-27 08:27:02.317 +05:45 [INF] Executed DbCommand (30ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [e].[Id], [e].[BranchCode], [e].[CitizenShipFileData], [e].[CitizenShipFileName], [e].[CitizenShipFileType], [e].[CreatedBy], [e].[CreatedOn], [e].[DateOfJoining], [e].[Designation], [e].[Email], [e].[Facilities], [e].[GenderCode], [e].[Grade], [e].[ModifiedBy], [e].[ModifiedOn], [e].[Name], [e].[OtherFacilities], [e].[PANNumber], [e].[PFAllowed], [e].[PhoneNumber], [e].[ProfilePicFileData], [e].[ProfilePicFileName], [e].[ProfilePicFileType], [e].[ProvidentPostingAccount], [e].[SalaryAmount], [e].[SalaryPostingAccount], [e].[SignatureFileData], [e].[SignatureFileName], [e].[SignatureFileType], [e].[Tax]
+FROM [Employees] AS [e]
+WHERE [e].[Id] = @__p_0
+2023-07-27 08:27:02.356 +05:45 [INF] Executed DbCommand (15ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [c].[Id], [c].[CreatedBy], [c].[CreatedOn], [c].[IsActive], [c].[IsLocked], [c].[ModifiedBy], [c].[ModifiedOn], [c].[Month], [c].[MonthName], [c].[NumberOfDay], [c].[RunningDay], [c].[Year]
+FROM [Calendars] AS [c]
+WHERE [c].[IsActive] = CAST(1 AS bit)
+2023-07-27 08:27:02.442 +05:45 [INF] 7/27/2023 8:27:02 AM: Depositing 10000 by admin on Deposit Account Id: 1
+2023-07-27 08:27:03.420 +05:45 [INF] Executed DbCommand (33ms) [Parameters=[@p0='Ten Thousand Only' (Size = 4000), @p1='000' (Nullable = false) (Size = 4000), @p2='2022-01-10T00:00:00.0000000', @p3=NULL (DbType = DateTime2), @p4='admin' (Nullable = false) (Size = 4000), @p5='8b327bb9-27f3-4eb0-b5ba-1d18166d1b26' (Nullable = false) (Size = 4000), @p6=NULL (Size = 4000), @p7=NULL (Size = 4000), @p8=NULL (Size = 4000), @p9='2023-07-27T08:27:02.4267053+05:45', @p10=NULL (DbType = DateTime2), @p11='Deposit Transaction on DS-00000001' (Size = 4000), @p12='10000' (Precision = 18) (Scale = 4), @p13=NULL (Size = 450)], CommandType='"Text"', CommandTimeout='30']
+SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+INSERT INTO [Transactions] ([AmountInWords], [BranchCode], [CompanyCalendarCreationDate], [CompanyCalendarModificationDate], [CreatedBy], [CreatorId], [ModifiedBy], [ModifierBranchCode], [ModifierId], [RealWorldCreationDate], [RealWorldModificationDate], [Remarks], [TransactionAmount], [VoucherNumber])
+OUTPUT INSERTED.[Id]
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13);
+2023-07-27 08:27:03.680 +05:45 [INF] Executed DbCommand (20ms) [Parameters=[@p14='5', @p0='Ten Thousand Only' (Size = 4000), @p1='000' (Nullable = false) (Size = 4000), @p2='2022-01-10T00:00:00.0000000', @p3=NULL (DbType = DateTime2), @p4='admin' (Nullable = false) (Size = 4000), @p5='8b327bb9-27f3-4eb0-b5ba-1d18166d1b26' (Nullable = false) (Size = 4000), @p6=NULL (Size = 4000), @p7=NULL (Size = 4000), @p8=NULL (Size = 4000), @p9='2023-07-27T08:27:02.4267053+05:45', @p10=NULL (DbType = DateTime2), @p11='Deposit Transaction on DS-00000001' (Size = 4000), @p12='10000' (Precision = 18) (Scale = 4), @p13='080/081VCH5000' (Size = 450)], CommandType='"Text"', CommandTimeout='30']
+SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+UPDATE [Transactions] SET [AmountInWords] = @p0, [BranchCode] = @p1, [CompanyCalendarCreationDate] = @p2, [CompanyCalendarModificationDate] = @p3, [CreatedBy] = @p4, [CreatorId] = @p5, [ModifiedBy] = @p6, [ModifierBranchCode] = @p7, [ModifierId] = @p8, [RealWorldCreationDate] = @p9, [RealWorldModificationDate] = @p10, [Remarks] = @p11, [TransactionAmount] = @p12, [VoucherNumber] = @p13
+OUTPUT 1
+WHERE [Id] = @p14;
+2023-07-27 08:27:03.881 +05:45 [INF] Executed DbCommand (8ms) [Parameters=[@__depositWrapper_DepositSchemeSubLedgerId_0='60'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [s].[Id], [s].[CurrentBalance], [s].[Description], [s].[LedgerId], [s].[Name], [s].[SubLedgerCode], [l].[Id], [l].[CurrentBalance], [l].[DepreciationRate], [l].[EntryDate], [l].[GroupTypeId], [l].[HisabNumber], [l].[IsBank], [l].[IsSubLedgerActive], [l].[LedgerCode], [l].[Name], [l].[NepaliName]
+FROM [SubLedgers] AS [s]
+INNER JOIN [Ledgers] AS [l] ON [s].[LedgerId] = [l].[Id]
+WHERE [s].[Id] = @__depositWrapper_DepositSchemeSubLedgerId_0
+2023-07-27 08:27:04.098 +05:45 [INF] Executed DbCommand (13ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [l].[Id], [l].[CurrentBalance], [l].[DepreciationRate], [l].[EntryDate], [l].[GroupTypeId], [l].[HisabNumber], [l].[IsBank], [l].[IsSubLedgerActive], [l].[LedgerCode], [l].[Name], [l].[NepaliName]
+FROM [Ledgers] AS [l]
+WHERE [l].[LedgerCode] = 1
+2023-07-27 08:27:04.362 +05:45 [INF] Executed DbCommand (52ms) [Parameters=[@p0='12000.0000' (Precision = 18) (Scale = 4), @p1=NULL (Size = 4000), @p2=NULL (DbType = Int32), @p3='1' (Nullable = true), @p4='1', @p5='Cash Deposit: Ashish' (Size = 4000), @p6='1', @p7='10000 is deposited on DS-00000001' (Size = 4000), @p8='Salary Amount' (Nullable = false) (Size = 4000), @p9='5', @p10='2', @p11=NULL (Size = 4000), @p12=NULL (DbType = Int32), @p14='1', @p13='12000.0000' (Precision = 18) (Scale = 4), @p15='11000.0000' (Precision = 18) (Scale = 4), @p16='1', @p17='Deposit Transaction of 10000 on DS-00000001' (Size = 4000), @p18='5', @p19='1', @p21='1', @p20='11000.0000' (Precision = 18) (Scale = 4), @p23='18', @p22='12000.0000' (Precision = 18) (Scale = 4), @p24='12000.0000' (Precision = 18) (Scale = 4), @p25='Deposit of 10000 on DS-00000001' (Size = 4000), @p26='60', @p27='5', @p28='2', @p30='60', @p29='12000.0000' (Precision = 18) (Scale = 4)], CommandType='"Text"', CommandTimeout='30']
+SET NOCOUNT ON;
+INSERT INTO [DepositAccountTransactions] ([BalanceAfterTransaction], [BankChequeNumber], [BankDetailId], [CollectedByEmployeeId], [DepositAccountId], [Narration], [PaymentType], [Remarks], [Source], [TransactionId], [TransactionType], [WithDrawalChequeNumber], [WithDrawalType])
+OUTPUT INSERTED.[Id]
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12);
+UPDATE [DepositAccounts] SET [PrincipalAmount] = @p13
+OUTPUT 1
+WHERE [Id] = @p14;
+INSERT INTO [LedgerTransactions] ([BalanceAfterTransaction], [LedgerId], [Remarks], [TransactionId], [TransactionType])
+OUTPUT INSERTED.[Id]
+VALUES (@p15, @p16, @p17, @p18, @p19);
+UPDATE [Ledgers] SET [CurrentBalance] = @p20
+OUTPUT 1
+WHERE [Id] = @p21;
+UPDATE [Ledgers] SET [CurrentBalance] = @p22
+OUTPUT 1
+WHERE [Id] = @p23;
+INSERT INTO [SubLedgerTransactions] ([BalanceAfterTransaction], [Remarks], [SubLedgerId], [TransactionId], [TransactionType])
+OUTPUT INSERTED.[Id]
+VALUES (@p24, @p25, @p26, @p27, @p28);
+UPDATE [SubLedgers] SET [CurrentBalance] = @p29
+OUTPUT 1
+WHERE [Id] = @p30;
+2023-07-27 08:27:04.449 +05:45 [INF] Executing OkObjectResult, writing value of type 'MicroFinance.Dtos.ResponseDto'.
+2023-07-27 08:27:04.452 +05:45 [INF] Executed action MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance) in 5297.9409ms
+2023-07-27 08:27:04.453 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-07-27 08:27:04.453 +05:45 [INF] HTTP POST /Transaction/makeDeposit responded 200 in 5302.2555 ms
+2023-07-27 08:27:04.454 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit multipart/form-data;+boundary=----WebKitFormBoundarymkMQO4k4rl0pa1tm 1006 - 200 - application/json;+charset=utf-8 5361.7694ms
+2023-07-27 08:38:54.444 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit multipart/form-data;+boundary=----WebKitFormBoundaryG8uWB8vFKArOBeu6 1006
+2023-07-27 08:38:54.444 +05:45 [INF] CORS policy execution successful.
+2023-07-27 08:38:54.445 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-07-27 08:38:54.445 +05:45 [INF] Route matched with {action = "MakeDeposit", controller = "Transaction"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.ResponseDto]] MakeDeposit(MicroFinance.Dtos.Transactions.MakeDepositTransactionDto) on controller MicroFinance.Controllers.Transactions.TransactionController (MicroFinance).
+2023-07-27 08:38:54.491 +05:45 [INF] Executing BadRequestObjectResult, writing value of type 'Microsoft.AspNetCore.Mvc.ValidationProblemDetails'.
+2023-07-27 08:38:54.512 +05:45 [INF] Executed action MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance) in 66.2926ms
+2023-07-27 08:38:54.512 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-07-27 08:38:54.513 +05:45 [INF] HTTP POST /Transaction/makeDeposit responded 400 in 68.0683 ms
+2023-07-27 08:38:54.514 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit multipart/form-data;+boundary=----WebKitFormBoundaryG8uWB8vFKArOBeu6 1006 - 400 - application/problem+json;+charset=utf-8 69.9083ms
+2023-07-27 08:39:12.447 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit multipart/form-data;+boundary=----WebKitFormBoundarycmcU7g6oD4DVMAEn 1013
+2023-07-27 08:39:12.448 +05:45 [INF] CORS policy execution successful.
+2023-07-27 08:39:12.448 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-07-27 08:39:12.449 +05:45 [INF] Route matched with {action = "MakeDeposit", controller = "Transaction"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.ResponseDto]] MakeDeposit(MicroFinance.Dtos.Transactions.MakeDepositTransactionDto) on controller MicroFinance.Controllers.Transactions.TransactionController (MicroFinance).
+2023-07-27 08:39:15.076 +05:45 [INF] Executed DbCommand (7ms) [Parameters=[@__id_0='1'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [d].[Id], [d].[AccountNumber], [d].[AccountType], [d].[BranchCode], [d].[ClientId], [d].[CompanyCalendarCreationDate], [d].[CompanyCalendarModificationDate], [d].[CreatedBy], [d].[CreatorId], [d].[DepositSchemeId], [d].[Description], [d].[ExpectedDailyDepositAmount], [d].[ExpectedTotalDepositAmount], [d].[ExpectedTotalDepositDay], [d].[ExpectedTotalInterestAmount], [d].[ExpectedTotalReturnAmount], [d].[InterestAmount], [d].[InterestPostingAccountNumberId], [d].[InterestRate], [d].[IsActive], [d].[IsSMSServiceActive], [d].[MatureDate], [d].[MatureInterestPostingAccountNumberId], [d].[ModifiedBy], [d].[ModifierBranchCode], [d].[ModifierId], [d].[NomineeName], [d].[OpeningDate], [d].[Period], [d].[PeriodType], [d].[PrincipalAmount], [d].[RealWorldCreationDate], [d].[RealWorldModificationDate], [d].[ReferredByEmployeeId], [d].[Relation], [d].[Status], [c].[Id], [c].[BranchCode], [c].[ClientAccountPurposeNepali], [c].[ClientCastCode], [c].[ClientCitizenShipIssueDate], [c].[ClientCitizenShipIssueDistrict], [c].[ClientCitizenshipFileData], [c].[ClientCitizenshipFileName], [c].[ClientCitizenshipFileType], [c].[ClientCitizenshipNumber], [c].[ClientDateOfBirth], [c].[ClientEducationStatus], [c].[ClientEmail], [c].[ClientFatherInLaw], [c].[ClientFatherName], [c].[ClientFatherNameNepali], [c].[ClientFirstName], [c].[ClientGenderCode], [c].[ClientGrandFatherName], [c].[ClientGrandFatherNameNepali], [c].[ClientGroupId], [c].[ClientId], [c].[ClientIfMemberOfOtherParty], [c].[ClientIncomeSource], [c].[ClientLastName], [c].[ClientMartialStatusCode], [c].[ClientMiddleName], [c].[ClientMobileNumber1], [c].[ClientMobileNumber2], [c].[ClientMotherInLaw], [c].[ClientMotherName], [c].[ClientMotherNameNepali], [c].[ClientNameOfDaughters], [c].[ClientNameOfSons], [c].[ClientNationality], [c].[ClientNationalityIdStatus], [c].[ClientNepaliName], [c].[ClientOccupation], [c].[ClientOtherInfo], [c].[ClientOtherInfo2], [c].[ClientPanNumber], [c].[ClientPhotoFileData], [c].[ClientPhotoFileName], [c].[ClientPhotoFileType], [c].[ClientShareTypeInfoId], [c].[ClientSignatureFileData], [c].[ClientSignatureFileName], [c].[ClientSignatureFileType], [c].[ClientSpouseName], [c].[ClientSpouseOccupation], [c].[ClientTelephoneNumber1], [c].[ClientTelephoneNumber2], [c].[ClientTypeId], [c].[ClientUnitId], [c].[ClientVotingId], [c].[ClientWebsite], [c].[CreatedBy], [c].[CreatedOn], [c].[CreatorId], [c].[IsActive], [c].[IsKYMUpdated], [c].[IsModified], [c].[IsShareAllowed], [c].[KYMTypeId], [c].[ModificationCount], [c].[ModifiedBy], [c].[ModifiedOn], [c].[ModifierId], [c].[NomineeAddress], [c].[NomineeCitizenshipNumber], [c].[NomineeContactNumber], [c].[NomineeIntroducedBy], [c].[NomineeName], [c].[NomineeNepaliName], [c].[NomineeNepaliRelation], [c].[NomineePhotoFileData], [c].[NomineePhotoFileName], [c].[NomineePhotoFileType], [c].[NomineeRelation], [c].[PermanentDistrictCode], [c].[PermanentStateCode], [c].[PermanentToleVillage], [c].[PermanentToleVillageNepali], [c].[PermanentVdcMunicipality], [c].[PermanentVdcMunicipalityNepali], [c].[PermanentWardNumber], [c].[PermanentWardNumberNepali], [c].[RegistrationDate], [c].[TemporaryDistrictCode], [c].[TemporaryStateCode], [c].[TemporaryToleVillage], [c].[TemporaryToleVillageNepali], [c].[TemporaryVdcMunicipality], [c].[TemporaryVdcMunicipalityNepali], [c].[TemporaryWardNumber], [c].[TemporaryWardNumberNepali], [d0].[Id], [d0].[BranchCode], [d0].[Calculation], [d0].[CompanyCalendarCreationDate], [d0].[CompanyCalendarModificationDate], [d0].[CreatedBy], [d0].[CreatorId], [d0].[DepositSubledgerId], [d0].[InterestRate], [d0].[InterestRateOnMinimumBalance], [d0].[InterestSubLedgerId], [d0].[IsActive], [d0].[MaximumInterestRate], [d0].[MinimumBalance], [d0].[MinimumInterestRate], [d0].[ModifiedBy], [d0].[ModifierBranchCode], [d0].[ModifierId], [d0].[PostingScheme], [d0].[RealWorldCreationDate], [d0].[RealWorldModificationDate], [d0].[SchemeName], [d0].[SchemeNameNepali], [d0].[SchemeTypeId], [d0].[Symbol], [d0].[TaxSubledgerId], [d1].[Id], [d1].[AccountNumber], [d1].[AccountType], [d1].[BranchCode], [d1].[ClientId], [d1].[CompanyCalendarCreationDate], [d1].[CompanyCalendarModificationDate], [d1].[CreatedBy], [d1].[CreatorId], [d1].[DepositSchemeId], [d1].[Description], [d1].[ExpectedDailyDepositAmount], [d1].[ExpectedTotalDepositAmount], [d1].[ExpectedTotalDepositDay], [d1].[ExpectedTotalInterestAmount], [d1].[ExpectedTotalReturnAmount], [d1].[InterestAmount], [d1].[InterestPostingAccountNumberId], [d1].[InterestRate], [d1].[IsActive], [d1].[IsSMSServiceActive], [d1].[MatureDate], [d1].[MatureInterestPostingAccountNumberId], [d1].[ModifiedBy], [d1].[ModifierBranchCode], [d1].[ModifierId], [d1].[NomineeName], [d1].[OpeningDate], [d1].[Period], [d1].[PeriodType], [d1].[PrincipalAmount], [d1].[RealWorldCreationDate], [d1].[RealWorldModificationDate], [d1].[ReferredByEmployeeId], [d1].[Relation], [d1].[Status]
+FROM [DepositAccounts] AS [d]
+INNER JOIN [Clients] AS [c] ON [d].[ClientId] = [c].[Id]
+INNER JOIN [DepositSchemes] AS [d0] ON [d].[DepositSchemeId] = [d0].[Id]
+LEFT JOIN [DepositAccounts] AS [d1] ON [d].[InterestPostingAccountNumberId] = [d1].[Id]
+WHERE [d].[Status] <> 3 AND [d].[Id] = @__id_0
+2023-07-27 08:39:15.147 +05:45 [INF] Executed DbCommand (11ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [e].[Id], [e].[BranchCode], [e].[CitizenShipFileData], [e].[CitizenShipFileName], [e].[CitizenShipFileType], [e].[CreatedBy], [e].[CreatedOn], [e].[DateOfJoining], [e].[Designation], [e].[Email], [e].[Facilities], [e].[GenderCode], [e].[Grade], [e].[ModifiedBy], [e].[ModifiedOn], [e].[Name], [e].[OtherFacilities], [e].[PANNumber], [e].[PFAllowed], [e].[PhoneNumber], [e].[ProfilePicFileData], [e].[ProfilePicFileName], [e].[ProfilePicFileType], [e].[ProvidentPostingAccount], [e].[SalaryAmount], [e].[SalaryPostingAccount], [e].[SignatureFileData], [e].[SignatureFileName], [e].[SignatureFileType], [e].[Tax]
+FROM [Employees] AS [e]
+WHERE [e].[Id] = @__p_0
+2023-07-27 08:39:15.174 +05:45 [INF] Executed DbCommand (24ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [c].[Id], [c].[CreatedBy], [c].[CreatedOn], [c].[IsActive], [c].[IsLocked], [c].[ModifiedBy], [c].[ModifiedOn], [c].[Month], [c].[MonthName], [c].[NumberOfDay], [c].[RunningDay], [c].[Year]
+FROM [Calendars] AS [c]
+WHERE [c].[IsActive] = CAST(1 AS bit)
+2023-07-27 08:39:15.264 +05:45 [INF] Executed DbCommand (19ms) [Parameters=[@__id_0='1'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [b].[Id], [b].[AccountNumber], [b].[BankBranch], [b].[BankTypeId], [b].[BranchCode], [b].[InterestRate], [b].[LedgerId], [b].[Name], [b].[NepaliName], [b].[TotalInterestBalance], [l].[Id], [l].[CurrentBalance], [l].[DepreciationRate], [l].[EntryDate], [l].[GroupTypeId], [l].[HisabNumber], [l].[IsBank], [l].[IsSubLedgerActive], [l].[LedgerCode], [l].[Name], [l].[NepaliName], [b0].[Id], [b0].[Name]
+FROM [BankSetups] AS [b]
+INNER JOIN [Ledgers] AS [l] ON [b].[LedgerId] = [l].[Id]
+INNER JOIN [BankTypes] AS [b0] ON [b].[BankTypeId] = [b0].[Id]
+WHERE [b].[Id] = @__id_0
+2023-07-27 08:39:15.344 +05:45 [INF] 7/27/2023 8:39:15 AM: Depositing 10000 by admin on Deposit Account Id: 1
+2023-07-27 08:39:15.376 +05:45 [INF] Executed DbCommand (4ms) [Parameters=[@p0='Ten Thousand Only' (Size = 4000), @p1='000' (Nullable = false) (Size = 4000), @p2='2022-01-10T00:00:00.0000000', @p3=NULL (DbType = DateTime2), @p4='admin' (Nullable = false) (Size = 4000), @p5='8b327bb9-27f3-4eb0-b5ba-1d18166d1b26' (Nullable = false) (Size = 4000), @p6=NULL (Size = 4000), @p7=NULL (Size = 4000), @p8=NULL (Size = 4000), @p9='2023-07-27T08:39:15.3433935+05:45', @p10=NULL (DbType = DateTime2), @p11='Deposit Transaction on DS-00000001' (Size = 4000), @p12='10000' (Precision = 18) (Scale = 4), @p13=NULL (Size = 450)], CommandType='"Text"', CommandTimeout='30']
+SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+INSERT INTO [Transactions] ([AmountInWords], [BranchCode], [CompanyCalendarCreationDate], [CompanyCalendarModificationDate], [CreatedBy], [CreatorId], [ModifiedBy], [ModifierBranchCode], [ModifierId], [RealWorldCreationDate], [RealWorldModificationDate], [Remarks], [TransactionAmount], [VoucherNumber])
+OUTPUT INSERTED.[Id]
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13);
+2023-07-27 08:39:15.409 +05:45 [INF] Executed DbCommand (3ms) [Parameters=[@p14='6', @p0='Ten Thousand Only' (Size = 4000), @p1='000' (Nullable = false) (Size = 4000), @p2='2022-01-10T00:00:00.0000000', @p3=NULL (DbType = DateTime2), @p4='admin' (Nullable = false) (Size = 4000), @p5='8b327bb9-27f3-4eb0-b5ba-1d18166d1b26' (Nullable = false) (Size = 4000), @p6=NULL (Size = 4000), @p7=NULL (Size = 4000), @p8=NULL (Size = 4000), @p9='2023-07-27T08:39:15.3433935+05:45', @p10=NULL (DbType = DateTime2), @p11='Deposit Transaction on DS-00000001' (Size = 4000), @p12='10000' (Precision = 18) (Scale = 4), @p13='080/081VCH6000' (Size = 450)], CommandType='"Text"', CommandTimeout='30']
+SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+UPDATE [Transactions] SET [AmountInWords] = @p0, [BranchCode] = @p1, [CompanyCalendarCreationDate] = @p2, [CompanyCalendarModificationDate] = @p3, [CreatedBy] = @p4, [CreatorId] = @p5, [ModifiedBy] = @p6, [ModifierBranchCode] = @p7, [ModifierId] = @p8, [RealWorldCreationDate] = @p9, [RealWorldModificationDate] = @p10, [Remarks] = @p11, [TransactionAmount] = @p12, [VoucherNumber] = @p13
+OUTPUT 1
+WHERE [Id] = @p14;
+2023-07-27 08:39:15.457 +05:45 [INF] Executed DbCommand (23ms) [Parameters=[@__depositWrapper_DepositSchemeSubLedgerId_0='60'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [s].[Id], [s].[CurrentBalance], [s].[Description], [s].[LedgerId], [s].[Name], [s].[SubLedgerCode], [l].[Id], [l].[CurrentBalance], [l].[DepreciationRate], [l].[EntryDate], [l].[GroupTypeId], [l].[HisabNumber], [l].[IsBank], [l].[IsSubLedgerActive], [l].[LedgerCode], [l].[Name], [l].[NepaliName]
+FROM [SubLedgers] AS [s]
+INNER JOIN [Ledgers] AS [l] ON [s].[LedgerId] = [l].[Id]
+WHERE [s].[Id] = @__depositWrapper_DepositSchemeSubLedgerId_0
+2023-07-27 08:39:15.499 +05:45 [INF] Executed DbCommand (3ms) [Parameters=[@p0='22000.0000' (Precision = 18) (Scale = 4), @p1='123456' (Size = 4000), @p2='1' (Nullable = true), @p3='1' (Nullable = true), @p4='1', @p5='Cash Deposit: Ashish' (Size = 4000), @p6='2', @p7='10000 is deposited on DS-00000001' (Size = 4000), @p8='Salary Amount' (Nullable = false) (Size = 4000), @p9='6', @p10='2', @p11=NULL (Size = 4000), @p12=NULL (DbType = Int32), @p14='1', @p13='22000.0000' (Precision = 18) (Scale = 4), @p15='11000.0000' (Precision = 18) (Scale = 4), @p16='75', @p17='Deposit Transaction of 10000 on DS-00000001' (Size = 4000), @p18='6', @p19='1', @p21='18', @p20='22000.0000' (Precision = 18) (Scale = 4), @p23='75', @p22='11000.0000' (Precision = 18) (Scale = 4), @p24='22000.0000' (Precision = 18) (Scale = 4), @p25='Deposit of 10000 on DS-00000001' (Size = 4000), @p26='60', @p27='6', @p28='2', @p30='60', @p29='22000.0000' (Precision = 18) (Scale = 4)], CommandType='"Text"', CommandTimeout='30']
+SET NOCOUNT ON;
+INSERT INTO [DepositAccountTransactions] ([BalanceAfterTransaction], [BankChequeNumber], [BankDetailId], [CollectedByEmployeeId], [DepositAccountId], [Narration], [PaymentType], [Remarks], [Source], [TransactionId], [TransactionType], [WithDrawalChequeNumber], [WithDrawalType])
+OUTPUT INSERTED.[Id]
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12);
+UPDATE [DepositAccounts] SET [PrincipalAmount] = @p13
+OUTPUT 1
+WHERE [Id] = @p14;
+INSERT INTO [LedgerTransactions] ([BalanceAfterTransaction], [LedgerId], [Remarks], [TransactionId], [TransactionType])
+OUTPUT INSERTED.[Id]
+VALUES (@p15, @p16, @p17, @p18, @p19);
+UPDATE [Ledgers] SET [CurrentBalance] = @p20
+OUTPUT 1
+WHERE [Id] = @p21;
+UPDATE [Ledgers] SET [CurrentBalance] = @p22
+OUTPUT 1
+WHERE [Id] = @p23;
+INSERT INTO [SubLedgerTransactions] ([BalanceAfterTransaction], [Remarks], [SubLedgerId], [TransactionId], [TransactionType])
+OUTPUT INSERTED.[Id]
+VALUES (@p24, @p25, @p26, @p27, @p28);
+UPDATE [SubLedgers] SET [CurrentBalance] = @p29
+OUTPUT 1
+WHERE [Id] = @p30;
+2023-07-27 08:39:15.513 +05:45 [INF] Executing OkObjectResult, writing value of type 'MicroFinance.Dtos.ResponseDto'.
+2023-07-27 08:39:15.514 +05:45 [INF] Executed action MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance) in 3064.548ms
+2023-07-27 08:39:15.514 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-07-27 08:39:15.514 +05:45 [INF] HTTP POST /Transaction/makeDeposit responded 200 in 3066.2307 ms
+2023-07-27 08:39:15.515 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit multipart/form-data;+boundary=----WebKitFormBoundarycmcU7g6oD4DVMAEn 1013 - 200 - application/json;+charset=utf-8 3068.3603ms
+2023-07-27 20:20:19.999 +05:45 [WRN] Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+2023-07-27 20:20:20.156 +05:45 [WRN] No store type was specified for the decimal property 'CurrentShareBalance' on entity type 'ShareAccount'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-07-27 20:20:20.525 +05:45 [WRN] No store type was specified for the decimal property 'CurrentShareBalance' on entity type 'ShareAccount'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-07-27 20:20:36.201 +05:45 [WRN] Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+2023-07-27 20:20:36.361 +05:45 [WRN] No store type was specified for the decimal property 'CurrentShareBalance' on entity type 'ShareAccount'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-07-27 20:20:37.281 +05:45 [INF] Executed DbCommand (25ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2023-07-27 20:20:37.318 +05:45 [INF] Executed DbCommand (18ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+2023-07-27 20:20:37.328 +05:45 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2023-07-27 20:20:37.330 +05:45 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+2023-07-27 20:20:37.353 +05:45 [INF] Executed DbCommand (4ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [MigrationId], [ProductVersion]
+FROM [__EFMigrationsHistory]
+ORDER BY [MigrationId];
+2023-07-27 20:20:37.379 +05:45 [INF] Applying migration '20230727143520_Transaction1.3'.
+2023-07-27 20:20:37.544 +05:45 [INF] Executed DbCommand (30ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+DECLARE @var0 sysname;
+SELECT @var0 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Transactions]') AND [c].[name] = N'CompanyCalendarModificationDate');
+IF @var0 IS NOT NULL EXEC(N'ALTER TABLE [Transactions] DROP CONSTRAINT [' + @var0 + '];');
+ALTER TABLE [Transactions] ALTER COLUMN [CompanyCalendarModificationDate] nvarchar(max) NULL;
+2023-07-27 20:20:37.581 +05:45 [INF] Executed DbCommand (27ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+DECLARE @var1 sysname;
+SELECT @var1 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Transactions]') AND [c].[name] = N'CompanyCalendarCreationDate');
+IF @var1 IS NOT NULL EXEC(N'ALTER TABLE [Transactions] DROP CONSTRAINT [' + @var1 + '];');
+ALTER TABLE [Transactions] ALTER COLUMN [CompanyCalendarCreationDate] nvarchar(max) NOT NULL;
+2023-07-27 20:20:37.608 +05:45 [INF] Executed DbCommand (26ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+DECLARE @var2 sysname;
+SELECT @var2 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'[JointAccounts]') AND [c].[name] = N'CompanyCalendarStartDate');
+IF @var2 IS NOT NULL EXEC(N'ALTER TABLE [JointAccounts] DROP CONSTRAINT [' + @var2 + '];');
+ALTER TABLE [JointAccounts] ALTER COLUMN [CompanyCalendarStartDate] nvarchar(max) NOT NULL;
+2023-07-27 20:20:37.640 +05:45 [INF] Executed DbCommand (30ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+DECLARE @var3 sysname;
+SELECT @var3 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'[JointAccounts]') AND [c].[name] = N'CompanyCalendarEndDate');
+IF @var3 IS NOT NULL EXEC(N'ALTER TABLE [JointAccounts] DROP CONSTRAINT [' + @var3 + '];');
+ALTER TABLE [JointAccounts] ALTER COLUMN [CompanyCalendarEndDate] nvarchar(max) NULL;
+2023-07-27 20:20:37.667 +05:45 [INF] Executed DbCommand (24ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+DECLARE @var4 sysname;
+SELECT @var4 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'[DepositSchemes]') AND [c].[name] = N'CompanyCalendarModificationDate');
+IF @var4 IS NOT NULL EXEC(N'ALTER TABLE [DepositSchemes] DROP CONSTRAINT [' + @var4 + '];');
+ALTER TABLE [DepositSchemes] ALTER COLUMN [CompanyCalendarModificationDate] nvarchar(max) NULL;
+2023-07-27 20:20:37.689 +05:45 [INF] Executed DbCommand (22ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+DECLARE @var5 sysname;
+SELECT @var5 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'[DepositSchemes]') AND [c].[name] = N'CompanyCalendarCreationDate');
+IF @var5 IS NOT NULL EXEC(N'ALTER TABLE [DepositSchemes] DROP CONSTRAINT [' + @var5 + '];');
+ALTER TABLE [DepositSchemes] ALTER COLUMN [CompanyCalendarCreationDate] nvarchar(max) NOT NULL;
+2023-07-27 20:20:37.714 +05:45 [INF] Executed DbCommand (24ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+DECLARE @var6 sysname;
+SELECT @var6 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'[DepositAccounts]') AND [c].[name] = N'OpeningDate');
+IF @var6 IS NOT NULL EXEC(N'ALTER TABLE [DepositAccounts] DROP CONSTRAINT [' + @var6 + '];');
+ALTER TABLE [DepositAccounts] ALTER COLUMN [OpeningDate] nvarchar(max) NOT NULL;
+2023-07-27 20:20:37.737 +05:45 [INF] Executed DbCommand (22ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+DECLARE @var7 sysname;
+SELECT @var7 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'[DepositAccounts]') AND [c].[name] = N'MatureDate');
+IF @var7 IS NOT NULL EXEC(N'ALTER TABLE [DepositAccounts] DROP CONSTRAINT [' + @var7 + '];');
+ALTER TABLE [DepositAccounts] ALTER COLUMN [MatureDate] nvarchar(max) NOT NULL;
+2023-07-27 20:20:37.761 +05:45 [INF] Executed DbCommand (22ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+DECLARE @var8 sysname;
+SELECT @var8 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'[DepositAccounts]') AND [c].[name] = N'CompanyCalendarModificationDate');
+IF @var8 IS NOT NULL EXEC(N'ALTER TABLE [DepositAccounts] DROP CONSTRAINT [' + @var8 + '];');
+ALTER TABLE [DepositAccounts] ALTER COLUMN [CompanyCalendarModificationDate] nvarchar(max) NULL;
+2023-07-27 20:20:37.787 +05:45 [INF] Executed DbCommand (24ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+DECLARE @var9 sysname;
+SELECT @var9 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'[DepositAccounts]') AND [c].[name] = N'CompanyCalendarCreationDate');
+IF @var9 IS NOT NULL EXEC(N'ALTER TABLE [DepositAccounts] DROP CONSTRAINT [' + @var9 + '];');
+ALTER TABLE [DepositAccounts] ALTER COLUMN [CompanyCalendarCreationDate] nvarchar(max) NOT NULL;
+2023-07-27 20:20:37.791 +05:45 [INF] Executed DbCommand (3ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20230727143520_Transaction1.3', N'7.0.5');

@@ -117,5 +117,9 @@ namespace MicroFinance.Repository.CompanyProfile
         {
             return await _companyProfileDbContex.Calendars.Where(c=>c.Year==year).ToListAsync();
         }
+        public async Task<Calendar> GetCalendarByYearAndMonth(int year, int month)
+        {
+            return await _companyProfileDbContex.Calendars.Where(c=>c.Year==year && c.Month==month).SingleOrDefaultAsync();
+        }
     }
 }

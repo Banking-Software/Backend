@@ -72,7 +72,7 @@ namespace MicroFinance.Services.Transactions
             depositWrapper.CreatorId = decodedToken.UserId;
             depositWrapper.BranchCode = decodedToken.BranchCode;
             depositWrapper.RealWorldCreationDate = DateTime.Now;
-            depositWrapper.CompanyCalendarCreationDate = new DateTime(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            depositWrapper.CompanyCalendarCreationDate = $"{companyCalendar.Year}/{companyCalendar.Month}/{companyCalendar.RunningDay}";
             
             string voucherNumber = await _depositAccountTransactionRepo.MakeDeposit(depositWrapper);
             return new ResponseDto()
