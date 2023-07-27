@@ -28,6 +28,44 @@ namespace MicroFinance.Repository.Transaction
             _transactionDbContext = transactionDbContext;
         }
 
+
+        public async Task<string> MakeDeposit(MakeDepositWrapper depositWrapper)
+        {
+            _logger.LogInformation($"{DateTime.Now}: Depositing {depositWrapper.TransactionAmount} by {depositWrapper.CreatedBy} on Deposit Account Id: {depositWrapper.DepositAccountId}");
+            return await MakeTransactionOnDepositAccount(depositWrapper);
+        }
+        public async Task<string> MakeWithDrawal(MakeWithDrawalWrapper withDrawalWrapper)
+        {
+            _logger.LogInformation($"{DateTime.Now}: WithDrawal {withDrawalWrapper.TransactionAmount} by {withDrawalWrapper.CreatedBy} on Deposit Account Id: {withDrawalWrapper.DepositAccountId}");
+            return await MakeTransactionOnDepositAccount(withDrawalWrapper);
+        }
+        private async Task<string> MakeTransactionOnDepositAccount(dynamic depositAccountTransactionWrapper)
+        {
+            using (var processTransaction = await _transactionDbContext.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    if (!(depositAccountTransactionWrapper is MakeDepositWrapper) && !(depositAccountTransactionWrapper is MakeWithDrawalWrapper))
+                        throw new Exception("Invalid Model Received For Transaction");
+
+                    BaseTransaction baseTransaction = await MakeBaseTransaction(depositAccountTransactionWrapper);
+                    DepositAccountTransaction depositAccountTransaction = await MakeDepositAccountTransaction(depositAccountTransactionWrapper, baseTransaction);
+                    await MakeSubLedgerTransaction(depositAccountTransactionWrapper, baseTransaction);
+                    await MakeLedgerTransaction(depositAccountTransactionWrapper, baseTransaction);
+                    int transactionStatus = await _transactionDbContext.SaveChangesAsync();
+                    if (transactionStatus < 1) throw new Exception("Unable to make Deposit Transaction");
+                    await processTransaction.CommitAsync();
+                    return baseTransaction.VoucherNumber;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"{DateTime.Now}: {ex.Message} {ex?.InnerException?.Message}");
+                    await processTransaction.RollbackAsync();
+                    throw new Exception(ex.Message);
+                }
+
+            }
+        }
         private async Task<BaseTransaction> GenerateVoucherNumber(BaseTransaction baseTransaction)
         {
             var existingBaseTransaction = await _transactionDbContext.Transactions.FindAsync(baseTransaction.Id);
@@ -118,7 +156,7 @@ namespace MicroFinance.Repository.Transaction
                 depositSchemeDepositSubledger.CurrentBalance -= depositOrWithDrawalTrasactionWrapper.TransactionAmount;
                 depositSchemeDepositSubledger.Ledger.CurrentBalance -= depositOrWithDrawalTrasactionWrapper.TransactionAmount;
             }
-            if(depositSchemeDepositSubledger.CurrentBalance < 0 || depositSchemeDepositSubledger.Ledger.CurrentBalance<0)
+            if (depositSchemeDepositSubledger.CurrentBalance < 0 || depositSchemeDepositSubledger.Ledger.CurrentBalance < 0)
                 throw new Exception($"Negative Transaction on '{depositSchemeDepositSubledger.Name}' or '{depositSchemeDepositSubledger.Ledger.Name}' is not allowed");
             subLedgerTransaction.BalanceAfterTransaction = depositSchemeDepositSubledger.CurrentBalance;
             await _transactionDbContext.SubLedgerTransactions.AddAsync(subLedgerTransaction);
@@ -136,7 +174,7 @@ namespace MicroFinance.Repository.Transaction
                 Ledger = ledger,
                 Transaction = baseTransaction,
             };
-            if(depositOrWithDrawalTrasactionWrapper is MakeDepositWrapper)
+            if (depositOrWithDrawalTrasactionWrapper is MakeDepositWrapper)
             {
                 ledgerTransaction.Remarks = $"Deposit Transaction of {baseTransaction.TransactionAmount} on {depositOrWithDrawalTrasactionWrapper.AccountNumber}";
                 ledger.CurrentBalance += baseTransaction.TransactionAmount;
@@ -148,47 +186,11 @@ namespace MicroFinance.Repository.Transaction
                 ledger.CurrentBalance -= baseTransaction.TransactionAmount;
                 ledgerTransaction.TransactionType = TransactionTypeEnum.Credit;
             }
-            if(ledger.CurrentBalance<0) throw new Exception($"Negative Transaction on {ledger.Name} not allowed");
+            if (ledger.CurrentBalance < 0) throw new Exception($"Negative Transaction on {ledger.Name} not allowed");
             ledgerTransaction.BalanceAfterTransaction = ledger.CurrentBalance;
             await _transactionDbContext.LedgerTransactions.AddAsync(ledgerTransaction);
             //var ledgerTransactionStatus = await _transactionDbContext.SaveChangesAsync();
         }
-        private async Task<string> MakeTransactionOnDepositAccount(dynamic depositAccountTransactionWrapper)
-        {
-            using (var processTransaction = await _transactionDbContext.Database.BeginTransactionAsync())
-            {
-                try
-                {
-                    if(!(depositAccountTransactionWrapper is MakeDepositWrapper) && !(depositAccountTransactionWrapper is MakeWithDrawalWrapper))
-                        throw new Exception("Invalid Model Received For Transaction");
-
-                    BaseTransaction baseTransaction = await MakeBaseTransaction(depositAccountTransactionWrapper);
-                    DepositAccountTransaction depositAccountTransaction = await MakeDepositAccountTransaction(depositAccountTransactionWrapper, baseTransaction);
-                    await MakeSubLedgerTransaction(depositAccountTransactionWrapper, baseTransaction);
-                    await MakeLedgerTransaction(depositAccountTransactionWrapper, baseTransaction);
-                    int transactionStatus = await _transactionDbContext.SaveChangesAsync();
-                    if (transactionStatus < 1) throw new Exception("Unable to make Deposit Transaction");
-                    await processTransaction.CommitAsync();
-                    return baseTransaction.VoucherNumber;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"{DateTime.Now}: {ex.Message} {ex?.InnerException?.Message}");
-                    await processTransaction.RollbackAsync();
-                    throw new Exception(ex.Message);
-                }
-
-            }
-        }
-        public async Task<string> MakeDeposit(MakeDepositWrapper depositWrapper)
-        {
-            _logger.LogInformation($"{DateTime.Now}: Depositing {depositWrapper.TransactionAmount} by {depositWrapper.CreatedBy} on Deposit Account Id: {depositWrapper.DepositAccountId}");
-            return await MakeTransactionOnDepositAccount(depositWrapper);
-        }
-        public async Task<string> MakeWithDrawal(MakeWithDrawalWrapper withDrawalWrapper)
-        {
-           _logger.LogInformation($"{DateTime.Now}: WithDrawal {withDrawalWrapper.TransactionAmount} by {withDrawalWrapper.CreatedBy} on Deposit Account Id: {withDrawalWrapper.DepositAccountId}");
-            return await MakeTransactionOnDepositAccount(withDrawalWrapper);
-        }
+        
     }
 }
