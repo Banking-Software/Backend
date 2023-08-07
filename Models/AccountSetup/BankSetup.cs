@@ -30,6 +30,6 @@ namespace MicroFinance.Models.AccountSetup
         [Column(TypeName ="decimal(18,4)")]
         public decimal TotalInterestBalance { get; set; }
 
-        public virtual ICollection<DepositAccountTransaction> DepositAccountTransactions { get; set; }
+        public virtual ICollection<BaseTransaction> BaseTransactions { get; set; }
     }
 }

@@ -65,18 +65,18 @@ namespace MicroFinance.SeedData
         {
             if (!context.SubLedgers.Any())
             {
-                var advancedLedger = await context.Ledgers.Where(l=>l.LedgerCode==4).SingleOrDefaultAsync();
-                var taxPayableLedger = await context.Ledgers.Where(l=>l.LedgerCode==29).SingleOrDefaultAsync();
-                var goodPurchaseLedger = await context.Ledgers.Where(l=>l.LedgerCode==62).SingleOrDefaultAsync();
-                var dhuwaniJyalaLedger = await context.Ledgers.Where(l=>l.LedgerCode==63).SingleOrDefaultAsync();
-                var salaryStaffLedger = await context.Ledgers.Where(l=>l.LedgerCode==64).SingleOrDefaultAsync();
-                var rentExpLedger = await context.Ledgers.Where(l=>l.LedgerCode==65).SingleOrDefaultAsync();
-                var statExpenseLedger = await context.Ledgers.Where(l=>l.LedgerCode==66).SingleOrDefaultAsync();
-                var repairExpenseLedger = await context.Ledgers.Where(l=>l.LedgerCode==67).SingleOrDefaultAsync();
-                var miscellaneousExpenseLedger = await context.Ledgers.Where(l=>l.LedgerCode==69).SingleOrDefaultAsync();
-                var depreciationExpenseLedger = await context.Ledgers.Where(l=>l.LedgerCode==70).SingleOrDefaultAsync();
-                var fuelExpenseLedger = await context.Ledgers.Where(l=>l.LedgerCode==71).SingleOrDefaultAsync();
-                var rebateExpenseLedger = await context.Ledgers.Where(l=>l.LedgerCode==74).SingleOrDefaultAsync();
+                var advancedLedger = await context.Ledgers.Where(l => l.LedgerCode == 4).SingleOrDefaultAsync();
+                var taxPayableLedger = await context.Ledgers.Where(l => l.LedgerCode == 29).SingleOrDefaultAsync();
+                var goodPurchaseLedger = await context.Ledgers.Where(l => l.LedgerCode == 62).SingleOrDefaultAsync();
+                var dhuwaniJyalaLedger = await context.Ledgers.Where(l => l.LedgerCode == 63).SingleOrDefaultAsync();
+                var salaryStaffLedger = await context.Ledgers.Where(l => l.LedgerCode == 64).SingleOrDefaultAsync();
+                var rentExpLedger = await context.Ledgers.Where(l => l.LedgerCode == 65).SingleOrDefaultAsync();
+                var statExpenseLedger = await context.Ledgers.Where(l => l.LedgerCode == 66).SingleOrDefaultAsync();
+                var repairExpenseLedger = await context.Ledgers.Where(l => l.LedgerCode == 67).SingleOrDefaultAsync();
+                var miscellaneousExpenseLedger = await context.Ledgers.Where(l => l.LedgerCode == 69).SingleOrDefaultAsync();
+                var depreciationExpenseLedger = await context.Ledgers.Where(l => l.LedgerCode == 70).SingleOrDefaultAsync();
+                var fuelExpenseLedger = await context.Ledgers.Where(l => l.LedgerCode == 71).SingleOrDefaultAsync();
+                var rebateExpenseLedger = await context.Ledgers.Where(l => l.LedgerCode == 74).SingleOrDefaultAsync();
 
                 await context.SubLedgers.AddRangeAsync(new List<SubLedger>
                 {
@@ -125,35 +125,35 @@ namespace MicroFinance.SeedData
                     new SubLedger {SubLedgerCode=28, Ledger=repairExpenseLedger ,Name="Cycle Repair 150.06"},
                     new SubLedger {SubLedgerCode=29, Ledger=repairExpenseLedger ,Name="Fintex Annual Maintenance Charge 150.06"},
                     new SubLedger {SubLedgerCode=30, Ledger=repairExpenseLedger ,Name="Generator Repair 150.06"},
-                    new SubLedger {SubLedgerCode=34, Ledger=repairExpenseLedger ,Name="Inverter Repair 150.06"},
-                    new SubLedger {SubLedgerCode=35, Ledger=repairExpenseLedger ,Name="Motorcycle Repair 150.06"},
+                    new SubLedger {SubLedgerCode=31, Ledger=repairExpenseLedger ,Name="Inverter Repair 150.06"},
+                    new SubLedger {SubLedgerCode=32, Ledger=repairExpenseLedger ,Name="Motorcycle Repair 150.06"},
                     //END
                     //Miscellaneous
-                    new SubLedger {SubLedgerCode=36, Ledger=miscellaneousExpenseLedger ,Name="Miscellaneous Expense"},
-                    new SubLedger {SubLedgerCode=37, Ledger=miscellaneousExpenseLedger ,Name="Agm Exp"},
-                    new SubLedger {SubLedgerCode=38, Ledger=miscellaneousExpenseLedger ,Name="Audit Exp"},
-                    new SubLedger {SubLedgerCode=39, Ledger=miscellaneousExpenseLedger ,Name="Dhito Sulka Exp"},
-                    new SubLedger {SubLedgerCode=40, Ledger=miscellaneousExpenseLedger ,Name="Donation Exp"},
-                    new SubLedger {SubLedgerCode=41, Ledger=miscellaneousExpenseLedger ,Name="Electricity Exp"},
-                    new SubLedger {SubLedgerCode=42, Ledger=miscellaneousExpenseLedger ,Name="Entertainment Exp"},
-                    new SubLedger {SubLedgerCode=43, Ledger=miscellaneousExpenseLedger ,Name="Fuel and Transportation Exp"},
-                    new SubLedger {SubLedgerCode=44, Ledger=miscellaneousExpenseLedger ,Name="Guest Service Exp"},
-                    new SubLedger {SubLedgerCode=45, Ledger=miscellaneousExpenseLedger ,Name="Loan Provision For Bad Dept Exp"},
-                    new SubLedger {SubLedgerCode=46, Ledger=miscellaneousExpenseLedger ,Name="Loan Risk Expenses"},
-                    new SubLedger {SubLedgerCode=47, Ledger=miscellaneousExpenseLedger ,Name="Paint House exp"},
-                    new SubLedger {SubLedgerCode=48, Ledger=miscellaneousExpenseLedger ,Name="Provident Fund Expense"},
-                    new SubLedger {SubLedgerCode=49, Ledger=miscellaneousExpenseLedger ,Name="Sweeper exp"},
-                    new SubLedger {SubLedgerCode=50, Ledger=miscellaneousExpenseLedger ,Name="Talim Exp"},
-                    new SubLedger {SubLedgerCode=51, Ledger=miscellaneousExpenseLedger ,Name="Tax Expense"},
-                    new SubLedger {SubLedgerCode=52, Ledger=miscellaneousExpenseLedger ,Name="Tea & Water"},
-                    new SubLedger {SubLedgerCode=53, Ledger=miscellaneousExpenseLedger ,Name="Telephone & Communication"},
+                    new SubLedger {SubLedgerCode=33, Ledger=miscellaneousExpenseLedger ,Name="Miscellaneous Expense"},
+                    new SubLedger {SubLedgerCode=34, Ledger=miscellaneousExpenseLedger ,Name="Agm Exp"},
+                    new SubLedger {SubLedgerCode=35, Ledger=miscellaneousExpenseLedger ,Name="Audit Exp"},
+                    new SubLedger {SubLedgerCode=36, Ledger=miscellaneousExpenseLedger ,Name="Dhito Sulka Exp"},
+                    new SubLedger {SubLedgerCode=37, Ledger=miscellaneousExpenseLedger ,Name="Donation Exp"},
+                    new SubLedger {SubLedgerCode=38, Ledger=miscellaneousExpenseLedger ,Name="Electricity Exp"},
+                    new SubLedger {SubLedgerCode=39, Ledger=miscellaneousExpenseLedger ,Name="Entertainment Exp"},
+                    new SubLedger {SubLedgerCode=40, Ledger=miscellaneousExpenseLedger ,Name="Fuel and Transportation Exp"},
+                    new SubLedger {SubLedgerCode=41, Ledger=miscellaneousExpenseLedger ,Name="Guest Service Exp"},
+                    new SubLedger {SubLedgerCode=42, Ledger=miscellaneousExpenseLedger ,Name="Loan Provision For Bad Dept Exp"},
+                    new SubLedger {SubLedgerCode=43, Ledger=miscellaneousExpenseLedger ,Name="Loan Risk Expenses"},
+                    new SubLedger {SubLedgerCode=44, Ledger=miscellaneousExpenseLedger ,Name="Paint House exp"},
+                    new SubLedger {SubLedgerCode=45, Ledger=miscellaneousExpenseLedger ,Name="Provident Fund Expense"},
+                    new SubLedger {SubLedgerCode=46, Ledger=miscellaneousExpenseLedger ,Name="Sweeper exp"},
+                    new SubLedger {SubLedgerCode=47, Ledger=miscellaneousExpenseLedger ,Name="Talim Exp"},
+                    new SubLedger {SubLedgerCode=48, Ledger=miscellaneousExpenseLedger ,Name="Tax Expense"},
+                    new SubLedger {SubLedgerCode=49, Ledger=miscellaneousExpenseLedger ,Name="Tea & Water"},
+                    new SubLedger {SubLedgerCode=50, Ledger=miscellaneousExpenseLedger ,Name="Telephone & Communication"},
 
-                    new SubLedger {SubLedgerCode=54, Ledger=depreciationExpenseLedger ,Name="Haras-150.9"},
+                    new SubLedger {SubLedgerCode=51, Ledger=depreciationExpenseLedger ,Name="Haras-150.9"},
 
-                    new SubLedger {SubLedgerCode=55, Ledger=fuelExpenseLedger ,Name="Kerosine-150.10"},
-                    new SubLedger {SubLedgerCode=56, Ledger=fuelExpenseLedger ,Name="Petrol Exp-150.10"},
-  
-                    new SubLedger {SubLedgerCode=57, Ledger=fuelExpenseLedger ,Name="Rebate On Interest"}
+                    new SubLedger {SubLedgerCode=52, Ledger=fuelExpenseLedger ,Name="Kerosine-150.10"},
+                    new SubLedger {SubLedgerCode=53, Ledger=fuelExpenseLedger ,Name="Petrol Exp-150.10"},
+
+                    new SubLedger {SubLedgerCode=54, Ledger=fuelExpenseLedger ,Name="Rebate On Interest"}
 
                 });
                 return await context.SaveChangesAsync();

@@ -127,6 +127,6 @@ namespace MicroFinance.Models.ClientSetup
 
         public virtual ICollection<DepositAccount> DepositAccountSelf { get; set; }
         public virtual ICollection<JointAccount> JointAccounts { get; set; }
-        public virtual ICollection<ShareAccount> ShareAccounts { get; set; }
+        public virtual ShareAccount ShareAccount { get; set; }
     }
 }

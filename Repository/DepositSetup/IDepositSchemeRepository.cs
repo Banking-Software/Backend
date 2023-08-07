@@ -5,7 +5,7 @@ namespace MicroFinance.Repository.DepositSetup
 {
     public interface IDepositSchemeRepository
     {
-        Task<int> CreateDepositScheme(DepositScheme depositScheme);
+        Task<int> CreateDepositScheme(DepositScheme depositScheme, List<string> subLedgerNamesForDepositScheme);
         Task<int> UpdateDepositScheme(DepositScheme updateDepositScheme);
         Task<List<DepositScheme>> GetAllDepositScheme();
         Task<DepositScheme> GetDepositSchemeByName(string name);

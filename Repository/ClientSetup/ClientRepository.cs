@@ -5,6 +5,7 @@ using MicroFinance.Dtos.ClientSetup;
 using MicroFinance.Models.AccountSetup;
 // using MicroFinance.DBContext.CompanyOperations;
 using MicroFinance.Models.ClientSetup;
+using MicroFinance.Repository.Share;
 using MicroFinance.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -18,82 +19,78 @@ namespace MicroFinance.Repository.ClientSetup
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<ClientRepository> _logger;
         private readonly IMapper _mapper;
+        private readonly IShareRepository _shareRepository;
 
         public ClientRepository
         (
-            ApplicationDbContext dbContext, 
-            ILogger<ClientRepository> logger, 
-            IMapper mapper
+            ApplicationDbContext dbContext,
+            ILogger<ClientRepository> logger,
+            IMapper mapper,
+            IShareRepository shareRepository
         )
         {
             _dbContext = dbContext;
             _logger = logger;
             _mapper = mapper;
+            _shareRepository = shareRepository;
         }
 
         private async Task<string> AddClientId(Client client)
         {
-            try
-            {
-                var existingclient = await _dbContext.Clients.FindAsync(client.Id);
-                client.ClientId = client.Id.ToString().PadLeft(5, '0');
-                var statusUpdate = await _dbContext.SaveChangesAsync();
-                if(statusUpdate<1) throw new Exception("Client Creation failed");
-                _logger.LogInformation($"{DateTime.Now}: {client.ClientId} has been assiged to newly created client");
-                return client.ClientId;
-            }
-            catch (Exception ex)
-            {
-                _dbContext.Clients.Remove(client);
-                _logger.LogError($"{DateTime.Now}: Failed to assign a unique ClientId. Newly Created Client is deleted");
-                _logger.LogError($"{DateTime.Now}:{ex.Message}");
-                throw new Exception(ex.Message);
-            }
+            var existingclient = await _dbContext.Clients.FindAsync(client.Id);
+            client.ClientId = client.Id.ToString().PadLeft(5, '0');
+            var statusUpdate = await _dbContext.SaveChangesAsync();
+            if (statusUpdate < 1) throw new Exception("Failed to assign Client number");
+            _logger.LogInformation($"{DateTime.Now}: {client.ClientId} number has been assiged to newly created client");
+            return client.ClientId;
         }
 
         public async Task<string> CreateClient(Client client)
         {
-            _logger.LogInformation($"{DateTime.Now} Creating Client...");
-            var highestClientId = await _dbContext.Clients.OrderByDescending(c=>c.ClientId).FirstOrDefaultAsync();
-            await _dbContext.Clients.AddAsync(client);
-            int result = await _dbContext.SaveChangesAsync();
-            if(result<1)
-                throw new Exception("Unable to Create a Client");
-            _logger.LogInformation($"{DateTime.Now}: New Client has been created by employee {client.CreatedBy}. Sending to assign unique clientId...");
-            return await AddClientId(client);
-        }
-
-        private void UpdatePropertyBag<TEntity>(PropertyValues propertyBag, TEntity updatedEntity)
-        {
-
-            foreach (var prop in propertyBag.Properties)
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
             {
-                var updatedValue = updatedEntity.GetType().GetProperty(prop.Name)?.GetValue(updatedEntity);
-                var existingValue = propertyBag[prop.Name];
-                var keyName = prop.Name;
-                if (!Equals(existingValue, updatedValue) && prop.Name != "Id" && prop.Name != "ClientId")
-                {
-                    propertyBag[prop.Name] = updatedValue;
-                }
+                _logger.LogInformation($"{DateTime.Now} Creating new Client {client.ClientFirstName} {client.ClientLastName}");
+                client.ShareType = client.ClientShareTypeInfoId != null ? await _dbContext.Ledgers.FindAsync(client.ClientShareTypeInfoId) : null;
+                client.KYMType = client.KYMTypeId != null ? await _dbContext.ClientKYMTypes.FindAsync(client.KYMTypeId) : null;
+                client.ClientType = await _dbContext.ClientTypes.FindAsync(client.ClientTypeId);
+                client.ClientGroup = client.ClientGroupId != null ? await _dbContext.ClientGroups.FindAsync(client.ClientGroupId) : null;
+                client.ClientUnit = client.ClientUnitId != null ? await _dbContext.ClientUnits.FindAsync(client.ClientUnitId) : null;
+                await _dbContext.Clients.AddAsync(client);
+                int result = await _dbContext.SaveChangesAsync();
+                if (result < 1)
+                    throw new Exception("Unable to Create a Client");
+                _logger.LogInformation($"{DateTime.Now}: New Client has been created by employee {client.CreatedBy}. Sending to assign unique client number...");
+                var clientId = await AddClientId(client);
+                await _shareRepository.CreateShareAccount(client);
+                await transaction.CommitAsync();
+                return clientId;
             }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Rolling back: {ex.Message} {ex?.InnerException}");
+                await transaction.RollbackAsync();
+                throw new Exception(ex.Message);
+            }
+
         }
 
         public async Task<int> UpdateClient(Client updateClient)
         {
             var existingClient = await _dbContext.Clients.FindAsync(updateClient.Id);
-            if(updateClient.IsActive && !existingClient.IsActive)
+            if (updateClient.IsActive && !existingClient.IsActive)
             {
                 _logger.LogInformation($"{DateTime.Now}: Activating inactive client {updateClient.ClientId} by employee {updateClient.ModifiedBy}");
             }
-            else if(!updateClient.IsActive && existingClient.IsActive)
+            else if (!updateClient.IsActive && existingClient.IsActive)
             {
                 _logger.LogInformation($"{DateTime.Now}: Deactivating active client {updateClient.ClientId} by employee {updateClient.ModifiedBy}");
             }
             _dbContext.Entry(existingClient).State = EntityState.Detached;
             _dbContext.Clients.Attach(updateClient);
             _dbContext.Entry(updateClient).State = EntityState.Modified;
-            var status =  await _dbContext.SaveChangesAsync();
-            if(status>=1)
+            var status = await _dbContext.SaveChangesAsync();
+            if (status >= 1)
             {
                 _logger.LogInformation($"{DateTime.Now}: client {updateClient.ClientId} update successfully by employee {updateClient.ModifiedBy}");
             }
@@ -103,8 +100,6 @@ namespace MicroFinance.Repository.ClientSetup
             }
             return status;
         }
-
-       
 
         public async Task<Client> GetClientByClientId(string clientId)
         {
@@ -119,12 +114,12 @@ namespace MicroFinance.Repository.ClientSetup
         public async Task<Client> GetClientById(int id)
         {
             return await _dbContext.Clients
-            .Where(c=>c.Id==id)
+            .Where(c => c.Id == id)
             .Include(c => c.ShareType)
             .Include(c => c.ClientType)
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
-            .Include(c=>c.KYMType)
+            .Include(c => c.KYMType)
             .SingleOrDefaultAsync();
         }
 
@@ -135,19 +130,19 @@ namespace MicroFinance.Repository.ClientSetup
             .Include(c => c.ClientType)
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
-            .Include(c=>c.KYMType)
+            .Include(c => c.KYMType)
             .ToListAsync();
             return clients;
         }
         public async Task<List<Client>> GetActiveClientsByBranchCode(string branchCode)
         {
             return await _dbContext.Clients
-            .Where(c=>c.IsActive && c.BranchCode==branchCode)
+            .Where(c => c.IsActive && c.BranchCode == branchCode)
             .Include(c => c.ShareType)
             .Include(c => c.ClientType)
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
-            .Include(c=>c.KYMType)
+            .Include(c => c.KYMType)
             .ToListAsync();
         }
         public async Task<List<Client>> GetClientsByGroup(int groupId)
@@ -157,7 +152,7 @@ namespace MicroFinance.Repository.ClientSetup
             .Include(c => c.ClientType)
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
-            .Include(c=>c.KYMType)
+            .Include(c => c.KYMType)
             .Where(c => c.ClientGroupId == groupId).ToListAsync();
             return clientByGroupId;
         }
@@ -169,7 +164,7 @@ namespace MicroFinance.Repository.ClientSetup
             .Include(c => c.ClientType)
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
-            .Include(c=>c.KYMType)
+            .Include(c => c.KYMType)
             .Where(c => c.ClientUnitId == unitId).ToListAsync();
             return clientByUnitId;
         }
@@ -181,7 +176,7 @@ namespace MicroFinance.Repository.ClientSetup
             .Include(c => c.ClientType)
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
-            .Include(c=>c.KYMType)
+            .Include(c => c.KYMType)
             .Where(c => c.ClientUnitId == unitId && c.ClientGroupId == groupId).ToListAsync();
             return clientByGroupIdAndUnitId;
         }
@@ -193,7 +188,7 @@ namespace MicroFinance.Repository.ClientSetup
             .Include(c => c.ClientType)
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
-            .Include(c=>c.KYMType)
+            .Include(c => c.KYMType)
             .Where(c => c.ClientShareTypeInfoId == shareTypeId).ToListAsync();
             return clientByShareId;
         }
@@ -258,6 +253,6 @@ namespace MicroFinance.Repository.ClientSetup
             return clientUnitById;
         }
 
-        
+
     }
 }

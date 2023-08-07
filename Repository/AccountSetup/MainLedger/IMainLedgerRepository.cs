@@ -41,8 +41,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
 
         // Operations related to subledger
         Task<int> CreateSubLedger(SubLedger subLedger);
-        Task<int> CreateMultipleSubLedger(List<SubLedger> subLedgers);
-        Task<int> UpdateSubLedgerCode(int subLedgerId);
+        Task<int> UpdateSubLedgerCode(SubLedger subLedger);
         Task<int> EditSubledger(SubLedger subLedger);
         Task<SubLedger> GetSubLedgerById(int id);
         Task<SubLedger> GetSubLedger(int id);

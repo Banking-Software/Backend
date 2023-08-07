@@ -36,6 +36,7 @@ namespace MicroFinance.Dtos.DepositSetup
         public int? ExpectedTotalDepositAmount { get; set; }
         public int? ExpectedTotalReturnAmount { get; set; }
         public int? ExpectedTotalInterestAmount { get; set; }
+        public IFormFile? SignaturePhoto { get; set; }
 
          public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

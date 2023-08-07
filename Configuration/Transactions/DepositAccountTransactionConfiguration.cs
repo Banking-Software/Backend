@@ -10,7 +10,6 @@ namespace MicroFinance.Configuration.Transactions
         {
             builder.HasIndex(dt=>dt.Id);
             builder.Property(dt=>dt.Id).ValueGeneratedOnAdd();
-            builder.Property(dt=>dt.PaymentType).IsRequired(true);
             builder.Property(dt=>dt.BalanceAfterTransaction).HasPrecision(18,4).IsRequired(true);
             builder.Property(dt=>dt.Source).IsRequired(true);
             builder.Property(dt=>dt.TransactionType).HasPrecision(18,4).IsRequired(true);
@@ -25,12 +24,6 @@ namespace MicroFinance.Configuration.Transactions
             .WithMany(da=>da.DepositAccountTransactions)
             .HasForeignKey(dt=>dt.DepositAccountId)
             .IsRequired(true)
-            .OnDelete(DeleteBehavior.ClientSetNull);
-
-            builder.HasOne(dt=>dt.BankDetail)
-            .WithMany(bnk=>bnk.DepositAccountTransactions)
-            .HasForeignKey(dt=>dt.BankDetailId)
-            .IsRequired(false)
             .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }

@@ -10,9 +10,10 @@ namespace MicroFinance.Configuration.ShareSetup
         {
             builder.HasKey(sa=>sa.Id);
             builder.Property(sa=>sa.Id).ValueGeneratedOnAdd();
+
             builder.HasOne(sa=>sa.Client)
-            .WithMany(c=>c.ShareAccounts)
-            .HasForeignKey(sa=>sa.AccountNumber)
+            .WithOne(c=>c.ShareAccount)
+            .HasForeignKey<ShareAccount>(sa=>sa.ClientId)
             .IsRequired(true)
             .OnDelete(DeleteBehavior.ClientSetNull);
         }

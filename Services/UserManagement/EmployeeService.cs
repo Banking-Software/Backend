@@ -55,7 +55,6 @@ namespace MicroFinance.Services.UserManagement
                 var loginResult = await _employeeRepo.Login(user, userLoginDto.Password, userLoginDto.StayLogin);
                 if (loginResult.Succeeded)
                 {
-
                     _logger.LogInformation($"{DateTime.Now} User Logged In > {userLoginDto.UserName}");
                     var tokenData = new TokenDto()
                     {
@@ -70,6 +69,7 @@ namespace MicroFinance.Services.UserManagement
                     return new TokenResponseDto() { Token = token };
                 }
                 _logger.LogError($"{DateTime.Now} Invalid Login {loginResult.ToString()} > {userLoginDto.UserName}");
+                throw new Exception("Invalid Credentials...");
             }
             throw new Exception("Your branch is In-active at the moment, please try again later");
            
@@ -407,9 +407,11 @@ namespace MicroFinance.Services.UserManagement
         public async Task<ResponseDto> EditProfileService(UpdateEmployeeDto updateEmployeeDto, TokenDto decodedToken)
         {
             var existingEmployee =  await _employeeRepo.GetEmployeeById(updateEmployeeDto.Id);
+            var branch = await _companyProfile.GetBranchServiceByBranchCodeService(updateEmployeeDto.BranchCode);
             if(existingEmployee==null) 
                 throw new Exception("Invalid Employee Request");
-
+            if(branch.IsActive==false)
+                throw new Exception("Provided Branch code is inactive");
             var employee = _mapper.Map<Employee>(updateEmployeeDto);
             employee.Id= existingEmployee.Id;
             employee.CreatedBy = existingEmployee.CreatedBy;

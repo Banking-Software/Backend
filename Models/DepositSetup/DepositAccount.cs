@@ -8,6 +8,7 @@ namespace MicroFinance.Models.DepositSetup
 {
     public class DepositAccount : BaseDeposit
     {
+
         public int DepositSchemeId { get; set; }
         public virtual DepositScheme DepositScheme { get; set; }
         public string? AccountNumber { get; set; }
@@ -17,9 +18,7 @@ namespace MicroFinance.Models.DepositSetup
         public AccountTypeEnum AccountType { get; set; }
         public string MatureDate { get; set; }
         public decimal InterestRate { get; set; }
-        [ValidationForNegativeBalanceService]
         public decimal PrincipalAmount { get; set; } = 0;
-        [ValidationForNegativeBalanceService]
         public decimal InterestAmount { get; set; } = 0;
         public int ReferredByEmployeeId { get; set; }
         public RelationTypeEnum? Relation { get; set; }
@@ -32,6 +31,9 @@ namespace MicroFinance.Models.DepositSetup
         public int? ExpectedTotalDepositAmount { get; set; }
         public int? ExpectedTotalReturnAmount { get; set; }
         public int? ExpectedTotalInterestAmount { get; set; }
+        public byte[]? SignatureFileData { get; set; }
+        public string? SignatureFileName { get; set; }
+        public FileType? SignatureFileType { get; set; }
         public int ClientId { get; set; }
         public virtual Client Client { get; set; }
         public int? InterestPostingAccountNumberId { get; set; }
@@ -40,5 +42,7 @@ namespace MicroFinance.Models.DepositSetup
         public DepositAccount? MatureInterestPostingAccountNumber { get; set; }
         public virtual ICollection<JointAccount> JointAccounts { get; set; }
         public virtual ICollection<DepositAccountTransaction> DepositAccountTransactions { get; set; }
+        public virtual ICollection<ShareTransaction> TransferToShareTransaction { get; set; }
+        public virtual ICollection<ShareTransaction> PaymentMethodShareTransaction { get; set; }
     }
 }

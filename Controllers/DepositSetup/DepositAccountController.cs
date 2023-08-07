@@ -40,8 +40,8 @@ namespace MicroFinance.Controllers.DepositSetup
         }
 
 
-        [HttpPost]
-        public async Task<ActionResult<ResponseDto>> CreateDepositAccount(CreateDepositAccountDto createDepositAccountDto)
+        [HttpPost("createDepositAccount")]
+        public async Task<ActionResult<ResponseDto>> CreateDepositAccount([FromForm] CreateDepositAccountDto createDepositAccountDto)
         {
 
             var decodedToken = GetDecodedToken();
@@ -49,12 +49,11 @@ namespace MicroFinance.Controllers.DepositSetup
 
         }
 
-        [HttpPut]
-        public async Task<ActionResult<ResponseDto>> UpdateNonClosedDepositAccount(UpdateDepositAccountDto updateDepositAccountDto)
+        [HttpPut("updateDepositAccount")]
+        public async Task<ActionResult<ResponseDto>> UpdateNonClosedDepositAccount([FromForm] UpdateDepositAccountDto updateDepositAccountDto)
         {
 
             var decodedToken = GetDecodedToken();
-
             return Ok(await _depositService.UpdateNonClosedDepositAccountService(updateDepositAccountDto, decodedToken));
 
         }
@@ -85,6 +84,11 @@ namespace MicroFinance.Controllers.DepositSetup
         {
             var decodedToken = GetDecodedToken();
             return Ok(await _depositService.GetNonClosedDepositAccountByAccountNumberService(accountNumber, decodedToken));
+        }
+        [HttpPost("getMatureDate")]
+        public async Task<ActionResult<string>> GetMatureDate(GenerateMatureDateDto generateMatureDateDto)
+        {
+            return Ok(await _depositService.GenerateMatureDateOfDepositAccountService(generateMatureDateDto));
         }
         // [HttpPost("flexibleInterestRate")]
         // public async Task<ActionResult<ResponseDto>> UpdateInterestRateAccordingToFlexibleInterestRate(FlexibleInterestRateSetupDto flexibleInterestRateSetupDto)

@@ -6,14 +6,21 @@ namespace MicroFinance.Dtos.DepositSetup
 {
     public class UpdateDepositAccountDto
     {
+        [Required]
         public int Id { get; set; }
+        [Required]
         public decimal InterestRate { get; set; }
+        [Required]
         public AccountStatusEnum Status { get; set; }
         public int? InterestPostingAccountId { get; set; }
         public int? MatureInterestPostingAccountId { get; set; }
         public string? Description { get; set; }
         public string? NomineeName { get; set; }
         public RelationTypeEnum? Relation { get; set; }
+        [Required]
+        public bool IsSignatureChanged { get; set; }
+        public IFormFile? SignaturePhoto { get; set; }
+        [Required]
         public bool IsSMSServiceActive { get; set; }
         public int? ExpectedDailyDepositAmount { get; set; }
         public int? ExpectedTotalDepositDay { get; set; }

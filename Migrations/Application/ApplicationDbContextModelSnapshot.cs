@@ -896,6 +896,15 @@ namespace MicroFinance.Migrations.Application
                     b.Property<int?>("Relation")
                         .HasColumnType("int");
 
+                    b.Property<byte[]>("SignatureFileData")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("SignatureFileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SignatureFileType")
+                        .HasColumnType("int");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -1277,29 +1286,43 @@ namespace MicroFinance.Migrations.Application
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AccountNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CurrentNumberOfKitta")
+                    b.Property<int>("ClientId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("CurrentShareBalance")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime?>("EndOn")
-                        .HasColumnType("datetime2");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId")
+                        .IsUnique();
+
+                    b.ToTable("ShareAccounts");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.Share.ShareKitta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("CurrentKitta")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("StartOn")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("PriceOfOneKitta")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountNumber");
-
-                    b.ToTable("ShareAccounts");
+                    b.ToTable("ShareKittas");
                 });
 
             modelBuilder.Entity("MicroFinance.Models.Transactions.BaseTransaction", b =>
@@ -1312,6 +1335,12 @@ namespace MicroFinance.Migrations.Application
 
                     b.Property<string>("AmountInWords")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BankChequeNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("BankDetailId")
+                        .HasColumnType("int");
 
                     b.Property<string>("BranchCode")
                         .IsRequired()
@@ -1341,6 +1370,9 @@ namespace MicroFinance.Migrations.Application
                     b.Property<string>("ModifierId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("PaymentType")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("RealWorldCreationDate")
                         .HasColumnType("datetime2");
 
@@ -1358,6 +1390,8 @@ namespace MicroFinance.Migrations.Application
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BankDetailId");
 
                     b.HasIndex("VoucherNumber")
                         .IsUnique()
@@ -1378,12 +1412,6 @@ namespace MicroFinance.Migrations.Application
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<string>("BankChequeNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("BankDetailId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("CollectedByEmployeeId")
                         .HasColumnType("int");
 
@@ -1393,9 +1421,6 @@ namespace MicroFinance.Migrations.Application
 
                     b.Property<string>("Narration")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PaymentType")
-                        .HasColumnType("int");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
@@ -1418,8 +1443,6 @@ namespace MicroFinance.Migrations.Application
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BankDetailId");
 
                     b.HasIndex("DepositAccountId");
 
@@ -1464,6 +1487,60 @@ namespace MicroFinance.Migrations.Application
                         .IsUnique();
 
                     b.ToTable("LedgerTransactions");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.Transactions.ShareTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BalanceAfterTransaction")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("Narration")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PaymentDepositAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ShareAccountId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<string>("ShareCertificateNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ShareTransactionType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransactionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TransferToDepositAccountId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentDepositAccountId");
+
+                    b.HasIndex("ShareAccountId");
+
+                    b.HasIndex("TransactionId")
+                        .IsUnique();
+
+                    b.HasIndex("TransferToDepositAccountId");
+
+                    b.ToTable("ShareTransactions");
                 });
 
             modelBuilder.Entity("MicroFinance.Models.Transactions.SubLedgerTransaction", b =>
@@ -1677,19 +1754,24 @@ namespace MicroFinance.Migrations.Application
             modelBuilder.Entity("MicroFinance.Models.Share.ShareAccount", b =>
                 {
                     b.HasOne("MicroFinance.Models.ClientSetup.Client", "Client")
-                        .WithMany("ShareAccounts")
-                        .HasForeignKey("AccountNumber")
+                        .WithOne("ShareAccount")
+                        .HasForeignKey("MicroFinance.Models.Share.ShareAccount", "ClientId")
                         .IsRequired();
 
                     b.Navigation("Client");
                 });
 
-            modelBuilder.Entity("MicroFinance.Models.Transactions.DepositAccountTransaction", b =>
+            modelBuilder.Entity("MicroFinance.Models.Transactions.BaseTransaction", b =>
                 {
                     b.HasOne("MicroFinance.Models.AccountSetup.BankSetup", "BankDetail")
-                        .WithMany("DepositAccountTransactions")
+                        .WithMany("BaseTransactions")
                         .HasForeignKey("BankDetailId");
 
+                    b.Navigation("BankDetail");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.Transactions.DepositAccountTransaction", b =>
+                {
                     b.HasOne("MicroFinance.Models.DepositSetup.DepositAccount", "DepositAccount")
                         .WithMany("DepositAccountTransactions")
                         .HasForeignKey("DepositAccountId")
@@ -1700,8 +1782,6 @@ namespace MicroFinance.Migrations.Application
                         .HasForeignKey("MicroFinance.Models.Transactions.DepositAccountTransaction", "TransactionId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
-
-                    b.Navigation("BankDetail");
 
                     b.Navigation("DepositAccount");
 
@@ -1724,6 +1804,36 @@ namespace MicroFinance.Migrations.Application
                     b.Navigation("Ledger");
 
                     b.Navigation("Transaction");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.Transactions.ShareTransaction", b =>
+                {
+                    b.HasOne("MicroFinance.Models.DepositSetup.DepositAccount", "PaymentDepositAccount")
+                        .WithMany("PaymentMethodShareTransaction")
+                        .HasForeignKey("PaymentDepositAccountId");
+
+                    b.HasOne("MicroFinance.Models.Share.ShareAccount", "ShareAccount")
+                        .WithMany("ShareTransactions")
+                        .HasForeignKey("ShareAccountId")
+                        .IsRequired();
+
+                    b.HasOne("MicroFinance.Models.Transactions.BaseTransaction", "Transaction")
+                        .WithOne("ShareTransaction")
+                        .HasForeignKey("MicroFinance.Models.Transactions.ShareTransaction", "TransactionId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("MicroFinance.Models.DepositSetup.DepositAccount", "TransferToAccount")
+                        .WithMany("TransferToShareTransaction")
+                        .HasForeignKey("TransferToDepositAccountId");
+
+                    b.Navigation("PaymentDepositAccount");
+
+                    b.Navigation("ShareAccount");
+
+                    b.Navigation("Transaction");
+
+                    b.Navigation("TransferToAccount");
                 });
 
             modelBuilder.Entity("MicroFinance.Models.Transactions.SubLedgerTransaction", b =>
@@ -1751,7 +1861,7 @@ namespace MicroFinance.Migrations.Application
 
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.BankSetup", b =>
                 {
-                    b.Navigation("DepositAccountTransactions");
+                    b.Navigation("BaseTransactions");
                 });
 
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.BankType", b =>
@@ -1798,7 +1908,8 @@ namespace MicroFinance.Migrations.Application
 
                     b.Navigation("JointAccounts");
 
-                    b.Navigation("ShareAccounts");
+                    b.Navigation("ShareAccount")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MicroFinance.Models.ClientSetup.ClientGroup", b =>
@@ -1826,6 +1937,10 @@ namespace MicroFinance.Migrations.Application
                     b.Navigation("DepositAccountTransactions");
 
                     b.Navigation("JointAccounts");
+
+                    b.Navigation("PaymentMethodShareTransaction");
+
+                    b.Navigation("TransferToShareTransaction");
                 });
 
             modelBuilder.Entity("MicroFinance.Models.DepositSetup.DepositScheme", b =>
@@ -1835,12 +1950,20 @@ namespace MicroFinance.Migrations.Application
                     b.Navigation("FlexibleInterestRates");
                 });
 
+            modelBuilder.Entity("MicroFinance.Models.Share.ShareAccount", b =>
+                {
+                    b.Navigation("ShareTransactions");
+                });
+
             modelBuilder.Entity("MicroFinance.Models.Transactions.BaseTransaction", b =>
                 {
                     b.Navigation("DepositAccountTransaction")
                         .IsRequired();
 
                     b.Navigation("LedgerTransaction")
+                        .IsRequired();
+
+                    b.Navigation("ShareTransaction")
                         .IsRequired();
 
                     b.Navigation("SubLedgerTransaction")

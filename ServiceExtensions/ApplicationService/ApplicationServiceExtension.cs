@@ -4,6 +4,7 @@ using MicroFinance.Repository.ClientSetup;
 using MicroFinance.Repository.CompanyProfile;
 using MicroFinance.Repository.DepositSetup;
 using MicroFinance.Repository.RecordsWithCode;
+using MicroFinance.Repository.Share;
 using MicroFinance.Repository.Transaction;
 using MicroFinance.Repository.UserManagement;
 using MicroFinance.Services.AccountSetup.MainLedger;
@@ -11,6 +12,7 @@ using MicroFinance.Services.ClientSetup;
 using MicroFinance.Services.CompanyProfile;
 using MicroFinance.Services.DepositSetup;
 using MicroFinance.Services.RecordsWithCode;
+using MicroFinance.Services.Share;
 using MicroFinance.Services.Transactions;
 using MicroFinance.Services.UserManagement;
 using MicroFinance.Token;
@@ -21,28 +23,36 @@ namespace MicroFinance.ServiceExtensions.ApplicationService
     {
         public static IServiceCollection AddApplicationServiceExtension(this IServiceCollection services)
         {
-            services.AddScoped<ISuperAdminRepository, SuperAdminRepository>();
-            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-            services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<IEmployeeService, EmployeeService>();
-            services.AddScoped<ISuperAdminService, SuperAdminService>();
-            services.AddScoped<IMainLedgerRepository, MainLedgerRepository>();
-            services.AddScoped<IMainLedgerService, MainLedgerService>();
+            services.AddTransient<ISuperAdminRepository, SuperAdminRepository>();
+            services.AddTransient<IEmployeeRepository, EmployeeRepository>();
+            services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<IEmployeeService, EmployeeService>();
+            services.AddTransient<ISuperAdminService, SuperAdminService>();
 
-            services.AddScoped<IClientRepository, ClientRepository>();
-            services.AddScoped<IClientService, ClientService>();
+            services.AddTransient<IMainLedgerRepository, MainLedgerRepository>();
+            services.AddTransient<IMainLedgerService, MainLedgerService>();
+            services.AddTransient<IClientRepository, ClientRepository>();
+            services.AddTransient<IClientService, ClientService>();
 
-            services.AddScoped<IDepositSchemeRepository, DepositSchemeRepository>();
-            services.AddScoped<IDepositSchemeService, DepositSchemeService>();
+            services.AddTransient<IDepositSchemeRepository, DepositSchemeRepository>();
+            services.AddTransient<IDepositSchemeService, DepositSchemeService>();
 
-            services.AddScoped<ICompanyProfileRepository, CompanyProfileRepository>();
-            services.AddScoped<ICompanyProfileService, CompanyProfileService>();
+            services.AddTransient<ICompanyProfileRepository, CompanyProfileRepository>();
+            services.AddTransient<ICompanyProfileService, CompanyProfileService>();
 
-            services.AddScoped<IRecordsWithCodeRepository, RecordsWithCodeRepository>();
-            services.AddScoped<IRecordsWithCodeService, RecordsWithCodeService>();
+            services.AddTransient<IRecordsWithCodeRepository, RecordsWithCodeRepository>();
+            services.AddTransient<IRecordsWithCodeService, RecordsWithCodeService>();
 
-            services.AddScoped<IDepositAccountTransactionRepository, DepositAccountTransactionRepository>();
-            services.AddScoped<IDepositAccountTransactionService, DepositAccountTransactionService>();
+            services.AddTransient<IDepositAccountTransactionRepository, DepositAccountTransactionRepository>();
+            services.AddTransient<IDepositAccountTransactionService, DepositAccountTransactionService>();
+
+            services.AddTransient<IShareAccountTransactionRepository, ShareAccountTransactionRepository>();
+            services.AddTransient<IShareAccountTransactionService, ShareAccountTransactionService>();
+
+            services.AddTransient<IShareRepository, ShareRepository>();
+            services.AddTransient<IShareService, ShareService>();
+
+            
             
             return services;
         }

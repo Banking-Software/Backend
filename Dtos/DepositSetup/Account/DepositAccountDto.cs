@@ -30,5 +30,8 @@ namespace MicroFinance.Dtos.DepositSetup
         public int? ExpectedTotalInterestAmount { get; set; }
         public string? InterestPostingAccountNumber { get; set; }
         public string? MatureInterestPostingAccountNumber { get; set; }
+        public string? SignatureFileData { get; set; }
+        public string? SignatureFileName { get; set; }
+        public FileType? SignatureFileType { get; set; }
     }
 }

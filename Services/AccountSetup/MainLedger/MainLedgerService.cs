@@ -16,12 +16,12 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
         private readonly ILogger<MainLedgerService> _logger;
 
         public MainLedgerService(
-            IMainLedgerRepository mainLedgerRepository, 
+            IMainLedgerRepository mainLedgerRepository,
             ICompanyProfileRepository companyProfileRepository,
             IMapper mapper, ILogger<MainLedgerService> logger)
         {
             _mainLedgerRepository = mainLedgerRepository;
-            _companyProfileRepository= companyProfileRepository;
+            _companyProfileRepository = companyProfileRepository;
             _mapper = mapper;
             _logger = logger;
         }
@@ -44,7 +44,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
                 return _mapper.Map<List<AccountTypeDto>>(accountTypes);
             else if (accountTypes.Count < 1)
                 return new List<AccountTypeDto>();
-            throw new ArgumentNullException($"Content not found");
+            throw new ArgumentNullException("Account Type");
 
         }
 
@@ -58,7 +58,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
             if (accountType != null && !(await _mainLedgerRepository.CheckIfGroupNameExist(createGroupTypeDto.AccountTypeId, createGroupTypeDto.Name)))
             {
                 var groupType = _mapper.Map<GroupType>(createGroupTypeDto);
-                groupType.AccountType = accountType;
+                // groupType.AccountType = accountType;
                 //groupType.DebitOrCredit = await _mainLedgerRepository.GetDebitOrCreditById(createGroupTypeDto.DebitOrCreditId);
                 var createStatus = await _mainLedgerRepository.CreateGroupType(groupType);
                 if (createStatus >= 1)
@@ -97,7 +97,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
                 return groupTypeDto;
             }
 
-            throw new ArgumentNullException($"Content does not Exist");
+            throw new ArgumentNullException($"Group Type with id {id}");
 
         }
 
@@ -116,7 +116,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
             }
             return new List<GroupTypeDto>();
             //}
-            throw new ArgumentNullException($"Account Type with Id: {accountTypeId} does not exist");
+            throw new ArgumentNullException($"Account Type with Id: {accountTypeId}");
         }
 
         public async Task<List<GroupTypeDto>> GetGroupTypesService()
@@ -126,7 +126,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
                 return _mapper.Map<List<GroupTypeDto>>(groupTypes);
             else if (groupTypes.Count < 1)
                 return new List<GroupTypeDto>();
-            throw new ArgumentNullException($"Content does not Exist");
+            throw new ArgumentNullException($"Group Type");
         }
 
         // END
@@ -146,7 +146,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
                 throw new ArgumentNullException("No Group found for the ledger or Ledger already exist");
 
             var ledger = _mapper.Map<Ledger>(createLedgerDto);
-            ledger.GroupType = groupType;
+            // ledger.GroupType = groupType;
             ledger.IsBank = false;
             var createStatus = await _mainLedgerRepository.CreateLedger(ledger);
             if (createStatus >= 1)
@@ -194,16 +194,6 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
             {
                 var ledgerDetailsDto = _mapper.Map<List<LedgerDto>>(ledgers);
                 return ledgerDetailsDto;
-                // foreach (var map in mappedDetails)
-                // {
-                //     var groupLedgerDto = new GroupLedgerDto()
-                //     {
-                //         Ledger = _mapper.Map<LedgerDto>(map.Ledger),
-                //         GroupType = _mapper.Map<GroupTypeDto>(map.GroupType)
-                //     };
-                //     groupLedgerDtos.Add(groupLedgerDto);
-                // }
-                // return groupLedgerDtos;
             }
             else if (ledgers.Count < 1) return new List<LedgerDto>();
             throw new ArgumentNullException("Content Doesnot exist");
@@ -216,16 +206,6 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
             {
                 var ledgerDetailsDto = _mapper.Map<List<LedgerDto>>(ledgers);
                 return ledgerDetailsDto;
-                // foreach (var map in mappedDetails)
-                // {
-                //     var groupLedgerDto = new GroupLedgerDto()
-                //     {
-                //         Ledger = _mapper.Map<LedgerDto>(map.Ledger),
-                //         GroupType = _mapper.Map<GroupTypeDto>(map.GroupType)
-                //     };
-                //     groupLedgerDtos.Add(groupLedgerDto);
-                // }
-                // return groupLedgerDtos;
             }
             else if (ledgers.Count < 1) return new List<LedgerDto>();
             throw new ArgumentNullException("Content Doesnot exist");
@@ -245,7 +225,6 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
         public async Task<List<LedgerDto>> GetLedgers()
         {
             var ledgers = await _mainLedgerRepository.GetLedgers();
-            // var groupLedgerDtos = new List<GroupLedgerDto>();
             if (ledgers != null && ledgers.Count >= 1)
             {
                 var ledgerDetailsDto = _mapper.Map<List<LedgerDto>>(ledgers);
@@ -262,12 +241,11 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
         {
             var bankType = await _mainLedgerRepository.GetBankTypeById(createBankSetupDto.BankTypeId);
             var branchCode = await _companyProfileRepository.GetBranchByBranchCode(createBankSetupDto.BranchCode);
-            if (bankType == null || branchCode == null) 
+            if (bankType == null || branchCode == null)
                 throw new Exception("Please check branch code or bank type and try again");
 
             var bankSetup = _mapper.Map<BankSetup>(createBankSetupDto);
-            bankSetup.BankType = bankType;
-            //bankSetup.BranchCode=branchCode;
+            // bankSetup.BankType = bankType;
             var createStatus = await _mainLedgerRepository.CreateBankSetup(bankSetup);
             if (createStatus >= 1)
             {
@@ -325,7 +303,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
             if (bankSetup != null)
                 return _mapper.Map<BankSetupDto>(bankSetup);
 
-            throw new ArgumentNullException("Content Does not Exist");
+            throw new ArgumentNullException("Bank Detail");
         }
 
         public async Task<List<BankSetupDto>> GetBankSetupService()
@@ -358,28 +336,16 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
             if (ledger != null && ledger.IsSubLedgerActive)
             {
                 var subledger = _mapper.Map<SubLedger>(createSubLedgerDto);
-                subledger.Ledger = ledger;
-                int subLedgerId = await _mainLedgerRepository.CreateSubLedger(subledger);
-                if (subLedgerId >= 1)
-                {
-                    int subLedgerCode = await _mainLedgerRepository.UpdateSubLedgerCode(subLedgerId);
-                    if(subLedgerCode>=1)
-                        return new ResponseDto()
-                        {
-                            Message = "Successfully Created Sub Ledger",
-                            Status = true,
-                            StatusCode = "200"
-                        };
-                }
+                await _mainLedgerRepository.CreateSubLedger(subledger);
                 return new ResponseDto()
                 {
-                    Message = "failed Create Sub Ledger",
-                    Status = false,
-                    StatusCode = "500"
+                    Message = "Successfully Created Sub Ledger",
+                    Status = true,
+                    StatusCode = "200"
                 };
-            }
-            throw new ArgumentNullException($"Ledger Doesnot exist or Subledger for given ledger is not allowed");
 
+            }
+            throw new Exception("Not Allowed to create Subledger for give ledger");
         }
         public async Task<ResponseDto> EditSubLedgerService(UpdateSubLedgerDto subLedgerDto)
         {
@@ -416,7 +382,7 @@ namespace MicroFinance.Services.AccountSetup.MainLedger
                 var subLedgerDetailsDto = _mapper.Map<SubLedgerDto>(subLedger);
                 return subLedgerDetailsDto;
             }
-            throw new ArgumentNullException("Content Not Found");
+            throw new ArgumentNullException("Requested SubLedger Not Found");
         }
 
         public async Task<List<SubLedgerDto>> GetSubLedgerByLedgerService(int ledgerId)

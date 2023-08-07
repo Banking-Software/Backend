@@ -14,6 +14,12 @@ namespace MicroFinance.Configuration.Transactions
             builder.Property(tsc=>tsc.TransactionAmount).HasPrecision(18,4).IsRequired(true);
             builder.Property(tsc=>tsc.RealWorldCreationDate).IsRequired(true);
             builder.Property(tsc=>tsc.CompanyCalendarCreationDate).IsRequired(true);
+
+             builder.HasOne(dt=>dt.BankDetail)
+            .WithMany(bnk=>bnk.BaseTransactions)
+            .HasForeignKey(dt=>dt.BankDetailId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }

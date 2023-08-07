@@ -20,7 +20,7 @@ namespace MicroFinance.Services
             try
             {
                 float maxFileValue = float.Parse(_config["ApplicationSettings:ImageMaxSize"]);
-                double maxFileSize = maxFileValue * 1024 * 1024; // 3MB 
+                double maxFileSize = maxFileValue * 1024 * 1024;
                 if (image.Length > maxFileSize)
                     throw new Exception($"File size exceeded the Limit. Upto {maxFileSize}MB is allowed while {image.Length}MB is received");
 

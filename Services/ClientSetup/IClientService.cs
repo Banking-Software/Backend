@@ -8,6 +8,7 @@ namespace MicroFinance.Services.ClientSetup
        Task<ResponseDto> CreateClientService(CreateClientDto newClient, TokenDto decodedToken); 
        Task<ResponseDto> UpdateClientService(UpdateClientDto updateClientDto, TokenDto decodedToken);
        Task<ClientDto> GetClientByClientIdService(string clientId, TokenDto decodedToken);
+       Task<ClientDto> GetClientByIdService(int id, TokenDto decodedToken);
        Task<List<ClientDto>> GetAllClientsService(TokenDto decodedToken);
        Task<List<ClientDto>> GetActiveClientsByBranchCodeService(string branchCode);
        Task<List<ClientDto>> GetClientsByGroupService(int groupId, TokenDto decodedToken);

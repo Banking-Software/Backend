@@ -139,7 +139,7 @@ namespace MicroFinance.Services.UserManagement
                     Status=false
                 };
            }
-           else if(user.IsActive==isActive)
+           else if(user?.IsActive==isActive)
            {
                 return new ResponseDto()
                 {

@@ -28,9 +28,9 @@ namespace MicroFinance.Dtos.CompanyProfile
             {
                 yield return new ValidationResult("Month cannot be greater than 12.", new[] { nameof(Month) });
             }
-            if(NumberOfDay>31)
+            if(NumberOfDay>32)
             {
-                yield return new ValidationResult("Number Of Day cannot be greater than 31.", new[] { nameof(NumberOfDay) });
+                yield return new ValidationResult("Number Of Day cannot be greater than 32.", new[] { nameof(NumberOfDay) });
             }
         }
     }

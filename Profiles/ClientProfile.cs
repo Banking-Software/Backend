@@ -12,8 +12,11 @@ namespace MicroFinance.Profiles
             .ForMember(dest=>dest.Id, opt=>opt.Ignore())
             .ForMember(dest=>dest.ClientId, opt=>opt.Ignore())
             .ForMember(dest=>dest.ClientType, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientTypeId, opt=>opt.MapFrom(src=>(int) src.ClientType))
             .ForMember(dest=>dest.ShareType, opt=>opt.Ignore())
+            .ForMember(dest=>dest.ClientShareTypeInfoId, opt=>opt.MapFrom(src=>((int?)src.ShareType)))
             .ForMember(dest=>dest.KYMType, opt=>opt.Ignore())
+            .ForMember(dest=>dest.KYMTypeId, opt=>opt.MapFrom(src=>(int?)src.KYMType))
             .ForMember(dest=>dest.ClientGroup, opt=>opt.Ignore())
             .ForMember(dest=>dest.ClientUnit, opt=>opt.Ignore());
             

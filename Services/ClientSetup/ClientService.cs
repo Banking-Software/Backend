@@ -54,11 +54,11 @@ namespace MicroFinance.Services.ClientSetup
             )
             {
                 Client client = _mapper.Map<Client>(newClient);
-                client.ShareType = newClient.ShareType != null ? await _clientRepo.GetShareTypeById((int)newClient.ShareType) : null;
-                client.KYMType = newClient.KYMType != null ? await _clientRepo.GetClientKYMTypeById((int)newClient.KYMType) : null;
-                client.ClientType = await _clientRepo.GetClientTypeById((int)newClient.ClientType);
-                client.ClientGroup = newClient.ClientGroupId != null ? await _clientRepo.GetClientGroupById((int)newClient.ClientGroupId) : null;
-                client.ClientUnit = newClient.ClientUnitId != null ? await _clientRepo.GetClientUnitById((int)newClient.ClientUnitId) : null;
+                // client.ShareType = newClient.ShareType != null ? await _clientRepo.GetShareTypeById((int)newClient.ShareType) : null;
+                // client.KYMType = newClient.KYMType != null ? await _clientRepo.GetClientKYMTypeById((int)newClient.KYMType) : null;
+                // client.ClientType = await _clientRepo.GetClientTypeById((int)newClient.ClientType);
+                // client.ClientGroup = newClient.ClientGroupId != null ? await _clientRepo.GetClientGroupById((int)newClient.ClientGroupId) : null;
+                // client.ClientUnit = newClient.ClientUnitId != null ? await _clientRepo.GetClientUnitById((int)newClient.ClientUnitId) : null;
                 client.CreatedBy = decodedToken.UserName;
                 client.CreatorId = decodedToken.UserId;
                 client.BranchCode = decodedToken.BranchCode;
@@ -107,7 +107,7 @@ namespace MicroFinance.Services.ClientSetup
                 updateClient = await UpdateClientImages(updateClientDto, updateClient, existingClient);
                 updateClient = await UpdateClientMetaData(updateClient, existingClient, decodedToken);
                 int updateStatus = await _clientRepo.UpdateClient(updateClient);
-                if (updateStatus >= 1) return new ResponseDto() { Message = $"Update successfull for client with Id: {existingClient.ClientId}" };
+                if (updateStatus >= 1) return new ResponseDto() { Message = $"Update successfull for client with Id: {existingClient.ClientId}", Status=true, StatusCode="200" };
                 throw new Exception("Failed to Update the client's detail");
             }
             throw new BadRequestExceptionHandler("No Data Found for given client");
@@ -411,6 +411,19 @@ namespace MicroFinance.Services.ClientSetup
             updateClient.ModificationCount ??= 0;
             updateClient.ModificationCount++;
             return Task.FromResult(updateClient);
+        }
+
+        public async Task<ClientDto> GetClientByIdService(int id, TokenDto decodedToken)
+        {
+            _logger.LogInformation($"{DateTime.Now}: {decodedToken.UserName} requested to fetch client details of Id: {id}");
+            var client = await _clientRepo.GetClientById(id);
+            if(client!=null)
+            {
+                _logger.LogInformation($"{DateTime.Now}: {decodedToken.UserName} sending detail of {client.ClientFirstName} {client.ClientLastName} client (Id: {id} to {decodedToken.UserName})");
+                return _mapper.Map<ClientDto>(client);
+            }
+            _logger.LogError($"{DateTime.Now}: (NOTFOUND) {decodedToken.UserName} requested client with Id {id} details and not found in database");
+            throw new NotFoundExceptionHandler("No Data Found for provided client id");
         }
     }
 }

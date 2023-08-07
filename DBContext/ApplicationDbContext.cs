@@ -20,13 +20,14 @@ namespace MicroFinance.DBContext
             _logger = logger;
         }
 
-         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder
                 .UseLoggerFactory(_logger)
                 .EnableSensitiveDataLogging()
                 .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name });
+            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -34,7 +35,7 @@ namespace MicroFinance.DBContext
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-            
+
             //Start: Client Setup
 
             modelBuilder.Entity<ClientGroup>()
@@ -45,9 +46,9 @@ namespace MicroFinance.DBContext
 
             // Flexible Interest Rate
             modelBuilder.Entity<FlexibleInterestRate>()
-            .HasOne(fir=>fir.DepositScheme)
-            .WithMany(ds=>ds.FlexibleInterestRates)
-            .HasForeignKey(fir=>fir.DepositSchemeId)
+            .HasOne(fir => fir.DepositScheme)
+            .WithMany(ds => ds.FlexibleInterestRates)
+            .HasForeignKey(fir => fir.DepositSchemeId)
             .OnDelete(DeleteBehavior.ClientSetNull);
         }
 
@@ -58,7 +59,7 @@ namespace MicroFinance.DBContext
         public DbSet<BankSetup> BankSetups { get; set; }
         public DbSet<SubLedger> SubLedgers { get; set; }
         public DbSet<DebitOrCredit> DebitOrCredits { get; set; }
-        public DbSet<BankType> BankTypes {get; set;}
+        public DbSet<BankType> BankTypes { get; set; }
 
         //START: Company Details
         public DbSet<Branch> Branches { get; set; }
@@ -78,10 +79,11 @@ namespace MicroFinance.DBContext
         public DbSet<ClientType> ClientTypes { get; set; }
         public DbSet<ClientGroup> ClientGroups { get; set; }
         public DbSet<ClientUnit> ClientUnits { get; set; }
-        
+
 
         // START: SHARE
         public DbSet<ShareAccount> ShareAccounts { get; set; }
+        public DbSet<ShareKitta> ShareKittas { get; set; }
         // START: Deposit
 
         public DbSet<DepositScheme> DepositSchemes { get; set; }
@@ -98,6 +100,7 @@ namespace MicroFinance.DBContext
         public DbSet<DepositAccountTransaction> DepositAccountTransactions { get; set; }
         public DbSet<LedgerTransaction> LedgerTransactions { get; set; }
         public DbSet<SubLedgerTransaction> SubLedgerTransactions { get; set; }
-    
+        public DbSet<ShareTransaction> ShareTransactions { get; set; }
+
     }
 }

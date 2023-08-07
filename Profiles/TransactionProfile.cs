@@ -1,5 +1,6 @@
 using AutoMapper;
 using MicroFinance.Dtos.Transactions;
+using MicroFinance.Dtos.Transactions.ShareTransaction;
 using MicroFinance.Models.Transactions;
 using MicroFinance.Models.Wrapper.TrasactionWrapper;
 
@@ -9,8 +10,11 @@ namespace MicroFinance.Profiles
     {
         public TransactionProfile()
         {   
-            CreateMap<MakeDepositTransactionDto, MakeDepositWrapper>();
-            CreateMap<MakeDepositWrapper, BaseTransaction>();
+            CreateMap<MakeDepositTransactionDto, DepositAccountTransactionWrapper>();
+            CreateMap<MakeWithDrawalTransactionDto, DepositAccountTransactionWrapper>();
+            CreateMap<DepositAccountTransactionWrapper, BaseTransaction>();
+            CreateMap<MakeShareTransactionDto, ShareAccountTransactionWrapper>();
+            CreateMap<ShareAccountTransactionWrapper, BaseTransaction>();
         }
     }
 }

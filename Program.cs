@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using MicroFinance.DBContext;
 using MicroFinance.DBContext.UserManagement;
+using MicroFinance.Middleware;
 using MicroFinance.Models.UserManagement;
 using MicroFinance.SeedData;
 using MicroFinance.ServiceExtensions.ApplicationService;
@@ -14,6 +15,17 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy
+    (
+        name: "allowCors", 
+        builder => 
+        builder.AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod());
+});
+
 
 builder.Services.AddControllers()
 .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
@@ -60,10 +72,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: "allowCors", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-});
+
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
@@ -119,19 +128,19 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
 // {
+app.UseMiddleware<SwaggerBasicAuthMiddleware>();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
 });
-// }
 app.UseCors("allowCors");
-// app.UseHttpsRedirection();
+app.UseSerilogRequestLogging();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 app.AddGlobalErrorHandler();
-app.UseSerilogRequestLogging();
+
 
 app.Run();

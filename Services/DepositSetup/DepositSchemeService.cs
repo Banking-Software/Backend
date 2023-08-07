@@ -4,6 +4,7 @@ using MicroFinance.Dtos.ClientSetup;
 using MicroFinance.Dtos.DepositSetup;
 using MicroFinance.Dtos.DepositSetup.Account;
 using MicroFinance.Enums.Deposit.Account;
+using MicroFinance.Exceptions;
 using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.ClientSetup;
 using MicroFinance.Models.DepositSetup;
@@ -26,6 +27,7 @@ namespace MicroFinance.Services.DepositSetup
         private readonly IClientRepository _clientRepo;
         private readonly ICompanyProfileService _companyProfileService;
         private readonly IEmployeeService _employeeService;
+        private readonly IConfiguration _config;
 
         public DepositSchemeService
         (
@@ -35,7 +37,8 @@ namespace MicroFinance.Services.DepositSetup
         IMainLedgerRepository mainLedgerRepository,
         IClientRepository clientRepository,
         ICompanyProfileService companyProfileService,
-        IEmployeeService employeeService
+        IEmployeeService employeeService,
+        IConfiguration config
         )
         {
             _loggger = logger;
@@ -45,30 +48,18 @@ namespace MicroFinance.Services.DepositSetup
             _clientRepo = clientRepository;
             _companyProfileService = companyProfileService;
             _employeeService = employeeService;
+            _config =  config;
         }
 
-
-        private async Task<List<SubLedger>> CreateSubLedgerForDepositScheme(CreateDepositSchemeDto createDepositScheme)
+        private List<string> GetSubLedgerNameForDepositScheme(CreateDepositSchemeDto createDepositScheme)
         {
             var depositSubledgerName = createDepositScheme.DepositSubledger ?? createDepositScheme.SchemeName + " " + "Deposit";
             var interestSubledgerName = createDepositScheme.InterestSubledger ?? createDepositScheme.SchemeName + " " + "Interest";
             var taxSublegderName = createDepositScheme.TaxSubledger ?? createDepositScheme.SchemeName + " " + "Tax";
-            // Deposit SubLedger
-            int depositLedgerId = (int)createDepositScheme.SchemeType;
-            Ledger depsoitLedgerSchemeType = await _mainLedgerRepository.GetLedger(depositLedgerId);
-            SubLedger depositSubledger = new SubLedger() { Name = depositSubledgerName, Ledger = depsoitLedgerSchemeType, Description = $"Subledger created while creating Deposit Scheme {createDepositScheme.SchemeName}" };
-            // Interest SubLedger
-            Ledger interestLedger = await _mainLedgerRepository.GetLedger(68); // Interest Expenses
-            SubLedger interestSubledger = new SubLedger() { Name = interestSubledgerName, Ledger = interestLedger, Description = $"Subledger created while creating Deposit Scheme {createDepositScheme.SchemeName}" };
-            // Tax SubLedger
-            Ledger taxLedger = await _mainLedgerRepository.GetLedger(29); // Tax Payable
-            SubLedger taxSubledger = new SubLedger() { Name = taxSublegderName, Ledger = taxLedger, Description = $"Subledger created while creating Deposit Scheme {createDepositScheme.SchemeName}" };
-            List<SubLedger> allSublegders = new List<SubLedger>() { depositSubledger, interestSubledger, taxSubledger };
-            int subledgerCreateStatus = await _mainLedgerRepository.CreateMultipleSubLedger(allSublegders);
-            if (subledgerCreateStatus < 1) throw new Exception("Unable to create the Scheme. Subledger creation failed");
-            return new List<SubLedger>() { depositSubledger, interestSubledger, taxSubledger };
-
+            
+            return new List<string>(){depositSubledgerName, interestSubledgerName, taxSublegderName};
         }
+
         public async Task<ResponseDto> CreateDepositSchemeService(CreateDepositSchemeDto createDepositScheme, TokenDto decodedToken)
         {
             var depositSchemeWithSameName = await _depositSchemeRepository.GetDepositSchemeByName(createDepositScheme.SchemeName);
@@ -78,17 +69,15 @@ namespace MicroFinance.Services.DepositSetup
 
             var companyCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
             var depositScheme = _mapper.Map<DepositScheme>(createDepositScheme);
-            List<SubLedger> subLedgersForDepositScheme = await CreateSubLedgerForDepositScheme(createDepositScheme);
-            depositScheme.SchemeType = await _mainLedgerRepository.GetLedger((int)createDepositScheme.SchemeType);
-            depositScheme.DepositSubLedger = subLedgersForDepositScheme[0];
-            depositScheme.InterestSubledger = subLedgersForDepositScheme[1];
-            depositScheme.TaxSubledger = subLedgersForDepositScheme[2];
+            List<string> subLedgerNamesForDepositScheme = GetSubLedgerNameForDepositScheme(createDepositScheme);
+            // depositScheme.SchemeType = await _mainLedgerRepository.GetLedger((int)createDepositScheme.SchemeType);
+            depositScheme.SchemeTypeId = (int) createDepositScheme.SchemeType;
             depositScheme.CreatedBy = decodedToken.UserName;
             depositScheme.CreatorId = decodedToken.UserId;
             depositScheme.BranchCode = decodedToken.BranchCode;
             depositScheme.RealWorldCreationDate = DateTime.Now;
             depositScheme.CompanyCalendarCreationDate = $"{companyCalendar.Year}/{companyCalendar.Month}/{companyCalendar.RunningDay}";
-            var depositSchemeId = await _depositSchemeRepository.CreateDepositScheme(depositScheme);
+            await _depositSchemeRepository.CreateDepositScheme(depositScheme, subLedgerNamesForDepositScheme);
             return new ResponseDto()
             {
                 Message = $"'{depositScheme.SchemeName}' created successfully",
@@ -102,7 +91,8 @@ namespace MicroFinance.Services.DepositSetup
         {
             var existingDepositScheme = await _depositSchemeRepository.GetDepositSchemeById(updateDepositScheme.Id);
             var companyCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
-            if (!existingDepositScheme.IsActive && !updateDepositScheme.IsActive)
+            if(existingDepositScheme==null) throw new NotFoundExceptionHandler("No Data Found for requested deposit scheme");
+            else if (!existingDepositScheme.IsActive && !updateDepositScheme.IsActive)
             {
                 _loggger.LogError($"{DateTime.Now}: Employee {decodedToken.UserName} tried to edit the inactive deposit scheme '{existingDepositScheme.SchemeName}'");
                 throw new Exception("Deposit Scheme you want update is In-Active. Please activate it and then update the infornation");
@@ -157,6 +147,14 @@ namespace MicroFinance.Services.DepositSetup
 
         // DEPOSIT ACCOUNT
 
+        private async Task<DepositAccount> UploadSignatureImages(dynamic depositAccountDto, DepositAccount depositAccount)
+        {
+            ImageUploadService uploadService = new ImageUploadService(_config);
+            List<string> listOfClientSignaturePhotoProperty = new List<string>() { nameof(DepositAccount.SignatureFileData), nameof(DepositAccount.SignatureFileName), nameof(DepositAccount.SignatureFileType) };
+            depositAccount = await uploadService.UploadImage(depositAccount, depositAccountDto?.SignaturePhoto, listOfClientSignaturePhotoProperty);
+            return depositAccount;
+        }
+
         public async Task<ResponseDto> CreateDepositAccountService(CreateDepositAccountDto createDepositAccountDto, TokenDto decodedToken)
         {
 
@@ -166,6 +164,7 @@ namespace MicroFinance.Services.DepositSetup
             await AddInterestAndMaturePostingAccountInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
             await AddReferredByEmployeeInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
             await AddBasicDetailsInDepositAccount(newDepositAccount, decodedToken);
+            newDepositAccount = await UploadSignatureImages(createDepositAccountDto, newDepositAccount);
             List<Client> jointClients =
             createDepositAccountDto.AccountType == AccountTypeEnum.Joint
             ?
@@ -211,6 +210,16 @@ namespace MicroFinance.Services.DepositSetup
             existingDepositAccount.ExpectedTotalDepositDay = updateDepositAccountDto.ExpectedTotalDepositDay;
             existingDepositAccount.ExpectedTotalInterestAmount = updateDepositAccountDto.ExpectedTotalInterestAmount;
             existingDepositAccount.ExpectedTotalReturnAmount = updateDepositAccountDto.ExpectedTotalReturnAmount;
+            if(updateDepositAccountDto.IsSignatureChanged && updateDepositAccountDto.SignaturePhoto!=null)
+            {
+                existingDepositAccount = await UploadSignatureImages(updateDepositAccountDto, existingDepositAccount);
+            }
+            else if(updateDepositAccountDto.IsSignatureChanged && updateDepositAccountDto.SignaturePhoto==null)
+            {
+                existingDepositAccount.SignatureFileData = null;
+                existingDepositAccount.SignatureFileName = null;
+                existingDepositAccount.SignatureFileType= null;
+            }
             if(updateDepositAccountDto.InterestPostingAccountId!=null && !updateDepositAccountDto.InterestPostingAccountId.Equals(existingDepositAccount?.InterestPostingAccountNumberId))
             {
                 var interestPostingAccount = await _depositSchemeRepository.GetNonClosedDepositAccountById((int) updateDepositAccountDto.InterestPostingAccountId);
@@ -254,7 +263,7 @@ namespace MicroFinance.Services.DepositSetup
                 || receivedCalendarDto.CurrentMonth>12 
                 || receivedCalendarDto.CurrentDay<1 
                 || receivedCalendarDto.CurrentDay>32
-            ) throw new Exception("Invalid Opening Date. Please refer formar YYYY/MM/DD as 2080/01/01");
+            ) throw new Exception("Invalid Opening Date. Please refer format YYYY/MM/DD as 2080/01/01");
             var matureDate = "";
             if(generateMatureDateDto.PeriodType == PeriodTypeEnum.Year)
                 matureDate = await GenerateMatureDateYearWise(generateMatureDateDto, receivedCalendarDto);
@@ -447,7 +456,7 @@ namespace MicroFinance.Services.DepositSetup
             return Task.FromResult(depositAccountWrapperDto);
         }
 
-         private async Task<string> GenerateMatureDateYearWise(GenerateMatureDateDto generateMatureDateDto, ReceivedCalendarDto receivedCalendarDto)
+        private async Task<string> GenerateMatureDateYearWise(GenerateMatureDateDto generateMatureDateDto, ReceivedCalendarDto receivedCalendarDto)
         {
             int matureYear = receivedCalendarDto.CurrentYear + generateMatureDateDto.Period;
             if(receivedCalendarDto.CurrentMonth==1)
@@ -460,7 +469,8 @@ namespace MicroFinance.Services.DepositSetup
                     matureMonth = 12;
                 else
                     matureMonth-=1;
-                matureDay = (await _companyProfileService.GetCalendarByYearAndMonthService(receivedCalendarDto.CurrentYear, matureMonth)).NumberOfDay;
+                var activeYearCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
+                matureDay = (await _companyProfileService.GetCalendarByYearAndMonthService(activeYearCalendar.Year, matureMonth)).NumberOfDay;
             }
             return $"{matureYear}/{matureMonth}/{matureDay}";
         }
@@ -477,7 +487,8 @@ namespace MicroFinance.Services.DepositSetup
             if(receivedCalendarDto.CurrentDay==1)
             {
                 matureMonth-=1;
-                matureDay = (await _companyProfileService.GetCalendarByYearAndMonthService(receivedCalendarDto.CurrentYear, matureMonth)).NumberOfDay;
+                var activeYearCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
+                matureDay = (await _companyProfileService.GetCalendarByYearAndMonthService(activeYearCalendar.Year, matureMonth)).NumberOfDay;
             }
             return $"{matureYear}/{matureMonth}/{matureDay}";
         }
@@ -500,7 +511,8 @@ namespace MicroFinance.Services.DepositSetup
                 matureYear +=matureMonth / 12;
                 matureMonth %= 12;
             }
-            int totalNumberOfDaysInCurrentMonth = (await _companyProfileService.GetCalendarByYearAndMonthService(receivedCalendarDto.CurrentYear, matureMonth)).NumberOfDay;
+            var activeYearCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
+            int totalNumberOfDaysInCurrentMonth = (await _companyProfileService.GetCalendarByYearAndMonthService(activeYearCalendar.Year, matureMonth)).NumberOfDay;
             if(matureDay>totalNumberOfDaysInCurrentMonth)
                 matureDay = totalNumberOfDaysInCurrentMonth;
             

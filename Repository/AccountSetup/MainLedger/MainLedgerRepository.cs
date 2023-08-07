@@ -1,5 +1,6 @@
 using MicroFinance.DBContext;
 using MicroFinance.Dtos.AccountSetup.MainLedger;
+using MicroFinance.Exceptions;
 // using MicroFinance.DBContext.CompanyOperations;
 using MicroFinance.Models.AccountSetup;
 using Microsoft.EntityFrameworkCore;
@@ -20,12 +21,14 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         public async Task<AccountType> GetAccountType(int id)
         {
             _logger.LogInformation($"{DateTime.Now} (GetAccountType) Returing...");
-            return await _dbContext.AccountTypes.FindAsync(id);
+            return await _dbContext.AccountTypes.Where(at=>at.Id==id).AsNoTracking().SingleOrDefaultAsync();
         }
 
         public async Task<List<AccountType>> GetAccountTypes()
         {
-            var accountTypes = await _dbContext.AccountTypes.ToListAsync();
+            var accountTypes = await _dbContext.AccountTypes
+            .AsNoTracking()
+            .ToListAsync();
             return accountTypes;
         }
 
@@ -34,20 +37,27 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         // Operations Related to Group
         public async Task<bool> CheckIfGroupNameExist(int accountTypeId, string groupName)
         {
-            var group = await _dbContext.GroupTypes.Where(gt => gt.AccountTypeId == accountTypeId && gt.Name == groupName).FirstOrDefaultAsync();
+            var group = await _dbContext.GroupTypes
+            .Where(gt => gt.AccountTypeId == accountTypeId && gt.Name == groupName)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
             if (group != null) return true;
             return false;
         }
         public async Task<int> CreateGroupType(GroupType groupType)
         {
             _logger.LogInformation($"{DateTime.Now} (CreateGroupType) Creating...");
+            groupType.AccountType = await _dbContext.AccountTypes.FindAsync(groupType.Id);
             await _dbContext.GroupTypes.AddAsync(groupType);
-            return await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
+            _dbContext.Entry(groupType).State = EntityState.Detached;
+            return groupType.Id;
         }
 
         public async Task<int> UpdateGroupType(UpdateGroupTypeDto groupTypeDto)
         {
             var existingGroup = await _dbContext.GroupTypes.FindAsync(groupTypeDto.Id);
+            if(existingGroup == null) throw new NotFoundExceptionHandler("No Data Found for requested Group Type");
             existingGroup.NepaliName = groupTypeDto.NepaliName;
             existingGroup.Name = groupTypeDto.Name;
             existingGroup.Schedule = groupTypeDto.Schedule;
@@ -58,7 +68,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         {
             return await _dbContext.GroupTypes
             .Include(gt => gt.AccountType)
-            // .Include(gt => gt.DebitOrCredit)
+            .AsNoTracking()
             .SingleOrDefaultAsync(gt => gt.Id == id);
         }
 
@@ -66,6 +76,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         {
             var groupTypeForDepositScheme = await _dbContext.GroupTypes
             .Where(gt => gt.Name == name.ToUpper() && gt.AccountType.Name == accountTypeName.ToUpper())
+            .AsNoTracking()
             .FirstOrDefaultAsync();
             return groupTypeForDepositScheme;
         }
@@ -73,7 +84,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         public async Task<List<GroupType>> GetGroupTypes()
         {
             return await _dbContext.GroupTypes.Include(gt => gt.AccountType)
-            // .Include(gt => gt.DebitOrCredit)
+            .AsNoTracking()
             .ToListAsync();
         }
 
@@ -82,8 +93,8 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             var groupTypes =
             await _dbContext.GroupTypes
             .Include(gt => gt.AccountType)
-            // .Include(gt => gt.DebitOrCredit)
             .Where(gt => gt.AccountTypeId == accountTypeId)
+            .AsNoTracking()
             .ToListAsync();
             return groupTypes;
 
@@ -94,35 +105,45 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
 
         public async Task<bool> CheckIfLedgerNameExist(int groupTypeId, string ledgerName)
         {
-            var ledger = await _dbContext.Ledgers.Where(l => l.GroupTypeId == groupTypeId && l.Name == ledgerName).FirstOrDefaultAsync();
+            var ledger = await _dbContext.Ledgers
+            .Where(l => l.GroupTypeId == groupTypeId && l.Name == ledgerName)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
             if (ledger != null) return true;
             return false;
         }
         public async Task<int> CreateLedger(Ledger ledger)
         {
-            _logger.LogInformation($"{DateTime.Now} Creating Ledger...");
-            await _dbContext.Ledgers.AddAsync(ledger);
-            await _dbContext.SaveChangesAsync();
-            return await UpdateLedgerCode(ledger);
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+            {
+                _logger.LogInformation($"{DateTime.Now} Creating Ledger...");
+                try
+                {
+                    ledger.GroupType = await _dbContext.GroupTypes.FindAsync(ledger.GroupTypeId);
+                    await _dbContext.Ledgers.AddAsync(ledger);
+                    var status = await _dbContext.SaveChangesAsync();
+                    if (status <= 0) throw new Exception("Unable to Create Ledger");
+                    var codeUpdate = await UpdateLedgerCode(ledger);
+                    if (codeUpdate <= 0) throw new Exception("Unable to assign the code");
+                    await transaction.CommitAsync();
+                    return ledger.Id;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception(ex.Message);
+                }
+            }
 
         }
         private async Task<int> UpdateLedgerCode(Ledger ledger)
         {
-            try
-            {
-                var existingledger = await _dbContext.Ledgers.FindAsync(ledger.Id);
-                existingledger.LedgerCode = ledger.Id;
-                var statusLedgerCode = await _dbContext.SaveChangesAsync();
-                if(statusLedgerCode<1) throw new Exception("Failed To Create Ledger");
-                return existingledger.Id;
-            }
-            catch (Exception ex)
-            {
-                _dbContext.Ledgers.Remove(ledger);
-                await _dbContext.SaveChangesAsync();
-                throw new Exception(ex.Message);
-            }
-
+            var existingledger = await _dbContext.Ledgers.FindAsync(ledger.Id);
+            _dbContext.Entry(existingledger).State = EntityState.Detached;
+            _dbContext.Ledgers.Attach(ledger);
+            existingledger.LedgerCode = ledger.Id;
+            _dbContext.Entry(ledger).State = EntityState.Modified;
+            return await _dbContext.SaveChangesAsync();
         }
         public async Task<int> EditLedger(UpdateLedgerDto ledger)
         {
@@ -133,6 +154,12 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             existingLedger.DepreciationRate = ledger.DepreciationRate;
             existingLedger.HisabNumber = ledger.HisabNumber;
             existingLedger.Name = ledger.Name;
+            if(existingLedger.IsBank==true)
+            {
+                var exisitngBank =  await _dbContext.BankSetups.Where(bs=>bs.LedgerId==existingLedger.Id).FirstOrDefaultAsync();
+                exisitngBank.NepaliName = existingLedger.NepaliName;
+                exisitngBank.Name = existingLedger.Name; 
+            }
             return await _dbContext.SaveChangesAsync();
         }
 
@@ -143,11 +170,15 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             .Include(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
             .Where(l => l.Id == id)
+            .AsNoTracking()
             .FirstOrDefaultAsync();
         }
         public async Task<List<Ledger>> GetLedgers()
         {
-            return await _dbContext.Ledgers.Include(l => l.GroupType).ThenInclude(gt => gt.AccountType)
+            return await _dbContext.Ledgers
+            .Include(l => l.GroupType)
+            .ThenInclude(gt => gt.AccountType)
+            .AsNoTracking()
             .ToListAsync();
             //return await _dbContext.Ledgers.ToListAsync();
         }
@@ -158,6 +189,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             .Include(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
             .Where(l => l.GroupType.AccountTypeId == accountTypeId)
+            .AsNoTracking()
             .ToListAsync();
             return ledgers;
         }
@@ -168,6 +200,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             .Include(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
             .Where(l => l.GroupTypeId == groupTypeId)
+            .AsNoTracking()
             .ToListAsync();
             return ledgers;
         }
@@ -180,39 +213,55 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         /// <returns></returns>
         public async Task<Ledger> GetLedgerByGroupTypeAndLedgerName(GroupType groupType, string ledgerName)
         {
-            return await _dbContext.Ledgers.Where(l => l.GroupTypeId == groupType.Id && l.Name == ledgerName.ToUpper()).FirstOrDefaultAsync();
+            return await _dbContext.Ledgers
+            .Where(l => l.GroupTypeId == groupType.Id && l.Name == ledgerName.ToUpper())
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
         }
 
-
+        private async Task CreateLedgerForBank(Ledger ledger)
+        {
+            await _dbContext.Ledgers.AddAsync(ledger);
+            var ledgerUpdate = await _dbContext.SaveChangesAsync();
+            if(ledgerUpdate<=0) throw new Exception("Not able to create ledger for bank");
+            await UpdateLedgerCode(ledger);
+        }
 
         // Operations Related to Bank Setup
         public async Task<int> CreateBankSetup(BankSetup bankSetup)
         {
-            var groupType = await _dbContext.GroupTypes.Where(gt => gt.CharKhataNumber == "90").FirstOrDefaultAsync();
-            Ledger ledger = await _dbContext.Ledgers.Where(l => l.GroupTypeId == groupType.Id && l.Name == bankSetup.Name.ToUpper()).FirstOrDefaultAsync();
-            if (ledger == null)
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
             {
-                ledger = new Ledger()
+                try
                 {
-                    GroupType = groupType,
-                    Name = bankSetup.Name,
-                    NepaliName = bankSetup.NepaliName,
-                    EntryDate = DateTime.Now,
-                    IsSubLedgerActive = false,
-                    IsBank = true
-                };
-                await _dbContext.Ledgers.AddAsync(ledger);
-                await _dbContext.SaveChangesAsync();
+                    bankSetup.BankType = await _dbContext.BankTypes.FindAsync(bankSetup.BankTypeId);
+                    var groupType = await _dbContext.GroupTypes.Where(gt => gt.CharKhataNumber == "90").FirstOrDefaultAsync();
+                    Ledger ledger = await _dbContext.Ledgers.Where(l => l.GroupTypeId == groupType.Id && l.Name == bankSetup.Name.ToUpper()).FirstOrDefaultAsync();
+                    if (ledger != null) throw new Exception("Ledger for Bank already exist");
+                    ledger = new Ledger()
+                    {
+                        GroupType = groupType,
+                        Name = bankSetup.Name,
+                        NepaliName = bankSetup.NepaliName,
+                        EntryDate = DateTime.Now,
+                        IsSubLedgerActive = false,
+                        IsBank = true
+                    };
+                    await CreateLedgerForBank(ledger);
+                    bankSetup.Ledger = ledger;
+                    await _dbContext.BankSetups.AddAsync(bankSetup);
+                    var addStatus = await _dbContext.SaveChangesAsync();
+                    if(addStatus<=0) throw new Exception("Unable to create bank");
+                    await transaction.CommitAsync();
+                    return bankSetup.Id;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception(ex.Message);
+                }
             }
-            bankSetup.Ledger = ledger;
-            await _dbContext.BankSetups.AddAsync(bankSetup);
-            var addStatus = await _dbContext.SaveChangesAsync();
-            if (addStatus < 1)
-            {
-                _dbContext.Ledgers.Remove(ledger);
-                await _dbContext.SaveChangesAsync();
-            }
-            return bankSetup.Id;
+
         }
 
         public async Task<int> EditBankSetup(UpdateBankSetup bankSetup)
@@ -234,6 +283,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             return await _dbContext.BankSetups
             .Include(bs => bs.Ledger)
             .Include(bs => bs.BankType)
+            .AsNoTracking()
             .ToListAsync();
         }
         public async Task<BankSetup> GetBankSetupById(int id)
@@ -241,6 +291,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             return await _dbContext.BankSetups
             .Include(bs => bs.Ledger)
             .Include(bs => bs.BankType)
+            .AsNoTracking()
             .SingleOrDefaultAsync(gtd => gtd.Id == id);
         }
         public async Task<List<BankSetup>> GetBankSetupByLedger(int ledgerId)
@@ -249,56 +300,52 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             .Where(bs => bs.LedgerId == ledgerId)
             .Include(bs => bs.Ledger)
             .Include(bs => bs.BankType)
+            .AsNoTracking()
             .ToListAsync();
         }
 
         public async Task<List<BankType>> GetAllBankType()
         {
-            return await _dbContext.BankTypes.ToListAsync();
+            return await _dbContext.BankTypes.AsNoTracking().ToListAsync();
         }
         public async Task<BankType> GetBankTypeById(int id)
         {
-            return await _dbContext.BankTypes.FindAsync(id);
+            return await _dbContext.BankTypes.Where(bs=>bs.Id==id).AsNoTracking().SingleOrDefaultAsync();
         }
         // Operation related to Subledger
         public async Task<int> CreateSubLedger(SubLedger subLedger)
         {
-            await _dbContext.SubLedgers.AddAsync(subLedger);
-            var subLedgerCreateStatus = await _dbContext.SaveChangesAsync();
-            if(subLedgerCreateStatus>=1)
-                return subLedger.Id;
-            return 0;
-        }
-        public async Task<int> UpdateSubLedgerCode(int subLedgerId)
-        {
-            var existingSubLedger = await _dbContext.SubLedgers.FindAsync(subLedgerId);
-            try
+            using (var processTransaction = await _dbContext.Database.BeginTransactionAsync())
             {
-                existingSubLedger.SubLedgerCode = subLedgerId;
-                var statusLedgerCode = await _dbContext.SaveChangesAsync();
-                if(statusLedgerCode<1) throw new Exception("Failed To Create Ledger");
-                return existingSubLedger.Id;
-            }
-            catch(Exception ex)
-            {
-                _dbContext.SubLedgers.Remove(existingSubLedger);
-                await _dbContext.SaveChangesAsync();
-                throw new Exception(ex.Message);
-            }
-        }
-        public async Task<int> CreateMultipleSubLedger(List<SubLedger> subLedgers)
-        {
-           await _dbContext.SubLedgers.AddRangeAsync(subLedgers);
-           var createStatus = await _dbContext.SaveChangesAsync();
-           if(createStatus>=1)
-           {
-                foreach (var subledger in subLedgers)
+                try
                 {
-                    await UpdateSubLedgerCode(subledger.Id);
+                    subLedger.Ledger = await _dbContext.Ledgers.FindAsync(subLedger.LedgerId);
+                    await _dbContext.SubLedgers.AddAsync(subLedger);
+                    var subLedgerCreateStatus = await _dbContext.SaveChangesAsync();
+                    if (subLedgerCreateStatus <= 0) throw new Exception("Unable to create subledger");
+                    var updateCodeStatus = await UpdateSubLedgerCode(subLedger);
+                    if (updateCodeStatus <= 0) throw new Exception("Unable To access SubLedger Code");
+                    await processTransaction.CommitAsync();
+                    return subLedger.Id;
                 }
-           }
-           return createStatus;
+                catch (Exception ex)
+                {
+                    await processTransaction.RollbackAsync();
+                    throw new Exception(ex.Message);
+                }
+            }
         }
+        public async Task<int> UpdateSubLedgerCode(SubLedger subLedger)
+        {
+            var existingSubLedger = await _dbContext.SubLedgers.FindAsync(subLedger.Id);
+            _dbContext.Entry(existingSubLedger).State = EntityState.Detached;
+            subLedger.SubLedgerCode = subLedger.Id;
+            _dbContext.SubLedgers.Attach(subLedger);
+            _dbContext.Entry(subLedger).State = EntityState.Modified;
+            var status = await _dbContext.SaveChangesAsync();
+            return status;
+        }
+
         public async Task<int> EditSubledger(SubLedger subLedger)
         {
             var existingSubLedger = await _dbContext.SubLedgers.FindAsync(subLedger.Id);
@@ -312,15 +359,16 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             .Include(sl => sl.Ledger)
             .ThenInclude(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
+            .AsNoTracking()
             .Where(sl => sl.Id == id).FirstOrDefaultAsync();
         }
         public async Task<SubLedger> GetSubLedgerById(int id)
         {
-            return await _dbContext.SubLedgers.Include(sl => sl.Ledger).Where(sl => sl.Id == id).FirstOrDefaultAsync();
+            return await _dbContext.SubLedgers.Include(sl => sl.Ledger).Where(sl => sl.Id == id).AsNoTracking().FirstOrDefaultAsync();
         }
         public async Task<SubLedger> GetSubLedgerByNameAndLedgerId(string subLedgerName, int ledgerId)
         {
-            return await _dbContext.SubLedgers.Where(sl=>sl.Name==subLedgerName&&sl.LedgerId==ledgerId).SingleOrDefaultAsync();
+            return await _dbContext.SubLedgers.Where(sl => sl.Name == subLedgerName && sl.LedgerId == ledgerId).AsNoTracking().SingleOrDefaultAsync();
         }
 
         public async Task<List<SubLedger>> GetSubLedgers()
@@ -329,6 +377,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             .Include(sl => sl.Ledger)
             .ThenInclude(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
+            .AsNoTracking()
             .ToListAsync();
         }
 
@@ -339,6 +388,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             .ThenInclude(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
             .Where(sl => sl.LedgerId == ledgerId)
+            .AsNoTracking()
             .ToListAsync();
         }
 
@@ -349,6 +399,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             .ThenInclude(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
             .Where(sl => sl.Ledger.GroupType.AccountTypeId == accountTypeId)
+            .AsNoTracking()
             .ToListAsync();
         }
 
@@ -359,16 +410,17 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             .ThenInclude(l => l.GroupType)
             .ThenInclude(gt => gt.AccountType)
             .Where(sl => sl.Ledger.GroupTypeId == groupTypeId)
+            .AsNoTracking()
             .ToListAsync();
         }
         // DEBIT CREDIT
         public async Task<DebitOrCredit> GetDebitOrCreditById(int id)
         {
-            return await _dbContext.DebitOrCredits.FindAsync(id);
+            return await _dbContext.DebitOrCredits.Where(dc=>dc.Id==id).AsNoTracking().SingleOrDefaultAsync();
         }
         public async Task<List<DebitOrCredit>> GetDebitOrCredits()
         {
-            return await _dbContext.DebitOrCredits.ToListAsync();
+            return await _dbContext.DebitOrCredits.AsNoTracking().ToListAsync();
         }
     }
 }
