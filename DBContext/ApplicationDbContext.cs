@@ -7,11 +7,15 @@ using MicroFinance.Models.DepositSetup.HelperTable;
 using MicroFinance.Models.RecordsWithCode;
 using MicroFinance.Models.Share;
 using MicroFinance.Models.Transactions;
+using MicroFinance.Models.UserManagement;
+using MicroFinance.Role;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace MicroFinance.DBContext
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
         private readonly ILoggerFactory _logger;
 
@@ -36,6 +40,19 @@ namespace MicroFinance.DBContext
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
+            modelBuilder.Entity<Employee>().HasIndex(u=> u.Email).IsUnique();
+
+            modelBuilder.Entity<User>()
+            .HasOne(a=>a.Employee)
+            .WithOne(a=>a.User)
+            .HasForeignKey<User>(u => u.EmployeeId).IsRequired(false);
+
+            modelBuilder.Entity<IdentityRole>().HasData(
+                new IdentityRole { Name = UserRole.Marketing.ToString(), NormalizedName = UserRole.Marketing.ToString().ToUpper()},
+                new IdentityRole { Name = UserRole.Assistant.ToString(), NormalizedName = UserRole.Assistant.ToString().ToUpper()},
+                new IdentityRole { Name = UserRole.SeniorAssistant.ToString(), NormalizedName = UserRole.SeniorAssistant.ToString().ToUpper()},
+                new IdentityRole { Name = UserRole.Officer.ToString(), NormalizedName = UserRole.Officer.ToString().ToUpper()},
+                new IdentityRole {Name = UserRole.SuperAdmin.ToString(), NormalizedName = UserRole.SuperAdmin.ToString().ToUpper()});
             //Start: Client Setup
 
             modelBuilder.Entity<ClientGroup>()
@@ -51,6 +68,7 @@ namespace MicroFinance.DBContext
             .HasForeignKey(fir => fir.DepositSchemeId)
             .OnDelete(DeleteBehavior.ClientSetNull);
         }
+        public DbSet<Employee> Employees { get; set; }
 
         // Start: MainLedger Setup
         public DbSet<AccountType> AccountTypes { get; set; }

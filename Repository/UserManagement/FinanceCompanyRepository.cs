@@ -1,5 +1,6 @@
 using System.Transactions;
-using MicroFinance.DBContext.UserManagement;
+using MicroFinance.DBContext;
+// using MicroFinance.DBContext.UserManagement;
 using MicroFinance.Exceptions;
 using MicroFinance.Models.UserManagement;
 using Microsoft.AspNetCore.Identity;
@@ -12,21 +13,26 @@ namespace MicroFinance.Repository.UserManagement
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly UserDbContext _userDbContext;
+        // private readonly UserDbContext _userDbContext;
         private readonly ILogger<EmployeeRepository> _logger;
+        private readonly ApplicationDbContext _dbContext;
 
-        public EmployeeRepository(
+        public EmployeeRepository
+        (
             ILogger<EmployeeRepository> logger,
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             RoleManager<IdentityRole> roleManager,
-            UserDbContext userDbContext)
+            // UserDbContext userDbContext,
+            ApplicationDbContext dbContext
+        )
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
-            _userDbContext = userDbContext;
+            // _userDbContext = userDbContext;
             _logger = logger;
+            _dbContext=dbContext;
 
         }
         // START: User
@@ -37,7 +43,7 @@ namespace MicroFinance.Repository.UserManagement
 
         public async Task<User> Register(User user, string password, string role)
         {
-            using var transaction = await _userDbContext.Database.BeginTransactionAsync();
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
             var userCreate = await _userManager.CreateAsync(user, password);
             string errorDescription = "Not able to Create User";
             string errorCode = "Invalid";
@@ -147,21 +153,21 @@ namespace MicroFinance.Repository.UserManagement
         // START: Employee
         public async Task<int> CreateEmployee(Employee employee)
         {
-            await _userDbContext.Employees.AddAsync(employee);
-            return await _userDbContext.SaveChangesAsync();
+            await _dbContext.Employees.AddAsync(employee);
+            return await _dbContext.SaveChangesAsync();
         }
         // Admin Task or User Task
         public async Task<int> EditEmployeeProfile(Employee updateEmployee, string oldEmail)
         {
             string newEmail = updateEmployee.Email;
-            var existingEmployee = await _userDbContext.Employees.FindAsync(updateEmployee.Id);
+            var existingEmployee = await _dbContext.Employees.FindAsync(updateEmployee.Id);
             using (var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 try
                 {
-                    _userDbContext.Entry(existingEmployee).State = EntityState.Detached;
-                    _userDbContext.Employees.Attach(updateEmployee);
-                    _userDbContext.Entry(updateEmployee).State = EntityState.Modified;
+                    _dbContext.Entry(existingEmployee).State = EntityState.Detached;
+                    _dbContext.Employees.Attach(updateEmployee);
+                    _dbContext.Entry(updateEmployee).State = EntityState.Modified;
                     if (oldEmail != newEmail)
                     {
                         var existingUserWithOldEmail = await _userManager.FindByEmailAsync(oldEmail);
@@ -173,7 +179,7 @@ namespace MicroFinance.Repository.UserManagement
                             await _userManager.UpdateAsync(existingUserWithOldEmail);
                         }
                     }
-                    await _userDbContext.SaveChangesAsync();
+                    await _dbContext.SaveChangesAsync();
                     transactionScope.Complete();
                     return 1;
                 }
@@ -187,16 +193,16 @@ namespace MicroFinance.Repository.UserManagement
 
         public async Task<List<Employee>> GetEmployees()
         {
-            return await _userDbContext.Employees.ToListAsync();
+            return await _dbContext.Employees.ToListAsync();
         }
         public async Task<Employee> GetEmployeeById(int id)
         {
-            return await _userDbContext.Employees.FindAsync(id);
+            return await _dbContext.Employees.FindAsync(id);
         }
 
         public async Task<Employee> GetEmployeeByEmail(string email)
         {
-            var employee = await _userDbContext.Employees
+            var employee = await _dbContext.Employees
                     .FirstOrDefaultAsync(u => u.Email == email);
 
             return employee;
@@ -204,8 +210,8 @@ namespace MicroFinance.Repository.UserManagement
 
         public async Task<int> DeleteEmployee(Employee employee)
         {
-            _userDbContext.Employees.Remove(employee);
-            return await _userDbContext.SaveChangesAsync();
+            _dbContext.Employees.Remove(employee);
+            return await _dbContext.SaveChangesAsync();
         }
         //END: Employee
     }

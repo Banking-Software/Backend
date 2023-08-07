@@ -18,18 +18,12 @@ namespace MicroFinance.Repository.CompanyProfile
             await _companyProfileDbContex.Branches.AddAsync(branch);
             return await _companyProfileDbContex.SaveChangesAsync();
         }
-
-        
-
         public async Task<int> CreateCompanyProfile(CompanyDetail companyDetail)
         {
             await _companyProfileDbContex.CompanyDetails.AddAsync(companyDetail);
             await _companyProfileDbContex.SaveChangesAsync();
             return companyDetail.Id;
         }
-
-        
-
         public async Task<Branch> GetBranchByBranchCode(string branchCode)
         {
             var branch = await _companyProfileDbContex.Branches.Where(b=>b.BranchCode==branchCode).FirstOrDefaultAsync();

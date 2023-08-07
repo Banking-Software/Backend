@@ -93,11 +93,11 @@ namespace MicroFinance.Services.CompanyProfile
         {
             var companyDetail = await _companyProfile.GetCompanyDetail();
             if(companyDetail==null) 
-                throw new Exception("Please Create Company Profile");
+                throw new Exception("Company Profile Has not Created Yet");
             var companyDetailDto = _mapper.Map<CompanyProfileDto>(companyDetail);
             if(companyDetail.LogoFileData!=null)
             {
-                companyDetailDto.LogoFileUrl = Convert.ToBase64String(companyDetail.LogoFileData);
+                companyDetailDto.LogoFileData = Convert.ToBase64String(companyDetail.LogoFileData);
             }
             return companyDetailDto;
         }

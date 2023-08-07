@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 using MicroFinance.DBContext;
-using MicroFinance.DBContext.UserManagement;
+// using MicroFinance.DBContext.UserManagement;
 using MicroFinance.Middleware;
 using MicroFinance.Models.UserManagement;
 using MicroFinance.SeedData;
@@ -37,7 +37,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbServiceExtension(builder.Configuration);
 
 // Identity Service /////////////////////////////////////////////////////
-builder.Services.AddSuperAdminIdentityServiceAsync(builder.Configuration);
+// builder.Services.AddSuperAdminIdentityServiceAsync(builder.Configuration);
 builder.Services.AddApplicationServiceExtension();
 builder.Services.AddUserIdentityServiceAsync(builder.Configuration);
 ////////////////////////////////////////////////////////////////////////
@@ -99,14 +99,16 @@ using (var scope = app.Services.CreateScope())
         try
         {
 
-            var superAdminDbContext = services.GetRequiredService<SuperAdminDbContext>();
-            await superAdminDbContext.Database.MigrateAsync();
-            var superAdminUserManager = services.GetRequiredService<UserManager<SuperAdmin>>();
-            await UserDbContextSeed.SeedSuperAdminRoleAsync(superAdminDbContext, superAdminUserManager);
-            var userDbContext = services.GetRequiredService<UserDbContext>();
-            await userDbContext.Database.MigrateAsync();
+            // var superAdminDbContext = services.GetRequiredService<SuperAdminDbContext>();
+            // await superAdminDbContext.Database.MigrateAsync();
+
+            
+            // var userDbContext = services.GetRequiredService<UserDbContext>();
+            // await userDbContext.Database.MigrateAsync();
             var dbContext = services.GetRequiredService<ApplicationDbContext>();
             await dbContext.Database.MigrateAsync();
+            var superAdminUserManager = services.GetRequiredService<UserManager<User>>();
+            await UserDbContextSeed.SeedSuperAdminRoleAsync(dbContext, superAdminUserManager);
 
             await LedgerDbContextSeed.SeedMainLedgerAsync(dbContext);
             await ClientDbContextSeed.SeedClientInfoAsync(dbContext);

@@ -40,7 +40,6 @@ namespace MicroFinance.Repository.Transaction
             using (var processTransaction = await _dbContext.Database.BeginTransactionAsync())
             {
                 // Lock the transaction
-
                 SemaphoreSlim shareAccountLock = LockManager.Instance.GetShareAccountLock(shareAccountTransactionWrapper.ShareAccountId);
                 await shareAccountLock.WaitAsync();
                 SemaphoreSlim shareKittaLock = LockManager.Instance.GetShareAccountLock(shareAccountTransactionWrapper.ShareKittaId);
@@ -117,8 +116,6 @@ namespace MicroFinance.Repository.Transaction
             }
 
         }
-
-
         private async Task<BaseTransaction> MakeTransaction(ShareAccountTransactionWrapper shareAccountTransactionWrapper)
         {
             bool isDepositInShareAccount = false;
@@ -146,9 +143,6 @@ namespace MicroFinance.Repository.Transaction
         {
             var depositAccountTransactionWrapper = await GetDepositAccountTransactionWrapper(baseTransaction, shareAccountTransactionWrapper);
             var depositAccount = await _depositAccountTransactionRepository.BaseTransactionOnDepositAccount(depositAccountTransactionWrapper, baseTransaction);
-            // var depositAccount = await TransactionOnDepositAccount(depositAccountTransactionWrapper);
-            // await CreateDepositAccountTransactionEntry(depositAccountTransactionWrapper, baseTransaction, depositAccount);
-            // await BaseTransactionOnSubLedger(baseTransaction, depositAccountTransactionWrapper);
             return depositAccount;
         }
         private async Task<DepositAccountTransactionWrapper> GetDepositAccountTransactionWrapper(BaseTransaction baseTransaction, ShareAccountTransactionWrapper shareAccountTransactionWrapper)
@@ -184,91 +178,11 @@ namespace MicroFinance.Repository.Transaction
             depositAccountTransactionWrapper.DepositSchemeId = depositSchemeId;
             return depositAccountTransactionWrapper;
         }
-        // private async Task<DepositAccount> TransactionOnDepositAccount(DepositAccountTransactionWrapper depositAccountTransactionWrapper)
-        // {
-        //     DepositAccount depositAccount = await _dbContext.DepositAccounts.FindAsync(depositAccountTransactionWrapper.DepositAccountId);
-        //     if (depositAccount != null)
-        //     {
-        //         depositAccount.PrincipalAmount = depositAccountTransactionWrapper.TransactionType==TransactionTypeEnum.Credit
-        //         ?
-        //         depositAccount.PrincipalAmount + depositAccountTransactionWrapper.TransactionAmount
-        //         :
-        //         depositAccount.PrincipalAmount - depositAccountTransactionWrapper.TransactionAmount;
-        //         if (depositAccount.PrincipalAmount < 0)
-        //         {
-        //             throw new BadRequestExceptionHandler($"Negative Transaction: current balance of {depositAccount.AccountNumber} will go to negative");
-        //         }
-        //         return depositAccount;
-        //     }
-        //     throw new Exception("No Deposit Account found");
-        // }
-        // private async Task CreateDepositAccountTransactionEntry(DepositAccountTransactionWrapper depositAccountTransactionWrapper, BaseTransaction baseTransaction, DepositAccount depositAccount)
-        // {
-        //     DepositAccountTransaction depositAccountTransaction = new DepositAccountTransaction()
-        //     {
-        //         Transaction = baseTransaction,
-        //         DepositAccount = depositAccount,
-        //         TransactionType = depositAccountTransactionWrapper.TransactionType,
-        //         WithDrawalType = depositAccountTransactionWrapper.WithDrawalType,
-        //         WithDrawalChequeNumber = depositAccountTransactionWrapper.WithDrawalChequeNumber,
-        //         CollectedByEmployeeId = depositAccountTransactionWrapper.CollectedByEmployeeId,
-        //         Narration = depositAccountTransactionWrapper.Narration,
-        //         Source = depositAccountTransactionWrapper.Source,
-        //         BalanceAfterTransaction = depositAccount.PrincipalAmount
-        //     };
-        //     await _dbContext.DepositAccountTransactions.AddAsync(depositAccountTransaction);
-        // }
-
-        // private async Task BaseTransactionOnSubLedger(BaseTransaction baseTransaction, DepositAccountTransactionWrapper depositAccountTransactionWrapper)
-        // {
-        //     var depositSchemeSubLedger = await TransactionOnSubLedger(baseTransaction, depositAccountTransactionWrapper);
-        //     await CreateDepositSchemeSubLedgerTransactionEntry(baseTransaction, depositSchemeSubLedger, depositAccountTransactionWrapper);
-        // }
-
-        // private async Task<SubLedger> TransactionOnSubLedger(BaseTransaction baseTransaction, DepositAccountTransactionWrapper depositAccountTransactionWrapper)
-        // {
-        //     SubLedger depositSchemeSubledger = await _dbContext.SubLedgers
-        //     .Include(sl=>sl.Ledger)
-        //     .Where(sl=>sl.Id==depositAccountTransactionWrapper.DepositSchemeSubLedgerId)
-        //     .SingleOrDefaultAsync();
-        //     if(depositSchemeSubledger!=null)
-        //     {
-        //         if(depositAccountTransactionWrapper.TransactionType==TransactionTypeEnum.Credit)
-        //         {
-        //             depositSchemeSubledger.CurrentBalance+=depositAccountTransactionWrapper.TransactionAmount;
-        //             depositSchemeSubledger.Ledger.CurrentBalance+=depositAccountTransactionWrapper.TransactionAmount;
-        //         }
-        //         else
-        //         {
-        //             depositSchemeSubledger.CurrentBalance-=depositAccountTransactionWrapper.TransactionAmount;
-        //             depositSchemeSubledger.Ledger.CurrentBalance-=depositAccountTransactionWrapper.TransactionAmount;
-        //         }
-        //         if(depositSchemeSubledger.CurrentBalance<0 || depositSchemeSubledger.Ledger.CurrentBalance<0)
-        //         {
-        //             throw new Exception("(Negative Balance: Current Transaction will lead SubLedger and Ledger to negative balance)");
-        //         }
-        //         return depositSchemeSubledger;
-        //     }
-        //     throw new Exception("No subLedger found for given deposit account");
-        // }
-        // private async Task CreateDepositSchemeSubLedgerTransactionEntry(BaseTransaction baseTransaction, SubLedger depositSchemeSubLedger ,DepositAccountTransactionWrapper depositAccountTransactionWrapper)
-        // {
-        //     SubLedgerTransaction subLedgerTransaction = new()
-        //     {
-        //         Transaction = baseTransaction,
-        //         SubLedger = depositSchemeSubLedger,
-        //         TransactionType = depositAccountTransactionWrapper.TransactionType,
-        //         Remarks = "Update on Subledger during share transaction",
-        //         BalanceAfterTransaction = depositSchemeSubLedger.CurrentBalance
-        //     };
-        //     await _dbContext.SubLedgerTransactions.AddAsync(subLedgerTransaction);
-        // }
-
+     
         private async Task BaseTransactionOnShareAccount(BaseTransaction baseTransaction,ShareAccountTransactionWrapper shareAccountTransactionWrapper, DepositAccount paymentOrTransferDepositAccount)
         {
             var shareAccount = await TransactionOnShareAccount(shareAccountTransactionWrapper);
             await CreateShareTransactionEntry(shareAccountTransactionWrapper, baseTransaction, shareAccount, paymentOrTransferDepositAccount);
-            //return shareAccount;
         }
 
         private async Task CreateShareTransactionEntry(ShareAccountTransactionWrapper shareAccountTransactionWrapper, BaseTransaction baseTransaction, ShareAccount shareAccount, DepositAccount paymentOrTransferDepositAccount)
@@ -294,7 +208,6 @@ namespace MicroFinance.Repository.Transaction
                 shareTransaction.PaymentDepositAccount = paymentOrTransferDepositAccount;
                 shareTransaction.Remarks =$"Share is {shareAccountTransactionWrapper.ShareTransactionType} through {paymentOrTransferDepositAccount.AccountNumber} account";
             }
-            
             await _dbContext.ShareTransactions.AddAsync(shareTransaction);
         }
 
@@ -327,47 +240,6 @@ namespace MicroFinance.Repository.Transaction
             if(shareKitta==null) throw new Exception("No any available kitta");
             shareKitta.CurrentKitta += TransactionAmount / shareKitta.PriceOfOneKitta ;
         }
-        // private async Task BaseTransactionOnLedger(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, TransactionTypeEnum ledgerTransactionType)
-        // {
-        //     Ledger paymentMethodLedger =  await TransactionOnLedger( baseTransaction,  paymentType, ledgerTransactionType);
-        //     await CreateLedgerTransactionEntry(baseTransaction, paymentMethodLedger, ledgerTransactionType);
-        // }
-        // private async Task<Ledger> TransactionOnLedger(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, TransactionTypeEnum ledgerTransactionType)
-        // {
-        //     Ledger ledger = paymentType==PaymentTypeEnum.Cash
-        //     ? 
-        //     await _dbContext.Ledgers.Where(l=>l.LedgerCode==1).SingleOrDefaultAsync() // In Cash of Cash Transaction
-        //     :
-        //     await _dbContext.Ledgers.Where(l=>l.Id == baseTransaction.BankDetail.LedgerId).SingleOrDefaultAsync();
-            
-        //     if(ledger!=null)
-        //     {
-        //         ledger.CurrentBalance = ledgerTransactionType==TransactionTypeEnum.Credit
-        //         ?
-        //         ledger.CurrentBalance+baseTransaction.TransactionAmount
-        //         :
-        //         ledger.CurrentBalance-baseTransaction.TransactionAmount;
-        //         if(ledger.CurrentBalance<0)
-        //         {
-        //             throw new Exception("Negative Balance: Your payment method leads to negative balance in ledger");
-        //         }
-        //         return ledger;
-        //     }
-        //     throw new Exception("No Ledger Found that satisfy your payment method");
-        // }
-
-        // private async Task CreateLedgerTransactionEntry(BaseTransaction baseTransaction, Ledger paymentMethodLedger, TransactionTypeEnum ledgerTransactionType)
-        // {
-        //     LedgerTransaction ledgerTransaction = new()
-        //     {
-        //         Transaction = baseTransaction,
-        //         Ledger = paymentMethodLedger,
-        //         TransactionType = ledgerTransactionType,
-        //         Remarks = $"{baseTransaction.TransactionAmount} is {ledgerTransactionType}",
-        //         BalanceAfterTransaction = paymentMethodLedger.CurrentBalance
-        //     };
-        //     await _dbContext.LedgerTransactions.AddAsync(ledgerTransaction);
-        // }
         private async Task<BaseTransaction> GenerateVoucherNumber(BaseTransaction baseTransaction)
         {
             var existingBaseTransaction = await _dbContext.Transactions.FindAsync(baseTransaction.Id);

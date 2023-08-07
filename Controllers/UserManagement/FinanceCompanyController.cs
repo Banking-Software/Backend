@@ -7,6 +7,7 @@ using MicroFinance.ErrorManage;
 using MicroFinance.Exceptions;
 using MicroFinance.Role;
 using MicroFinance.Services;
+using MicroFinance.Services.CompanyProfile;
 using MicroFinance.Services.UserManagement;
 using MicroFinance.Token;
 using Microsoft.AspNetCore.Authorization;
@@ -21,19 +22,22 @@ namespace MicroFinance.Controllers.UserManagement
         private readonly ILogger<FinanceCompanyController> _logger;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
+        private readonly ICompanyProfileService _companyProfileService;
 
         public FinanceCompanyController
         (
             IEmployeeService employeeService,
             ILogger<FinanceCompanyController> logger,
             IMapper mapper,
-            ITokenService tokenService
+            ITokenService tokenService,
+            ICompanyProfileService companyProfileService
         )
         {
             _employeeService = employeeService;
             _logger = logger;
             _mapper = mapper;
             _tokenService = tokenService;
+            _companyProfileService=companyProfileService;
         }
 
         private TokenDto GetDecodedToken()
@@ -57,24 +61,23 @@ namespace MicroFinance.Controllers.UserManagement
         [AllowAnonymous]
         public async Task<ActionResult<TokenResponseDto>> Login(UserLoginDto userLoginDto)
         {
-
             var user = await _employeeService.GetUserByUserNameService(userLoginDto.UserName);
+            var companyProfile = await _companyProfileService.GetCompanyProfileService();
             if (user.IsActive == false)
                 throw new UnAuthorizedExceptionHandler("Unauthorized Access. Contact Officer");
+            if(companyProfile.CompanyValidityEndDate < DateTime.Now)
+                throw new UnAuthorizedExceptionHandler($"Software Validity Ended on {companyProfile.CompanyValidityEndDate}. Please Contact Software Provider");
             var tokenResponseDto = await _employeeService.LoginService(userLoginDto);
             return Ok(tokenResponseDto);
-
         }
 
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         [HttpPut("updateUserPassword")]
         public async Task<ActionResult<ResponseDto>> UpdateUserPassword(UpdateUserPasswordDto updateUserPasswordDto)
         {
-
             var userName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
             var updateStatus = await _employeeService.UpdatePasswordService(updateUserPasswordDto, userName);
             return Ok(updateStatus);
-
         }
 
         [TypeFilter(typeof(IsUserOfficerFilter))]

@@ -34,45 +34,68 @@ namespace MicroFinance.Repository.Transaction
             _mapper = mapper;
             _transactionDbContext = transactionDbContext;
         }
-
-
-        // public async Task<string> MakeDeposit(DepositAccountTransactionWrapper depositWrapper)
-        // {
-        //     _logger.LogInformation($"{DateTime.Now}: Depositing {depositWrapper.TransactionAmount} by {depositWrapper.CreatedBy} on Deposit Account Id: {depositWrapper.DepositAccountId}");
-        //     return await MakeTransactionOnDepositAccount(depositWrapper);
-        // }
-        // public async Task<string> MakeWithDrawal(DepositAccountTransactionWrapper withDrawalWrapper)
-        // {
-        //     _logger.LogInformation($"{DateTime.Now}: WithDrawal {withDrawalWrapper.TransactionAmount} by {withDrawalWrapper.CreatedBy} on Deposit Account Id: {withDrawalWrapper.DepositAccountId}");
-        //     return await MakeTransactionOnDepositAccount(withDrawalWrapper);
-        // }
         public async Task<string> MakeTransaction(DepositAccountTransactionWrapper transactionData)
         {
-             return await MakeTransactionOnDepositAccount(transactionData);
+            _transactionDbContext.ChangeTracker.Clear();
+            using var processTransaction = _transactionDbContext.Database.BeginTransaction();
+            _logger.LogInformation($"{DateTime.Now}: Locking required accounts for the Deposit transaction...");
+            int accountId = transactionData.DepositAccountId;
+            int depositSchemeSubLedgerId = transactionData.DepositSchemeSubLedgerId;
+            int depositSchemeLedgerId = transactionData.DepositSchemeLedgerId;
+            int paymentTypeLedgerId = transactionData.PaymentType == PaymentTypeEnum.Cash ? 1 : (int)transactionData.BankLedgerId;
+            SemaphoreSlim accountLock = LockManager.Instance.GetAccountLock(accountId);
+            await accountLock.WaitAsync();
+            SemaphoreSlim depositSchemeSubLedgerLock = LockManager.Instance.GetSubLedgerLock(depositSchemeSubLedgerId);
+            await depositSchemeSubLedgerLock.WaitAsync();
+            SemaphoreSlim depositSchemeLedgerLock = LockManager.Instance.GetLedgerLock(depositSchemeLedgerId);
+            await depositSchemeLedgerLock.WaitAsync();
+            SemaphoreSlim paymentTypeLedgerLock = LockManager.Instance.GetLedgerLock(paymentTypeLedgerId);
+            await paymentTypeLedgerLock.WaitAsync();
+            try
+            {
+                string voucherNumber = await MakeTransactionOnDepositAccount(transactionData);
+                _transactionDbContext.ChangeTracker.Clear();
+                await processTransaction.CommitAsync();
+                return voucherNumber;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{DateTime.Now}: {ex.Message} {ex?.InnerException?.Message}");
+                processTransaction.Rollback();
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                _logger.LogInformation($"{DateTime.Now}: Releasing the locks...");
+                accountLock.Release();
+                depositSchemeSubLedgerLock.Release();
+                depositSchemeLedgerLock.Release();
+                paymentTypeLedgerLock.Release();
+            }
         }
         private async Task<string> MakeTransactionOnDepositAccount(DepositAccountTransactionWrapper depositAccountTransactionWrapper)
         {
-            using (var processTransaction = _transactionDbContext.Database.BeginTransaction())
-            {
-                _transactionDbContext.ChangeTracker.Clear();
-                _logger.LogInformation($"{DateTime.Now}: Locking required accounts for the Deposit transaction...");
-                int accountId = depositAccountTransactionWrapper.DepositAccountId;
-                int depositSchemeSubLedgerId = depositAccountTransactionWrapper.DepositSchemeSubLedgerId;
-                int depositSchemeLedgerId =depositAccountTransactionWrapper.DepositSchemeLedgerId;
-                int paymentTypeLedgerId = depositAccountTransactionWrapper.PaymentType==PaymentTypeEnum.Cash ? 1 :(int) depositAccountTransactionWrapper.BankLedgerId;
-                SemaphoreSlim accountLock = LockManager.Instance.GetAccountLock(accountId);
-                await accountLock.WaitAsync();
-                SemaphoreSlim depositSchemeSubLedgerLock = LockManager.Instance.GetSubLedgerLock(depositSchemeSubLedgerId);
-                await depositSchemeSubLedgerLock.WaitAsync();
-                SemaphoreSlim depositSchemeLedgerLock = LockManager.Instance.GetLedgerLock(depositSchemeLedgerId);
-                await depositSchemeLedgerLock.WaitAsync();
-                SemaphoreSlim paymentTypeLedgerLock = LockManager.Instance.GetLedgerLock(paymentTypeLedgerId);
-                await paymentTypeLedgerLock.WaitAsync();
-                try
-                {
+            // using (var processTransaction = _transactionDbContext.Database.BeginTransaction())
+            // {
+            //     _transactionDbContext.ChangeTracker.Clear();
+            //     _logger.LogInformation($"{DateTime.Now}: Locking required accounts for the Deposit transaction...");
+            //     int accountId = depositAccountTransactionWrapper.DepositAccountId;
+            //     int depositSchemeSubLedgerId = depositAccountTransactionWrapper.DepositSchemeSubLedgerId;
+            //     int depositSchemeLedgerId = depositAccountTransactionWrapper.DepositSchemeLedgerId;
+            //     int paymentTypeLedgerId = depositAccountTransactionWrapper.PaymentType == PaymentTypeEnum.Cash ? 1 : (int)depositAccountTransactionWrapper.BankLedgerId;
+            //     SemaphoreSlim accountLock = LockManager.Instance.GetAccountLock(accountId);
+            //     await accountLock.WaitAsync();
+            //     SemaphoreSlim depositSchemeSubLedgerLock = LockManager.Instance.GetSubLedgerLock(depositSchemeSubLedgerId);
+            //     await depositSchemeSubLedgerLock.WaitAsync();
+            //     SemaphoreSlim depositSchemeLedgerLock = LockManager.Instance.GetLedgerLock(depositSchemeLedgerId);
+            //     await depositSchemeLedgerLock.WaitAsync();
+            //     SemaphoreSlim paymentTypeLedgerLock = LockManager.Instance.GetLedgerLock(paymentTypeLedgerId);
+            //     await paymentTypeLedgerLock.WaitAsync();
+            //     try
+            //     {
                     bool isDeposit = false;
                     TransactionTypeEnum ledgerTransactionType = TransactionTypeEnum.Credit;
-                    if(depositAccountTransactionWrapper.TransactionType==TransactionTypeEnum.Credit)
+                    if (depositAccountTransactionWrapper.TransactionType == TransactionTypeEnum.Credit)
                     {
                         isDeposit = true;
                         ledgerTransactionType = TransactionTypeEnum.Debit;
@@ -82,25 +105,25 @@ namespace MicroFinance.Repository.Transaction
                     await BaseTransactionOnLedger(baseTransaction, depositAccountTransactionWrapper.PaymentType, ledgerTransactionType, isDeposit);
                     int transactionStatus = await _transactionDbContext.SaveChangesAsync();
                     if (transactionStatus < 1) throw new Exception("Unable to make Deposit Transaction");
-                    processTransaction.Commit();
-                    _transactionDbContext.ChangeTracker.Clear();
+                    // processTransaction.Commit();
+                    //_transactionDbContext.ChangeTracker.Clear();
                     return baseTransaction.VoucherNumber;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"{DateTime.Now}: {ex.Message} {ex?.InnerException?.Message}");
-                    processTransaction.Rollback();
-                    throw new Exception(ex.Message);
-                }
-                finally
-                {
-                    _logger.LogInformation($"{DateTime.Now}: Releasing the locks...");
-                    accountLock.Release();
-                    depositSchemeSubLedgerLock.Release();
-                    depositSchemeLedgerLock.Release();
-                    paymentTypeLedgerLock.Release();
-                }
-            }
+                // }
+                // catch (Exception ex)
+                // {
+                //     _logger.LogError($"{DateTime.Now}: {ex.Message} {ex?.InnerException?.Message}");
+                //     processTransaction.Rollback();
+                //     throw new Exception(ex.Message);
+                // }
+                // finally
+                // {
+                //     _logger.LogInformation($"{DateTime.Now}: Releasing the locks...");
+                //     accountLock.Release();
+                //     depositSchemeSubLedgerLock.Release();
+                //     depositSchemeLedgerLock.Release();
+                //     paymentTypeLedgerLock.Release();
+                // }
+            //}
         }
         private async Task<BaseTransaction> GenerateVoucherNumber(BaseTransaction baseTransaction)
         {
@@ -116,7 +139,7 @@ namespace MicroFinance.Repository.Transaction
         private async Task<BaseTransaction> MakeBaseTransaction(DepositAccountTransactionWrapper transactionData)
         {
             BaseTransaction baseTransaction = _mapper.Map<BaseTransaction>(transactionData);
-            baseTransaction.Remarks = transactionData.WithDrawalType!=null
+            baseTransaction.Remarks = transactionData.WithDrawalType != null
             ?
             TransactionRemarks.WithdrawalTransaction.ToString()
             :
@@ -145,11 +168,11 @@ namespace MicroFinance.Repository.Transaction
         private async Task<DepositAccount> TransactionOnDepositAccount(DepositAccountTransactionWrapper depositAccountTransactionWrapper)
         {
             DepositAccount depositAccount = await _transactionDbContext.DepositAccounts
-            .Where(da=>da.Id == depositAccountTransactionWrapper.DepositAccountId && da.Status!=AccountStatusEnum.Close)
+            .Where(da => da.Id == depositAccountTransactionWrapper.DepositAccountId && da.Status != AccountStatusEnum.Close)
             .SingleOrDefaultAsync();
             if (depositAccount != null)
             {
-                depositAccount.PrincipalAmount = depositAccountTransactionWrapper.TransactionType==TransactionTypeEnum.Credit
+                depositAccount.PrincipalAmount = depositAccountTransactionWrapper.TransactionType == TransactionTypeEnum.Credit
                 ?
                 depositAccount.PrincipalAmount + depositAccountTransactionWrapper.TransactionAmount
                 :
@@ -175,7 +198,7 @@ namespace MicroFinance.Repository.Transaction
                 Narration = depositAccountTransactionWrapper.Narration,
                 Source = depositAccountTransactionWrapper.Source,
                 BalanceAfterTransaction = depositAccount.PrincipalAmount,
-                Remarks=$"Transaction done as {baseTransaction.Remarks}"
+                Remarks = $"Transaction done as {baseTransaction.Remarks}"
             };
             await _transactionDbContext.DepositAccountTransactions.AddAsync(depositAccountTransaction);
         }
@@ -189,22 +212,22 @@ namespace MicroFinance.Repository.Transaction
         private async Task<SubLedger> TransactionOnSubLedger(BaseTransaction baseTransaction, DepositAccountTransactionWrapper depositAccountTransactionWrapper)
         {
             SubLedger depositSchemeSubledger = await _transactionDbContext.SubLedgers
-            .Include(sl=>sl.Ledger)
-            .Where(sl=>sl.Id==depositAccountTransactionWrapper.DepositSchemeSubLedgerId)
+            .Include(sl => sl.Ledger)
+            .Where(sl => sl.Id == depositAccountTransactionWrapper.DepositSchemeSubLedgerId)
             .SingleOrDefaultAsync();
-            if(depositSchemeSubledger!=null)
+            if (depositSchemeSubledger != null)
             {
-                if(depositAccountTransactionWrapper.TransactionType==TransactionTypeEnum.Credit)
+                if (depositAccountTransactionWrapper.TransactionType == TransactionTypeEnum.Credit)
                 {
-                    depositSchemeSubledger.CurrentBalance+=depositAccountTransactionWrapper.TransactionAmount;
-                    depositSchemeSubledger.Ledger.CurrentBalance+=depositAccountTransactionWrapper.TransactionAmount;
+                    depositSchemeSubledger.CurrentBalance += depositAccountTransactionWrapper.TransactionAmount;
+                    depositSchemeSubledger.Ledger.CurrentBalance += depositAccountTransactionWrapper.TransactionAmount;
                 }
                 else
                 {
-                    depositSchemeSubledger.CurrentBalance-=depositAccountTransactionWrapper.TransactionAmount;
-                    depositSchemeSubledger.Ledger.CurrentBalance-=depositAccountTransactionWrapper.TransactionAmount;
+                    depositSchemeSubledger.CurrentBalance -= depositAccountTransactionWrapper.TransactionAmount;
+                    depositSchemeSubledger.Ledger.CurrentBalance -= depositAccountTransactionWrapper.TransactionAmount;
                 }
-                if(depositSchemeSubledger.CurrentBalance<0 || depositSchemeSubledger.Ledger.CurrentBalance<0)
+                if (depositSchemeSubledger.CurrentBalance < 0 || depositSchemeSubledger.Ledger.CurrentBalance < 0)
                 {
                     throw new Exception("(Negative Balance: Current Transaction will lead SubLedger and Ledger to negative balance)");
                 }
@@ -212,7 +235,7 @@ namespace MicroFinance.Repository.Transaction
             }
             throw new Exception("No subLedger found for given deposit account");
         }
-        private async Task CreateDepositSchemeSubLedgerTransactionEntry(BaseTransaction baseTransaction, SubLedger depositSchemeSubLedger ,DepositAccountTransactionWrapper depositAccountTransactionWrapper)
+        private async Task CreateDepositSchemeSubLedgerTransactionEntry(BaseTransaction baseTransaction, SubLedger depositSchemeSubLedger, DepositAccountTransactionWrapper depositAccountTransactionWrapper)
         {
             SubLedgerTransaction subLedgerTransaction = new()
             {
@@ -227,25 +250,25 @@ namespace MicroFinance.Repository.Transaction
 
         public async Task BaseTransactionOnLedger(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, TransactionTypeEnum ledgerTransactionType, bool isDeposit)
         {
-            Ledger paymentMethodLedger =  await TransactionOnLedger( baseTransaction,  paymentType, ledgerTransactionType, isDeposit);
+            Ledger paymentMethodLedger = await TransactionOnLedger(baseTransaction, paymentType, ledgerTransactionType, isDeposit);
             await CreateLedgerTransactionEntry(baseTransaction, paymentMethodLedger, ledgerTransactionType);
         }
         private async Task<Ledger> TransactionOnLedger(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, TransactionTypeEnum ledgerTransactionType, bool isDeposit)
         {
-            Ledger ledger = paymentType==PaymentTypeEnum.Cash
-            ? 
-            await _transactionDbContext.Ledgers.Where(l=>l.LedgerCode==1).SingleOrDefaultAsync() // In Cash of Cash Transaction
+            Ledger ledger = paymentType == PaymentTypeEnum.Cash
+            ?
+            await _transactionDbContext.Ledgers.Where(l => l.LedgerCode == 1).SingleOrDefaultAsync() // In Cash of Cash Transaction
             :
-            await _transactionDbContext.Ledgers.Where(l=>l.Id == baseTransaction.BankDetail.LedgerId).SingleOrDefaultAsync();
-            
-            if(ledger!=null)
+            await _transactionDbContext.Ledgers.Where(l => l.Id == baseTransaction.BankDetail.LedgerId).SingleOrDefaultAsync();
+
+            if (ledger != null)
             {
                 ledger.CurrentBalance = isDeposit
                 ?
-                ledger.CurrentBalance+baseTransaction.TransactionAmount
+                ledger.CurrentBalance + baseTransaction.TransactionAmount
                 :
-                ledger.CurrentBalance-baseTransaction.TransactionAmount;
-                if(ledger.CurrentBalance<0)
+                ledger.CurrentBalance - baseTransaction.TransactionAmount;
+                if (ledger.CurrentBalance < 0)
                 {
                     throw new Exception("Negative Balance: Your payment method leads to negative balance in ledger");
                 }
@@ -266,124 +289,5 @@ namespace MicroFinance.Repository.Transaction
             };
             await _transactionDbContext.LedgerTransactions.AddAsync(ledgerTransaction);
         }
-
-        // Task<DepositAccount> IDepositAccountTransactionRepository.BaseTransactionOnDepositAccount(DepositAccountTransactionWrapper depositAccountTransactionWrapper, BaseTransaction baseTransaction)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // Task IDepositAccountTransactionRepository.BaseTransactionOnLedger(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, TransactionTypeEnum ledgerTransactionType)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // Task<DepositAccount> IDepositAccountTransactionRepository.BaseTransactionOnDepositAccount(DepositAccountTransactionWrapper depositAccountTransactionWrapper, BaseTransaction baseTransaction)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // Task IDepositAccountTransactionRepository.BaseTransactionOnLedger(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, TransactionTypeEnum ledgerTransactionType)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // private async Task MakeDepositAccountTransaction(DepositAccountTransactionWrapper depositOrWithDrawalTrasactionWrapper, BaseTransaction baseTransaction)
-        // {
-        //     DepositAccount depositAccount = await _transactionDbContext.DepositAccounts.FindAsync(depositOrWithDrawalTrasactionWrapper.DepositAccountId);
-        //     DepositAccountTransaction depositAccountTransaction = new DepositAccountTransaction()
-        //     {
-        //         Transaction = baseTransaction,
-        //         TransactionType = depositOrWithDrawalTrasactionWrapper.TransactionType,
-        //         // PaymentType = depositOrWithDrawalTrasactionWrapper.PaymentType,
-        //         CollectedByEmployeeId = depositOrWithDrawalTrasactionWrapper.CollectedByEmployeeId,
-        //         Narration = depositOrWithDrawalTrasactionWrapper.Narration,
-        //         Source = depositOrWithDrawalTrasactionWrapper.Source,
-        //     };
-        //     if (depositOrWithDrawalTrasactionWrapper.WithDrawalType!=null)
-        //     {
-        //         depositAccount.PrincipalAmount = depositAccount.PrincipalAmount - depositOrWithDrawalTrasactionWrapper.TransactionAmount;
-        //         depositAccountTransaction.Remarks = $"{depositOrWithDrawalTrasactionWrapper.TransactionAmount} is withdrawn on {depositAccount.AccountNumber}";
-        //         depositAccountTransaction.WithDrawalChequeNumber = depositOrWithDrawalTrasactionWrapper.WithDrawalChequeNumber;
-        //         depositAccountTransaction.WithDrawalType = depositOrWithDrawalTrasactionWrapper.WithDrawalType;
-        //     }
-        //     else
-        //     {
-        //         depositAccount.PrincipalAmount = depositAccount.PrincipalAmount + depositOrWithDrawalTrasactionWrapper.TransactionAmount;
-        //         depositAccountTransaction.Remarks = $"{depositOrWithDrawalTrasactionWrapper.TransactionAmount} is deposited on {depositAccount.AccountNumber}";
-        //     }          
-        //     // if (depositOrWithDrawalTrasactionWrapper.PaymentType == PaymentTypeEnum.Bank)
-        //     // {
-        //     //     var bankDetail = await _transactionDbContext.BankSetups.FindAsync(depositOrWithDrawalTrasactionWrapper.BankDetailId);
-        //     //     depositAccountTransaction.BankDetail = bankDetail;
-        //     //     depositAccountTransaction.BankChequeNumber = depositOrWithDrawalTrasactionWrapper.BankChequeNumber;
-        //     // }
-        //     depositAccountTransaction.DepositAccount = depositAccount;
-        //     depositAccountTransaction.BalanceAfterTransaction = depositAccount.PrincipalAmount;
-        //     if (depositAccount.PrincipalAmount < 0) throw new Exception("Negative Transaction not allowed");
-        //     await _transactionDbContext.DepositAccountTransactions.AddAsync(depositAccountTransaction);
-        // }
-        // private async Task MakeSubLedgerTransaction(DepositAccountTransactionWrapper depositOrWithDrawalTrasactionWrapper, BaseTransaction baseTransaction)
-        // {
-        //     int depositSchemeSubLedgerId = depositOrWithDrawalTrasactionWrapper.DepositSchemeSubLedgerId;
-        //     var depositSchemeDepositSubledger = await _transactionDbContext.SubLedgers.Include(sl => sl.Ledger).Where(sl => sl.Id == depositSchemeSubLedgerId).FirstOrDefaultAsync();
-        //     Ledger schemeLegder = depositSchemeDepositSubledger.Ledger;
-        //     SubLedgerTransaction subLedgerTransaction = new SubLedgerTransaction()
-        //     {
-        //         Transaction = baseTransaction,
-        //         TransactionType = depositOrWithDrawalTrasactionWrapper.TransactionType
-        //     };
-        //     if (depositOrWithDrawalTrasactionWrapper.WithDrawalType==null)
-        //     {
-        //         subLedgerTransaction.Remarks = $"Deposit of {depositOrWithDrawalTrasactionWrapper.TransactionAmount} on {depositOrWithDrawalTrasactionWrapper.AccountNumber}";
-        //         depositSchemeDepositSubledger.CurrentBalance += depositOrWithDrawalTrasactionWrapper.TransactionAmount;
-        //         schemeLegder.CurrentBalance += depositOrWithDrawalTrasactionWrapper.TransactionAmount;
-        //     }
-        //     else
-        //     {
-        //         subLedgerTransaction.Remarks = $"WithDrawal of {depositOrWithDrawalTrasactionWrapper.TransactionAmount} on {depositOrWithDrawalTrasactionWrapper.AccountNumber}";
-        //         depositSchemeDepositSubledger.CurrentBalance -= depositOrWithDrawalTrasactionWrapper.TransactionAmount;
-        //         schemeLegder.CurrentBalance -= depositOrWithDrawalTrasactionWrapper.TransactionAmount;
-        //     }
-        //     subLedgerTransaction.SubLedger = depositSchemeDepositSubledger;
-        //     subLedgerTransaction.BalanceAfterTransaction = depositSchemeDepositSubledger.CurrentBalance;
-        //     if (depositSchemeDepositSubledger.CurrentBalance < 0 || schemeLegder.CurrentBalance < 0)
-        //         throw new Exception($"Negative Transaction on '{depositSchemeDepositSubledger.Name}' or '{depositSchemeDepositSubledger.Ledger.Name}' is not allowed");
-        //     await _transactionDbContext.SubLedgerTransactions.AddAsync(subLedgerTransaction); 
-        // }
-        // internal async Task MakeLedgerTransaction(DepositAccountTransactionWrapper depositOrWithDrawalTrasactionWrapper, BaseTransaction baseTransaction)
-        // {
-        //     Ledger ledger = depositOrWithDrawalTrasactionWrapper.PaymentType == PaymentTypeEnum.Cash
-        //     ?
-        //     await _transactionDbContext.Ledgers.Where(l => l.LedgerCode == 1).SingleOrDefaultAsync()
-        //     :
-        //     await _transactionDbContext.Ledgers.FindAsync(depositOrWithDrawalTrasactionWrapper.BankLedgerId);
-        //     LedgerTransaction ledgerTransaction = new LedgerTransaction();
-        //     _transactionDbContext.Entry(ledger).State = EntityState.Detached;
-        //     _transactionDbContext.Ledgers.Attach(ledger);
-        //     if (depositOrWithDrawalTrasactionWrapper.WithDrawalType==null)
-        //     {
-        //         ledgerTransaction.Remarks = $"Deposit Transaction of {baseTransaction.TransactionAmount} on {depositOrWithDrawalTrasactionWrapper.AccountNumber}";
-        //         ledger.CurrentBalance += baseTransaction.TransactionAmount;
-        //         ledgerTransaction.TransactionType = TransactionTypeEnum.Debit;
-        //     }
-        //     else
-        //     {
-        //         ledgerTransaction.Remarks = $"WithDrawal Transaction of {baseTransaction.TransactionAmount} on {depositOrWithDrawalTrasactionWrapper.AccountNumber}";
-        //         ledger.CurrentBalance -= baseTransaction.TransactionAmount;
-        //         ledgerTransaction.TransactionType = TransactionTypeEnum.Credit;
-        //     }
-        //     ledgerTransaction.BalanceAfterTransaction = ledger.CurrentBalance;
-        //     ledgerTransaction.Ledger = ledger;
-        //     ledgerTransaction.Transaction = baseTransaction;
-        //     // _transactionDbContext.Ledgers.Attach(ledger);
-        //     // _transactionDbContext.Entry(ledger).State = EntityState.Modified;
-        //     if (ledgerTransaction.Ledger.CurrentBalance < 0) 
-        //         throw new Exception($"Negative Transaction on {ledger.Name} not allowed");
-
-        //     await _transactionDbContext.LedgerTransactions.AddAsync(ledgerTransaction);
-        //     // var ledgerTransactionStatus = await _transactionDbContext.SaveChangesAsync();
-        //     // if(ledgerTransactionStatus<=0) throw new Exception("Error: MakeLedgerTransaction");
-        // }
-
     }
 }

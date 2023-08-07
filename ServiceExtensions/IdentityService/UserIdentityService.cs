@@ -1,5 +1,6 @@
 using System.Text;
-using MicroFinance.DBContext.UserManagement;
+using MicroFinance.DBContext;
+// using MicroFinance.DBContext.UserManagement;
 using MicroFinance.Models.UserManagement;
 using MicroFinance.Role;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,7 +16,8 @@ namespace MicroFinance.ServiceExtensions.IdentityService
             var builder = services.AddIdentityCore<User>();
             builder = new IdentityBuilder(builder.UserType, builder.Services);
             builder.AddRoles<IdentityRole>();
-            builder.AddEntityFrameworkStores<UserDbContext>();
+            //builder.AddEntityFrameworkStores<UserDbContext>();
+            builder.AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequiredLength = 8;
@@ -43,20 +45,25 @@ namespace MicroFinance.ServiceExtensions.IdentityService
                         ValidateAudience = false
                     };
                 });
-            // services.AddAuthorization(opt =>
-            // {
-            //     opt.AddPolicy("OfficerOnly", policy =>
-            //     {
-            //         policy.RequireClaim("role", UserRole.Officer.ToString());
-            //         policy.RequireClaim("IsActive", "true");
-            //     });
-            //     opt.AddPolicy("ActiveUsers", policy=>
-            //     {
-            //         policy.RequireClaim("IsActive", "true");
-            //     });
-            // });
+            services.AddAuthentication
+                (JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer("SuperAdminToken", options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero,
+                        ValidateIssuerSigningKey = true,
+                        // Check if the key is same or not using same algorithm
+                        IssuerSigningKey = new SymmetricSecurityKey
+                        (Encoding.UTF8.GetBytes(config["Token:Key"])),
+                        // check the issuer 
+                        ValidIssuer = config["Token:SuperIssuer"],
+                        ValidateIssuer = true,
+                        ValidateAudience = false
+                    };
+                });
             return services;
         }
     }
-
 }

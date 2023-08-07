@@ -13,9 +13,11 @@ namespace MicroFinance.Dtos.CompanyProfile
         public DateTime? EstablishedDate { get; set; }
         public string? PhoneNo { get; set; }
         public string? CompanyEmailAddress { get; set; }
-        public string? LogoFileUrl { get; set; }
+        public DateTime CompanyValidityStartDate { get; set; }
+        public DateTime CompanyValidityEndDate { get; set; }
+        public string? LogoFileData { get; set; }
         public string? LogoFileName { get; set; }
         public FileType? LogoFileType { get; set; }
-        public DateTime? FromDate { get; set; }
+        public decimal CurrentTax { get; set; }
     }
 }

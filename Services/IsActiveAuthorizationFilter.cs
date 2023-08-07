@@ -34,14 +34,24 @@ namespace MicroFinance.Services
             string role = context.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
             string branchCode = context.HttpContext.User.FindFirst("BranchCode")?.Value;
             // if role is superadmin call superadmin service
-            if(role!=FintexRole.SuperAdmin.ToString())
+            if(role!=UserRole.SuperAdmin.ToString())
             {
                 var user = await _employeeService.GetUserByIdService(currentUserId);
                 var branch = await _companyProfile.GetBranchServiceByBranchCodeService(branchCode);
+                var companyDetail = await _companyProfile.GetCompanyProfileService();
                 if(user.Message!="Success" || user.IsActive==false || branch==null || branch.IsActive==false)
                 {
                     _logger.LogError($"{DateTime.Now}: Failed to give access to {user.UserName}. 'User Active Status': {user.IsActive}, 'Branch':{branch?.BranchCode}, 'Branch Status':{branch?.IsActive}");
                     context.Result=new UnauthorizedResult();
+                }
+                if(companyDetail.CompanyValidityEndDate < DateTime.Now)
+                {
+                    string errorMessage = $"Software Validity ended on {companyDetail.CompanyValidityEndDate}. Please contact software provider";
+                    _logger.LogError($"{DateTime.Now}: Tried to Use software even after validity ended on {companyDetail.CompanyValidityEndDate}");
+                    context.Result=new ObjectResult(errorMessage)
+                    {
+                        StatusCode = 401
+                    };
                 }
             }
             else

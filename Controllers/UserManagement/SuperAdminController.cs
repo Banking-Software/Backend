@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Security.Claims;
 using AutoMapper;
-using MicroFinance.DBContext.UserManagement;
+// using MicroFinance.DBContext.UserManagement;
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.CompanyProfile;
 using MicroFinance.Dtos.UserManagement;
@@ -54,12 +54,11 @@ namespace MicroFinance.Controllers.UserManagement
 
         [AllowAnonymous]
         [HttpPost("login")]
+        // public async Task<ActionResult<TokenResponseDto>> Login(SuperAdminLoginDto superAdminLoginDto)
         public async Task<ActionResult<TokenResponseDto>> Login(SuperAdminLoginDto superAdminLoginDto)
         {
-
             var superadmin = await _superAdminService.LoginService(superAdminLoginDto);
             return Ok(superadmin);
-
         }
 
         [TypeFilter(typeof(IsActiveAuthorizationFilter))]

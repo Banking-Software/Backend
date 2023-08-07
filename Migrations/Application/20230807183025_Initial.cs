@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace MicroFinance.Migrations.Application
 {
     /// <inheritdoc />
-    public partial class BranchCode : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,6 +23,20 @@ namespace MicroFinance.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AccountTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetRoles",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,10 +172,12 @@ namespace MicroFinance.Migrations.Application
                     EstablishedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PhoneNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompanyEmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FromDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompanyValidityStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompanyValidityEndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LogoFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     LogoFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LogoFileType = table.Column<int>(type: "int", nullable: true)
+                    LogoFileType = table.Column<int>(type: "int", nullable: true),
+                    CurrentTax = table.Column<decimal>(type: "decimal(2,2)", precision: 2, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -242,6 +260,47 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "Employees",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DateOfJoining = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Designation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GenderCode = table.Column<int>(type: "int", nullable: true),
+                    PFAllowed = table.Column<bool>(type: "bit", nullable: true),
+                    SalaryPostingAccount = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProvidentPostingAccount = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SalaryAmount = table.Column<double>(type: "float", nullable: true),
+                    Tax = table.Column<float>(type: "real", nullable: true),
+                    Facilities = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OtherFacilities = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Grade = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PANNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProfilePicFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    ProfilePicFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProfilePicFileType = table.Column<int>(type: "int", nullable: true),
+                    CitizenShipFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    CitizenShipFileType = table.Column<int>(type: "int", nullable: true),
+                    CitizenShipFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SignatureFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    SignatureFileType = table.Column<int>(type: "int", nullable: true),
+                    SignatureFileName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Employees", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Genders",
                 columns: table => new
                 {
@@ -269,6 +328,21 @@ namespace MicroFinance.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MaritalStatuses", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ShareKittas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PriceOfOneKitta = table.Column<int>(type: "int", nullable: false),
+                    CurrentKitta = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShareKittas", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -311,6 +385,65 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "AspNetRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DepositLimit = table.Column<double>(type: "float", nullable: true),
+                    LoanLimit = table.Column<double>(type: "float", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EmployeeId = table.Column<int>(type: "int", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Ledgers",
                 columns: table => new
                 {
@@ -324,7 +457,7 @@ namespace MicroFinance.Migrations.Application
                     DepreciationRate = table.Column<decimal>(type: "decimal(5,2)", nullable: true),
                     HisabNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsSubLedgerActive = table.Column<bool>(type: "bit", nullable: false),
-                    CurrentBalance = table.Column<decimal>(type: "decimal(18,4)", nullable: true),
+                    CurrentBalance = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
                     IsBank = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -334,6 +467,91 @@ namespace MicroFinance.Migrations.Application
                         name: "FK_Ledgers_GroupTypes_GroupTypeId",
                         column: x => x.GroupTypeId,
                         principalTable: "GroupTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserLogins",
+                columns: table => new
+                {
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -512,6 +730,7 @@ namespace MicroFinance.Migrations.Application
                     SubLedgerCode = table.Column<int>(type: "int", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CurrentBalance = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
                     LedgerId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -526,24 +745,55 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "Transactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VoucherNumber = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    TransactionAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    AmountInWords = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentType = table.Column<int>(type: "int", nullable: true),
+                    BankDetailId = table.Column<int>(type: "int", nullable: true),
+                    BankChequeNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RealWorldCreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompanyCalendarCreationDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifierId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifierBranchCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RealWorldModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompanyCalendarModificationDate = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Transactions_BankSetups_BankDetailId",
+                        column: x => x.BankDetailId,
+                        principalTable: "BankSetups",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ShareAccounts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AccountNumber = table.Column<int>(type: "int", nullable: false),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
                     CurrentShareBalance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CurrentNumberOfKitta = table.Column<int>(type: "int", nullable: false),
-                    StartOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    EndOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ShareAccounts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ShareAccounts_Clients_AccountNumber",
-                        column: x => x.AccountNumber,
+                        name: "FK_ShareAccounts_Clients_ClientId",
+                        column: x => x.ClientId,
                         principalTable: "Clients",
                         principalColumn: "Id");
                 });
@@ -573,12 +823,12 @@ namespace MicroFinance.Migrations.Application
                     CreatorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RealWorldCreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CompanyCalendarCreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompanyCalendarCreationDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifierId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifierBranchCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RealWorldModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CompanyCalendarModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CompanyCalendarModificationDate = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -606,6 +856,60 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "LedgerTransactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TransactionId = table.Column<int>(type: "int", nullable: false),
+                    LedgerId = table.Column<int>(type: "int", nullable: false),
+                    TransactionType = table.Column<int>(type: "int", nullable: false),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BalanceAfterTransaction = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LedgerTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LedgerTransactions_Ledgers_LedgerId",
+                        column: x => x.LedgerId,
+                        principalTable: "Ledgers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_LedgerTransactions_Transactions_TransactionId",
+                        column: x => x.TransactionId,
+                        principalTable: "Transactions",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubLedgerTransactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TransactionId = table.Column<int>(type: "int", nullable: false),
+                    SubLedgerId = table.Column<int>(type: "int", nullable: false),
+                    TransactionType = table.Column<int>(type: "int", nullable: false),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BalanceAfterTransaction = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubLedgerTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubLedgerTransactions_SubLedgers_SubLedgerId",
+                        column: x => x.SubLedgerId,
+                        principalTable: "SubLedgers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SubLedgerTransactions_Transactions_TransactionId",
+                        column: x => x.TransactionId,
+                        principalTable: "Transactions",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DepositAccounts",
                 columns: table => new
                 {
@@ -613,11 +917,11 @@ namespace MicroFinance.Migrations.Application
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DepositSchemeId = table.Column<int>(type: "int", nullable: false),
                     AccountNumber = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    OpeningDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OpeningDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Period = table.Column<int>(type: "int", nullable: false),
                     PeriodType = table.Column<int>(type: "int", nullable: false),
                     AccountType = table.Column<int>(type: "int", nullable: false),
-                    MatureDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MatureDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     InterestRate = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
                     PrincipalAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     InterestAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
@@ -632,6 +936,9 @@ namespace MicroFinance.Migrations.Application
                     ExpectedTotalDepositAmount = table.Column<int>(type: "int", nullable: true),
                     ExpectedTotalReturnAmount = table.Column<int>(type: "int", nullable: true),
                     ExpectedTotalInterestAmount = table.Column<int>(type: "int", nullable: true),
+                    SignatureFileData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    SignatureFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SignatureFileType = table.Column<int>(type: "int", nullable: true),
                     ClientId = table.Column<int>(type: "int", nullable: false),
                     InterestPostingAccountNumberId = table.Column<int>(type: "int", nullable: true),
                     MatureInterestPostingAccountNumberId = table.Column<int>(type: "int", nullable: true),
@@ -640,12 +947,12 @@ namespace MicroFinance.Migrations.Application
                     CreatorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RealWorldCreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CompanyCalendarCreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompanyCalendarCreationDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifierId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifierBranchCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RealWorldModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CompanyCalendarModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CompanyCalendarModificationDate = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -695,6 +1002,38 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "DepositAccountTransactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TransactionId = table.Column<int>(type: "int", nullable: false),
+                    DepositAccountId = table.Column<int>(type: "int", nullable: false),
+                    TransactionType = table.Column<int>(type: "int", precision: 18, scale: 4, nullable: false),
+                    WithDrawalType = table.Column<int>(type: "int", nullable: true),
+                    WithDrawalChequeNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CollectedByEmployeeId = table.Column<int>(type: "int", nullable: true),
+                    Narration = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Source = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BalanceAfterTransaction = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DepositAccountTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DepositAccountTransactions_DepositAccounts_DepositAccountId",
+                        column: x => x.DepositAccountId,
+                        principalTable: "DepositAccounts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_DepositAccountTransactions_Transactions_TransactionId",
+                        column: x => x.TransactionId,
+                        principalTable: "Transactions",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "JointAccounts",
                 columns: table => new
                 {
@@ -704,8 +1043,8 @@ namespace MicroFinance.Migrations.Application
                     JointClientId = table.Column<int>(type: "int", nullable: false),
                     RealWorldStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RealWorldEndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CompanyCalendarStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CompanyCalendarEndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CompanyCalendarStartDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CompanyCalendarEndDate = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -723,50 +1062,56 @@ namespace MicroFinance.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "Transaction",
+                name: "ShareTransactions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DepositAccountId = table.Column<int>(type: "int", nullable: false),
+                    ShareTransactionType = table.Column<int>(type: "int", nullable: false),
                     TransactionType = table.Column<int>(type: "int", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ShareCertificateNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Narration = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionId = table.Column<int>(type: "int", nullable: false),
+                    ShareAccountId = table.Column<int>(type: "int", nullable: false),
+                    TransferToDepositAccountId = table.Column<int>(type: "int", nullable: true),
+                    PaymentDepositAccountId = table.Column<int>(type: "int", nullable: true),
+                    BalanceAfterTransaction = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Transaction", x => x.Id);
+                    table.PrimaryKey("PK_ShareTransactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Transaction_DepositAccounts_DepositAccountId",
-                        column: x => x.DepositAccountId,
+                        name: "FK_ShareTransactions_DepositAccounts_PaymentDepositAccountId",
+                        column: x => x.PaymentDepositAccountId,
                         principalTable: "DepositAccounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ShareTransactions_DepositAccounts_TransferToDepositAccountId",
+                        column: x => x.TransferToDepositAccountId,
+                        principalTable: "DepositAccounts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ShareTransactions_ShareAccounts_ShareAccountId",
+                        column: x => x.ShareAccountId,
+                        principalTable: "ShareAccounts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ShareTransactions_Transactions_TransactionId",
+                        column: x => x.TransactionId,
+                        principalTable: "Transactions",
+                        principalColumn: "Id");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "DepositTransaction",
-                columns: table => new
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TransactionId = table.Column<int>(type: "int", nullable: false),
-                    PaymentType = table.Column<int>(type: "int", nullable: false),
-                    TransactionAmount = table.Column<int>(type: "int", nullable: false),
-                    TotalAmountAfterTransaction = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
-                    Employee = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Source = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Narration = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OpeningCharge = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DepositTransaction", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DepositTransaction_Transaction_TransactionId",
-                        column: x => x.TransactionId,
-                        principalTable: "Transaction",
-                        principalColumn: "Id");
+                    { "71eab024-cf51-4c0b-93d9-237a75d09c83", "e79a0af6-b059-4ad6-82ad-20b572d857d2", "Marketing", "MARKETING" },
+                    { "a155c930-7463-45f0-a59f-0b2d191cd524", "ff5bed60-5c81-4fd0-a185-228452d20401", "Assistant", "ASSISTANT" },
+                    { "ea4dbc99-cbec-41a7-8f38-d09b4f72906e", "0b8629a7-3136-4dae-b194-f8db37b52063", "SeniorAssistant", "SENIORASSISTANT" },
+                    { "ec63ff51-f9a5-4af7-8d3d-ebd10f7ae6a5", "148744c1-db60-4594-b395-7975de7b13cc", "Officer", "OFFICER" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -774,6 +1119,52 @@ namespace MicroFinance.Migrations.Application
                 table: "AccountTypes",
                 column: "Name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoleClaims_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserClaims_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserLogins_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "EmailIndex",
+                table: "AspNetUsers",
+                column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_EmployeeId",
+                table: "AspNetUsers",
+                column: "EmployeeId",
+                unique: true,
+                filter: "[EmployeeId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "UserNameIndex",
+                table: "AspNetUsers",
+                column: "NormalizedUserName",
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BankSetups_BankTypeId",
@@ -888,6 +1279,22 @@ namespace MicroFinance.Migrations.Application
                 column: "MatureInterestPostingAccountNumberId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DepositAccountTransactions_DepositAccountId",
+                table: "DepositAccountTransactions",
+                column: "DepositAccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DepositAccountTransactions_Id",
+                table: "DepositAccountTransactions",
+                column: "Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DepositAccountTransactions_TransactionId",
+                table: "DepositAccountTransactions",
+                column: "TransactionId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DepositSchemes_DepositSubledgerId",
                 table: "DepositSchemes",
                 column: "DepositSubledgerId",
@@ -923,9 +1330,9 @@ namespace MicroFinance.Migrations.Application
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DepositTransaction_TransactionId",
-                table: "DepositTransaction",
-                column: "TransactionId",
+                name: "IX_Employees_Email",
+                table: "Employees",
+                column: "Email",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -969,9 +1376,42 @@ namespace MicroFinance.Migrations.Application
                 filter: "[LedgerCode] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ShareAccounts_AccountNumber",
+                name: "IX_LedgerTransactions_LedgerId",
+                table: "LedgerTransactions",
+                column: "LedgerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LedgerTransactions_TransactionId",
+                table: "LedgerTransactions",
+                column: "TransactionId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShareAccounts_ClientId",
                 table: "ShareAccounts",
-                column: "AccountNumber");
+                column: "ClientId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShareTransactions_PaymentDepositAccountId",
+                table: "ShareTransactions",
+                column: "PaymentDepositAccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShareTransactions_ShareAccountId",
+                table: "ShareTransactions",
+                column: "ShareAccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShareTransactions_TransactionId",
+                table: "ShareTransactions",
+                column: "TransactionId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShareTransactions_TransferToDepositAccountId",
+                table: "ShareTransactions",
+                column: "TransferToDepositAccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SubLedgers_LedgerId",
@@ -992,16 +1432,46 @@ namespace MicroFinance.Migrations.Application
                 filter: "[SubLedgerCode] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transaction_DepositAccountId",
-                table: "Transaction",
-                column: "DepositAccountId");
+                name: "IX_SubLedgerTransactions_SubLedgerId",
+                table: "SubLedgerTransactions",
+                column: "SubLedgerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubLedgerTransactions_TransactionId",
+                table: "SubLedgerTransactions",
+                column: "TransactionId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_BankDetailId",
+                table: "Transactions",
+                column: "BankDetailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_VoucherNumber",
+                table: "Transactions",
+                column: "VoucherNumber",
+                unique: true,
+                filter: "[VoucherNumber] IS NOT NULL");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BankSetups");
+                name: "AspNetRoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserLogins");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
                 name: "Branches");
@@ -1022,6 +1492,9 @@ namespace MicroFinance.Migrations.Application
                 name: "DepositAccountStatuses");
 
             migrationBuilder.DropTable(
+                name: "DepositAccountTransactions");
+
+            migrationBuilder.DropTable(
                 name: "DepositAccountTypes");
 
             migrationBuilder.DropTable(
@@ -1029,9 +1502,6 @@ namespace MicroFinance.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "DepositSchemeCalculationTypes");
-
-            migrationBuilder.DropTable(
-                name: "DepositTransaction");
 
             migrationBuilder.DropTable(
                 name: "Districts");
@@ -1046,28 +1516,52 @@ namespace MicroFinance.Migrations.Application
                 name: "JointAccounts");
 
             migrationBuilder.DropTable(
+                name: "LedgerTransactions");
+
+            migrationBuilder.DropTable(
                 name: "MaritalStatuses");
 
             migrationBuilder.DropTable(
-                name: "ShareAccounts");
+                name: "ShareKittas");
+
+            migrationBuilder.DropTable(
+                name: "ShareTransactions");
 
             migrationBuilder.DropTable(
                 name: "States");
 
             migrationBuilder.DropTable(
-                name: "BankTypes");
+                name: "SubLedgerTransactions");
 
             migrationBuilder.DropTable(
-                name: "Transaction");
+                name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "DepositAccounts");
 
             migrationBuilder.DropTable(
-                name: "Clients");
+                name: "ShareAccounts");
+
+            migrationBuilder.DropTable(
+                name: "Transactions");
+
+            migrationBuilder.DropTable(
+                name: "Employees");
 
             migrationBuilder.DropTable(
                 name: "DepositSchemes");
+
+            migrationBuilder.DropTable(
+                name: "Clients");
+
+            migrationBuilder.DropTable(
+                name: "BankSetups");
+
+            migrationBuilder.DropTable(
+                name: "SubLedgers");
 
             migrationBuilder.DropTable(
                 name: "ClientGroups");
@@ -1082,7 +1576,7 @@ namespace MicroFinance.Migrations.Application
                 name: "ClientUnits");
 
             migrationBuilder.DropTable(
-                name: "SubLedgers");
+                name: "BankTypes");
 
             migrationBuilder.DropTable(
                 name: "Ledgers");
