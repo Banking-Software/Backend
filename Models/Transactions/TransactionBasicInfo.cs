@@ -13,5 +13,8 @@ namespace MicroFinance.Models.Transactions
         public string? ModifierBranchCode { get; set; }
         public DateTime? RealWorldModificationDate { get; set; }
         public string? CompanyCalendarModificationDate { get; set; }
+        public int TransactionYear { get; set; }
+        public int TransactionMonth { get; set; }
+        public int TransactionDay { get; set; }
     }
 }

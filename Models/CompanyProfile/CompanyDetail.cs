@@ -21,7 +21,7 @@ namespace MicroFinance.Models.CompanyProfile
         public string? LogoFileName { get; set; }
         public FileType? LogoFileType { get; set; }
         public decimal CurrentTax { get; set; }=0;
-
+        public string CurrentFiscalYear { get; set; } = "8081";
         // LOGO
     }
 }

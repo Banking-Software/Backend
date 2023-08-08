@@ -10,6 +10,7 @@ namespace MicroFinance.Repository.Transaction
         // Task<string> MakeDeposit(DepositAccountTransactionWrapper depositWrapper);
         // Task<string> MakeWithDrawal(DepositAccountTransactionWrapper withDrawalWrapper);
         Task<string> MakeTransaction(DepositAccountTransactionWrapper transactionData);
+        Task<BaseTransaction> BaseTransaction(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, int? bankDetailId, string? bankChequeNumber);
         Task<DepositAccount> BaseTransactionOnDepositAccount(DepositAccountTransactionWrapper depositAccountTransactionWrapper, BaseTransaction baseTransaction);
         Task BaseTransactionOnLedger(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, TransactionTypeEnum ledgerTransactionType, bool isDeposit);
     }

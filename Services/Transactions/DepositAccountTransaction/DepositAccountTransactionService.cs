@@ -94,6 +94,7 @@ namespace MicroFinance.Services.Transactions
             transactionData.BranchCode = decodedToken.BranchCode;
             transactionData.RealWorldCreationDate = DateTime.Now;
             transactionData.CompanyCalendarCreationDate = $"{companyCalendar.Year}/{companyCalendar.Month}/{companyCalendar.RunningDay}";
+            
             return transactionData;
             
         }

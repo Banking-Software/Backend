@@ -19,5 +19,6 @@ namespace MicroFinance.Dtos.CompanyProfile
         public string? LogoFileName { get; set; }
         public FileType? LogoFileType { get; set; }
         public decimal CurrentTax { get; set; }
+        public string CurrentFiscalYear { get; set; }
     }
 }

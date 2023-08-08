@@ -75,7 +75,7 @@ namespace MicroFinance.Services.Transactions
                 shareAccountTransactionWrapper.TransferToDepositSchemeSubLedgerId = transferToDepositAccount.DepositScheme.DepositSubledgerId;
                 shareAccountTransactionWrapper.TransferToDepositSchemeLedgerId = transferToDepositAccount.DepositScheme.SchemeTypeId;
             }
-            if(makeShareTransactionDto.PaymentType == PaymentTypeEnum.Bank)
+            else if(makeShareTransactionDto.PaymentType == PaymentTypeEnum.Bank)
             {
                 var bankDetail = await _mainLedgerService.GetBankSetupByIdService((int) makeShareTransactionDto.BankDetailId);
                 shareAccountTransactionWrapper.BankLedgerId = bankDetail.LedgerId;
@@ -87,7 +87,6 @@ namespace MicroFinance.Services.Transactions
                 {
                      throw new BadRequestExceptionHandler("Either Deposit Account or Deposit Scheme is not active");
                 }
-                // var paymentDepositAccountSubLedger = await _mainLedgerService.GetSubLedgerByIdService(paymentDepositAccountNumber.DepositScheme.DepositSubledgerId);
                 shareAccountTransactionWrapper.PaymentDepositSchemeId = paymentDepositAccountNumber.DepositScheme.Id;
                 shareAccountTransactionWrapper.PaymentDepositSchemeSubLedgerId = paymentDepositAccountNumber.DepositScheme.DepositSubledgerId;
                 shareAccountTransactionWrapper.PaymentDepositSchemeLedgerId = paymentDepositAccountNumber.DepositScheme.SchemeTypeId;

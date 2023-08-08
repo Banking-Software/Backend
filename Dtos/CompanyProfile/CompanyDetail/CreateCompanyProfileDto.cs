@@ -13,9 +13,10 @@ namespace MicroFinance.Dtos.CompanyProfile
         public DateTime? EstablishedDate { get; set; }
         public string? PhoneNo { get; set; }
         public string? CompanyEmailAddress { get; set; }
-        public decimal CurrentTax { get; set; }
         public DateTime CompanyValidityStartDate { get; set; }
         public DateTime CompanyValidityEndDate { get; set; }
         public IFormFile? CompanyLogo { get; set; }
+        public decimal CurrentTax { get; set; }
+        public string CurrentFiscalYear { get; set; }
     }
 }

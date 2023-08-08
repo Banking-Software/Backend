@@ -42,7 +42,7 @@ namespace MicroFinance.Repository.Transaction
                 // Lock the transaction
                 SemaphoreSlim shareAccountLock = LockManager.Instance.GetShareAccountLock(shareAccountTransactionWrapper.ShareAccountId);
                 await shareAccountLock.WaitAsync();
-                SemaphoreSlim shareKittaLock = LockManager.Instance.GetShareAccountLock(shareAccountTransactionWrapper.ShareKittaId);
+                SemaphoreSlim shareKittaLock = LockManager.Instance.GetShareKittaLock(shareAccountTransactionWrapper.ShareKittaId);
                 await shareKittaLock.WaitAsync();
 
                 SemaphoreSlim transferAccountLock = null;
@@ -129,11 +129,11 @@ namespace MicroFinance.Repository.Transaction
             DepositAccount depositAccountForTransferOrPayment = null;
             if(shareAccountTransactionWrapper.ShareTransactionType == ShareTransactionTypeEnum.Transfer || shareAccountTransactionWrapper.PaymentType==PaymentTypeEnum.Account)
                 depositAccountForTransferOrPayment = await BaseTransactionOnDepositAccount(baseTransaction, shareAccountTransactionWrapper);
-            await BaseTransactionOnShareAccount(baseTransaction, shareAccountTransactionWrapper, depositAccountForTransferOrPayment);
-            // When ShareTransaction = Transfer then no Payment methods are allowed
-            if(shareAccountTransactionWrapper.ShareTransactionType!=ShareTransactionTypeEnum.Transfer)
+            else
                 await _depositAccountTransactionRepository.BaseTransactionOnLedger(baseTransaction, shareAccountTransactionWrapper.PaymentType, ledgerTransactionType, isDepositInShareAccount);
-            await ModifyShareKittaNumber(shareAccountTransactionWrapper.ShareAccountId, shareAccountTransactionWrapper.TransactionAmount);
+            await BaseTransactionOnShareAccount(baseTransaction, shareAccountTransactionWrapper, depositAccountForTransferOrPayment);
+            if(shareAccountTransactionWrapper.ShareTransactionType==ShareTransactionTypeEnum.Issue)
+                await ModifyShareKittaNumber(shareAccountTransactionWrapper.ShareAccountId, shareAccountTransactionWrapper.TransactionAmount);
             return baseTransaction;
         }
 
@@ -240,17 +240,17 @@ namespace MicroFinance.Repository.Transaction
             if(shareKitta==null) throw new Exception("No any available kitta");
             shareKitta.CurrentKitta += TransactionAmount / shareKitta.PriceOfOneKitta ;
         }
-        private async Task<BaseTransaction> GenerateVoucherNumber(BaseTransaction baseTransaction)
-        {
-            var existingBaseTransaction = await _dbContext.Transactions.FindAsync(baseTransaction.Id);
-            _dbContext.Entry(existingBaseTransaction).State = EntityState.Detached;
-            baseTransaction.VoucherNumber = "080/081" + "VCH" + baseTransaction.Id + baseTransaction.BranchCode;
-            _dbContext.Transactions.Attach(baseTransaction);
-            _dbContext.Entry(baseTransaction).State = EntityState.Modified;
-            var voucherStatus = await _dbContext.SaveChangesAsync();
-            if (voucherStatus < 1) throw new Exception("Failed to Create Voucher Number");
-            return baseTransaction;
-        }
+        // private async Task<BaseTransaction> GenerateVoucherNumber(BaseTransaction baseTransaction)
+        // {
+        //     var existingBaseTransaction = await _dbContext.Transactions.FindAsync(baseTransaction.Id);
+        //     _dbContext.Entry(existingBaseTransaction).State = EntityState.Detached;
+        //     baseTransaction.VoucherNumber = "080/081" + "VCH" + baseTransaction.Id + baseTransaction.BranchCode;
+        //     _dbContext.Transactions.Attach(baseTransaction);
+        //     _dbContext.Entry(baseTransaction).State = EntityState.Modified;
+        //     var voucherStatus = await _dbContext.SaveChangesAsync();
+        //     if (voucherStatus < 1) throw new Exception("Failed to Create Voucher Number");
+        //     return baseTransaction;
+        // }
         private async Task<BaseTransaction> MakeBaseTransaction(ShareAccountTransactionWrapper shareAccountTransactionWrapper)
         {
             BaseTransaction baseTransaction = new BaseTransaction();
@@ -267,10 +267,11 @@ namespace MicroFinance.Repository.Transaction
                 baseTransaction.BankDetail = bankDetail;
                 baseTransaction.BankChequeNumber = shareAccountTransactionWrapper.BankChequeNumber;
             }
-            await _dbContext.Transactions.AddAsync(baseTransaction);
-            var transactionAddStatus = await _dbContext.SaveChangesAsync();
-            if (transactionAddStatus < 1) throw new Exception("Failed to create Transaction");
-            return await GenerateVoucherNumber(baseTransaction);
+            return await _depositAccountTransactionRepository.BaseTransaction(baseTransaction, shareAccountTransactionWrapper.PaymentType, shareAccountTransactionWrapper.BankDetailId, shareAccountTransactionWrapper.BankChequeNumber);
+            // await _dbContext.Transactions.AddAsync(baseTransaction);
+            // var transactionAddStatus = await _dbContext.SaveChangesAsync();
+            // if (transactionAddStatus < 1) throw new Exception("Failed to create Transaction");
+            // return await GenerateVoucherNumber(baseTransaction);
         }
     }
 }

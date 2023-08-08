@@ -125,37 +125,7 @@ namespace MicroFinance.Repository.Transaction
                 // }
             //}
         }
-        private async Task<BaseTransaction> GenerateVoucherNumber(BaseTransaction baseTransaction)
-        {
-            var existingBaseTransaction = await _transactionDbContext.Transactions.FindAsync(baseTransaction.Id);
-            _transactionDbContext.Entry(existingBaseTransaction).State = EntityState.Detached;
-            baseTransaction.VoucherNumber = "080/081" + "VCH" + baseTransaction.Id + baseTransaction.BranchCode;
-            _transactionDbContext.Transactions.Attach(baseTransaction);
-            _transactionDbContext.Entry(baseTransaction).State = EntityState.Modified;
-            var voucherStatus = await _transactionDbContext.SaveChangesAsync();
-            if (voucherStatus < 1) throw new Exception("Failed to Create Voucher Number");
-            return baseTransaction;
-        }
-        private async Task<BaseTransaction> MakeBaseTransaction(DepositAccountTransactionWrapper transactionData)
-        {
-            BaseTransaction baseTransaction = _mapper.Map<BaseTransaction>(transactionData);
-            baseTransaction.Remarks = transactionData.WithDrawalType != null
-            ?
-            TransactionRemarks.WithdrawalTransaction.ToString()
-            :
-            TransactionRemarks.DepositTransaction.ToString();
-
-            if (transactionData.PaymentType == PaymentTypeEnum.Bank)
-            {
-                var bankDetail = await _transactionDbContext.BankSetups.FindAsync(transactionData.BankDetailId);
-                baseTransaction.BankDetail = bankDetail;
-                baseTransaction.BankChequeNumber = transactionData.BankChequeNumber;
-            }
-            await _transactionDbContext.Transactions.AddAsync(baseTransaction);
-            var transactionAddStatus = await _transactionDbContext.SaveChangesAsync();
-            if (transactionAddStatus < 1) throw new Exception("Failed to create Transaction");
-            return await GenerateVoucherNumber(baseTransaction);
-        }
+      
 
         public async Task<DepositAccount> BaseTransactionOnDepositAccount(DepositAccountTransactionWrapper depositAccountTransactionWrapper, BaseTransaction baseTransaction)
         {
@@ -288,6 +258,58 @@ namespace MicroFinance.Repository.Transaction
                 BalanceAfterTransaction = paymentMethodLedger.CurrentBalance
             };
             await _transactionDbContext.LedgerTransactions.AddAsync(ledgerTransaction);
+        }
+
+        public async Task<BaseTransaction> BaseTransaction(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, int? bankDetailId, string? bankChequeNumber)
+        {
+            var transactionDate = baseTransaction.CompanyCalendarCreationDate.Split("/");
+            baseTransaction.TransactionYear = Int32.Parse(transactionDate[0]);
+            baseTransaction.TransactionMonth = Int32.Parse(transactionDate[1]);
+            baseTransaction.TransactionDay = Int32.Parse(transactionDate[0]);
+            if (paymentType == PaymentTypeEnum.Bank && bankDetailId!=null)
+            {
+                var bankDetail = await _transactionDbContext.BankSetups.FindAsync(bankDetailId);
+                baseTransaction.BankDetail = bankDetail;
+                baseTransaction.BankChequeNumber = bankChequeNumber;
+            }
+            await _transactionDbContext.Transactions.AddAsync(baseTransaction);
+            var status = await _transactionDbContext.SaveChangesAsync();
+            if(status<1) throw new Exception("Unable to Make Transaction");
+            return await GenerateVoucherNumber(baseTransaction);
+        }
+
+        private async Task<BaseTransaction> GenerateVoucherNumber(BaseTransaction baseTransaction)
+        {
+            var existingBaseTransaction = await _transactionDbContext.Transactions.FindAsync(baseTransaction.Id);
+            string fiscalYear = (await _transactionDbContext.CompanyDetails.FirstOrDefaultAsync()).CurrentFiscalYear;
+            _transactionDbContext.Entry(existingBaseTransaction).State = EntityState.Detached;
+            baseTransaction.VoucherNumber = $"{fiscalYear}VCH{baseTransaction.Id}{baseTransaction.BranchCode}";
+            _transactionDbContext.Transactions.Attach(baseTransaction);
+            _transactionDbContext.Entry(baseTransaction).State = EntityState.Modified;
+            var voucherStatus = await _transactionDbContext.SaveChangesAsync();
+            if (voucherStatus < 1) throw new Exception("Failed to Create Voucher Number");
+            return baseTransaction;
+        }
+        private async Task<BaseTransaction> MakeBaseTransaction(DepositAccountTransactionWrapper transactionData)
+        {
+            BaseTransaction baseTransaction = _mapper.Map<BaseTransaction>(transactionData);
+            baseTransaction.Remarks = transactionData.WithDrawalType != null
+            ?
+            TransactionRemarks.WithdrawalTransaction.ToString()
+            :
+            TransactionRemarks.DepositTransaction.ToString();
+            return await BaseTransaction(baseTransaction, transactionData.PaymentType, transactionData.BankDetailId, transactionData.BankChequeNumber);
+
+            // if (transactionData.PaymentType == PaymentTypeEnum.Bank)
+            // {
+            //     var bankDetail = await _transactionDbContext.BankSetups.FindAsync(transactionData.BankDetailId);
+            //     baseTransaction.BankDetail = bankDetail;
+            //     baseTransaction.BankChequeNumber = transactionData.BankChequeNumber;
+            // }
+            // await _transactionDbContext.Transactions.AddAsync(baseTransaction);
+            // var transactionAddStatus = await _transactionDbContext.SaveChangesAsync();
+            // if (transactionAddStatus < 1) throw new Exception("Failed to create Transaction");
+            // return await GenerateVoucherNumber(baseTransaction);
         }
     }
 }

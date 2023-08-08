@@ -12,7 +12,7 @@ namespace MicroFinance.Dtos.CompanyProfile
         [Required]
         public string MonthName { get; set; }
         [Required]
-        [Range(1, 31, ErrorMessage = "Number Of Day must be between 1 and 31.")]
+        [Range(1, 32, ErrorMessage = "Number Of Day must be between 1 and 31.")]
         public int NumberOfDay { get; set; }
         public int? RunningDay { get; set; }
         [Required]
