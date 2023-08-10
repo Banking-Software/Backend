@@ -1,6 +1,14 @@
 namespace MicroFinance.Models.Wrapper.Reports;
-public class ShareTransactionReportWrappr : TransactionReportWrapper
+
+
+public class ShareTransactionReport : BaseReportWrapper
 {
-    public int ShareTransactionId { get; set; }
-    
+    public int ShareTransactionId { get; set; } // Current TransactionId
+}
+public class ShareTransactionReportWrapper
+{
+    public decimal? PreviousBalanceAfterTransaction { get; set; }
+    public decimal DebitSum {get; set;}
+    public decimal CreditSum{get; set;}
+    public List<ShareTransactionReport> ShareTransactionReports { get; set; }
 }

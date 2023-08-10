@@ -1,6 +1,5 @@
-namespace MicroFinance.Models.Wrapper;
-
+namespace MicroFinance.Models.Wrapper.Reports;
 public class LedgerTransactionReport
 {
-    public int LedgerTransactionId { get; set; }
+    public int TransactionId { get; set; }
 }
