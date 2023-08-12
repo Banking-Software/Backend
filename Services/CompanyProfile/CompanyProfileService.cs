@@ -2,6 +2,8 @@ using AutoMapper;
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.CompanyProfile;
 using MicroFinance.Enums;
+using MicroFinance.Exceptions;
+using MicroFinance.Helper;
 using MicroFinance.Models.CompanyProfile;
 using MicroFinance.Repository.CompanyProfile;
 
@@ -12,12 +14,20 @@ namespace MicroFinance.Services.CompanyProfile
         private readonly ICompanyProfileRepository _companyProfile;
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
+        private readonly INepaliCalendarFormat _nepaliCalendarFormat;
 
-        public CompanyProfileService(ICompanyProfileRepository companyProfile, IMapper mapper, IConfiguration config)
+        public CompanyProfileService
+        (
+            ICompanyProfileRepository companyProfile, 
+            IMapper mapper, 
+            IConfiguration config,
+            INepaliCalendarFormat nepaliCalendarFormat
+        )
         {
             _companyProfile = companyProfile;
             _mapper = mapper;
             _config=config;
+            _nepaliCalendarFormat=nepaliCalendarFormat;
         }
 
 
@@ -154,19 +164,36 @@ namespace MicroFinance.Services.CompanyProfile
             }
             throw new NotImplementedException("No Branch Found");
         }
+
        
         public async Task<ResponseDto> CreateCalenderService(List<CreateCalenderDto> createCalenderDtos, Dictionary<string, string> userClaim)
         {
             CalendarServiceDto validateCalender = new CalendarServiceDto();
             validateCalender.ValidateCalenderList(createCalenderDtos);
+            var calendarForCurrentYear = await _companyProfile.GetCalendarByYear(createCalenderDtos[0].Year);
+            if(calendarForCurrentYear.Count>=1)
+                throw new UnAuthorizedExceptionHandler("Calendar already exist for the given year");
+        
+            var activeCalendar = await _companyProfile.GetActiveCalender();
             List<Calendar> calendars = new List<Calendar>();
+            int activeMonth=0;
             foreach (var calenderDto in createCalenderDtos)
             {
                 var calendar = _mapper.Map<Calendar>(calenderDto);
+                string lastDateOfTheMonth = await _nepaliCalendarFormat.GetNepaliFormatDate(calendar.Year, calendar.Month, calendar.NumberOfDay);
+                bool isRightFormat = await _nepaliCalendarFormat.VerifyNepaliDate(lastDateOfTheMonth);
+                if(!isRightFormat)
+                    throw new Exception($"Invalid Date: {calendar.MonthName} doesnot content day {calendar.NumberOfDay}");
+                
                 calendar.CreatedBy = userClaim["currentUserName"];
                 calendar.CreatedOn = DateTime.Now;
+                if(calendar.IsActive && activeCalendar!=null)
+                    throw new BadRequestExceptionHandler("One Active Calendar already exist. You are not allowed to create another");
+                if(calendar.IsActive) activeMonth+=1;
                 calendars.Add(calendar);
             }
+            if( activeMonth<1 && activeCalendar==null )
+                throw new Exception("You need to make exactly one month as active. 0 active month received!");
 
             int createStatus = await _companyProfile.CreateCalender(calendars);
             if (createStatus >= 1)
@@ -180,10 +207,15 @@ namespace MicroFinance.Services.CompanyProfile
         {
             var currentCurrrentCalender = await _companyProfile.GetCalendarById(updateCalenderDto.Id);
             if (currentCurrrentCalender == null) throw new Exception("No Calender Found");
-            if (currentCurrrentCalender.IsActive == true || currentCurrrentCalender.IsLocked == true)
+            if (currentCurrrentCalender.IsLocked == true)
             {
                 throw new Exception("Calender is locked, not allowed to edit. Please Contact Software Provider");
             }
+            string lastDateOfTheMonth = $"{updateCalenderDto.Year}-{updateCalenderDto.Month}-{updateCalenderDto.NumberOfDay}";
+            bool isRightFormat = await _nepaliCalendarFormat.VerifyNepaliDateFormat(lastDateOfTheMonth);
+            if(!isRightFormat)
+                throw new Exception($"Invalid Date: {updateCalenderDto.MonthName} doesnot content day {updateCalenderDto.NumberOfDay}");
+
             int updateStatus = await _companyProfile.UpdateCalender(updateCalenderDto, userClaim);
             if (updateStatus >= 1)
             {
@@ -226,6 +258,12 @@ namespace MicroFinance.Services.CompanyProfile
                 return _mapper.Map<CalendarDto>(activeCalender);
             }
             throw new Exception("No Active Calender Exist");
+        }
+
+        public async Task<int> GetActiveYearService()
+        {
+            int year = await _companyProfile.GetActiveYear();
+            return year;
         }
 
          public async Task<CalendarDto> GetCalendarByYearAndMonthService(int year, int month)

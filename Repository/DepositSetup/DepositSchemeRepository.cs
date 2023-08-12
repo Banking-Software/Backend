@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AutoMapper;
 using MicroFinance.DBContext;
 using MicroFinance.Enums.Deposit.Account;
@@ -188,20 +189,20 @@ namespace MicroFinance.Repository.DepositSetup
 
         public async Task<int> UpdateDepositAccount(DepositAccount updateDepositAccount)
         {
-            var existingDepositAccount = await _depositDbContext.DepositAccounts.FindAsync(updateDepositAccount.Id);
-            _depositDbContext.Entry(existingDepositAccount).State = EntityState.Detached;
-            _depositDbContext.DepositAccounts.Attach(updateDepositAccount);
-            _depositDbContext.Entry(existingDepositAccount).State = EntityState.Modified;
+            //  var existingDepositAccount = await _depositDbContext.DepositAccounts.FindAsync(updateDepositAccount.Id);
+            // _depositDbContext.Entry(existingDepositAccount).State = EntityState.Detached;
+            //_depositDbContext.DepositAccounts.Attach(updateDepositAccount);
+            _depositDbContext.Entry(updateDepositAccount).State = EntityState.Modified;
             return await _depositDbContext.SaveChangesAsync();
         }
-        public async Task<List<DepositAccountWrapper>> GetAllNonClosedDepositAccounts()
+        public async Task<List<DepositAccountWrapper>> GetAllDepositAccountsWrapper(Expression<Func<DepositAccount, bool>> expression)
         {
             var depositAccountWrappers = await _depositDbContext.DepositAccounts
              .Include(da => da.Client)
              .Include(da => da.DepositScheme)
              .Include(da => da.InterestPostingAccountNumber)
              .Include(da => da.InterestPostingAccountNumber)
-             .Where(da => da.Status != AccountStatusEnum.Close)
+             .Where(expression)
              .Select(da => new DepositAccountWrapper
              {
                  DepositAccount = da,
@@ -214,14 +215,14 @@ namespace MicroFinance.Repository.DepositSetup
              .ToListAsync();
             return depositAccountWrappers;
         }
-        public async Task<DepositAccountWrapper> GetNonClosedDepositAccount(int id)
+        public async Task<DepositAccountWrapper> GetDepositAccountWrapper(Expression<Func<DepositAccount, bool>> expression)
         {
             var depositAccountWrappers = await _depositDbContext.DepositAccounts
              .Include(da => da.Client)
              .Include(da => da.DepositScheme)
              .Include(da => da.InterestPostingAccountNumber)
              .Include(da => da.InterestPostingAccountNumber)
-             .Where(da => da.Status != AccountStatusEnum.Close && da.Id == id)
+             .Where(expression)
              .Select(da => new DepositAccountWrapper
              {
                  DepositAccount = da,
@@ -233,97 +234,77 @@ namespace MicroFinance.Repository.DepositSetup
              .AsNoTracking()
              .SingleOrDefaultAsync();
              return depositAccountWrappers;
-            // DepositAccountWrapper nonCloseDepositAccountWrapper = new DepositAccountWrapper();
-            // var depositAccount = await _depositDbContext.DepositAccounts
-            // .Include(da => da.Client)
-            // .Include(da => da.DepositScheme)
-            // .Include(da => da.InterestPostingAccountNumber)
-            // .Include(da => da.InterestPostingAccountNumber)
-            // .Where(da => da.Status != AccountStatusEnum.Close && da.Id == id)
-            // .SingleOrDefaultAsync();
-            // if (depositAccount == null)
-            //     return new DepositAccountWrapper();
-            // if (depositAccount.AccountType == AccountTypeEnum.Joint)
-            // {
-            //     var jointAccounts = await _depositDbContext.JointAccounts
-            //     .Include(ja => ja.JointClient)
-            //     .Where(ja => ja.DepositAccountId == depositAccount.Id && ja.RealWorldEndDate == null && ja.CompanyCalendarEndDate == null)
-            //     .ToListAsync();
-            //     nonCloseDepositAccountWrapper.JointAccount = jointAccounts;
-            // }
-            // nonCloseDepositAccountWrapper.DepositAccount = depositAccount;
-            // _depositDbContext.Entry(depositAccount).State = EntityState.Detached;
-            // return nonCloseDepositAccountWrapper;
+            
         }
 
-        public async Task<DepositAccount> GetNonClosedDepositAccountById(int id)
+        public async Task<DepositAccount> GetDepositAccount(Expression<Func<DepositAccount, bool>> expression)
         {
             var depositAccount = await _depositDbContext.DepositAccounts
             .Include(da => da.Client)
             .Include(da => da.DepositScheme)
             .Include(da => da.InterestPostingAccountNumber)
             .Include(da => da.InterestPostingAccountNumber)
-            .Where(da => da.Id == id && da.Status != AccountStatusEnum.Close)
+            .Where(expression)
             .AsNoTracking()
             .SingleOrDefaultAsync();
             return depositAccount;
         }
-        public async Task<DepositAccount> GetDepositAccountByDepositSchemeIdAndClientId(int depositSchemeId, int clientId)
-        {
-            return await _depositDbContext.DepositAccounts
-            .Include(da => da.DepositScheme)
-            .Include(da => da.Client)
-            .Where
-            (
-                da => da.DepositSchemeId == depositSchemeId
-                && da.ClientId == clientId
-                && da.Status != AccountStatusEnum.Close
-            )
-            .AsNoTracking()
-            .SingleOrDefaultAsync();
-        }
+        // public async Task<DepositAccount> GetDepositAccountByDepositSchemeIdAndClientId(int depositSchemeId, int clientId)
+        // {
+        //     return await _depositDbContext.DepositAccounts
+        //     .Include(da => da.DepositScheme)
+        //     .Include(da => da.Client)
+        //     .Where
+        //     (
+        //         da => da.DepositSchemeId == depositSchemeId
+        //         && da.ClientId == clientId
+        //         && da.Status != AccountStatusEnum.Close
+        //     )
+        //     .AsNoTracking()
+        //     .SingleOrDefaultAsync();
+        // }
 
-        public async Task<DepositAccountWrapper> GetNonClosedDepositAccountByAccountNumber(string accountNumber)
-        {
-            var depositAccountWrappers = await _depositDbContext.DepositAccounts
-            .Include(da => da.Client)
-            .Include(da => da.DepositScheme)
-            .Include(da => da.InterestPostingAccountNumber)
-            .Include(da => da.InterestPostingAccountNumber)
-            .Where(da => da.Status != AccountStatusEnum.Close && da.AccountNumber == accountNumber)
-            .Select(da => new DepositAccountWrapper
-            {
-                DepositAccount = da,
-                JointAccount = _depositDbContext.JointAccounts
-                    .Include(ja => ja.JointClient)
-                    .Where(ja => ja.DepositAccountId == da.Id && ja.RealWorldEndDate == null && ja.CompanyCalendarEndDate == null)
-                    .ToList()
-            })
-            .AsNoTracking()
-            .SingleOrDefaultAsync();
-            return depositAccountWrappers;
-        }
+        // public async Task<DepositAccountWrapper> GetNonClosedDepositAccountByAccountNumber(string accountNumber)
+        // {
+        //     var depositAccountWrappers = await _depositDbContext.DepositAccounts
+        //     .Include(da => da.Client)
+        //     .Include(da => da.DepositScheme)
+        //     .Include(da => da.InterestPostingAccountNumber)
+        //     .Include(da => da.InterestPostingAccountNumber)
+        //     .Where(da => da.Status != AccountStatusEnum.Close && da.AccountNumber == accountNumber)
+        //     .Select(da => new DepositAccountWrapper
+        //     {
+        //         DepositAccount = da,
+        //         JointAccount = _depositDbContext.JointAccounts
+        //             .Include(ja => ja.JointClient)
+        //             .Where(ja => ja.DepositAccountId == da.Id && ja.RealWorldEndDate == null && ja.CompanyCalendarEndDate == null)
+        //             .ToList()
+        //     })
+        //     .AsNoTracking()
+        //     .SingleOrDefaultAsync();
+        //     return depositAccountWrappers;
+        // }
 
-        public async Task<List<DepositAccountWrapper>> GetNonClosedDepositAccountByDepositScheme(int depositSchemeId)
-        {
-            var depositAccountWrappers = await _depositDbContext.DepositAccounts
-            .Include(da => da.Client)
-            .Include(da => da.DepositScheme)
-            .Include(da => da.InterestPostingAccountNumber)
-            .Include(da => da.InterestPostingAccountNumber)
-            .Where(da => da.Status != AccountStatusEnum.Close && da.DepositSchemeId == depositSchemeId)
-            .Select(da => new DepositAccountWrapper
-            {
-                DepositAccount = da,
-                JointAccount = _depositDbContext.JointAccounts
-                    .Include(ja => ja.JointClient)
-                    .Where(ja => ja.DepositAccountId == da.Id && ja.RealWorldEndDate == null && ja.CompanyCalendarEndDate == null)
-                    .ToList()
-            })
-            .AsNoTracking()
-            .ToListAsync();
-            return depositAccountWrappers;
-        }
+        // public async Task<List<DepositAccountWrapper>> GetNonClosedDepositAccountByDepositScheme(int depositSchemeId)
+        // {
+        //     var depositAccountWrappers = await _depositDbContext.DepositAccounts
+        //     .Include(da => da.Client)
+        //     .Include(da => da.DepositScheme)
+        //     .Include(da => da.InterestPostingAccountNumber)
+        //     .Include(da => da.InterestPostingAccountNumber)
+        //     .Where(da => da.Status != AccountStatusEnum.Close && da.DepositSchemeId == depositSchemeId)
+        //     .Select(da => new DepositAccountWrapper
+        //     {
+        //         DepositAccount = da,
+        //         JointAccount = _depositDbContext.JointAccounts
+        //             .Include(ja => ja.JointClient)
+        //             .Where(ja => ja.DepositAccountId == da.Id && ja.RealWorldEndDate == null && ja.CompanyCalendarEndDate == null)
+        //             .ToList()
+        //     })
+        //     .AsNoTracking()
+        //     .ToListAsync();
+        //     return depositAccountWrappers;
+        // }
         // public async Task<int> CreateFlexibleInterestRate(FlexibleInterestRate flexibleInterestRate)
         // {
         //     await _depositDbContext.FlexibleInterestRates.AddAsync(flexibleInterestRate);

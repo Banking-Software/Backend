@@ -75,30 +75,57 @@ namespace MicroFinance.Repository.ClientSetup
 
         }
 
+        private async Task HandleShareAccount(Client updateClient)
+        {
+            var existingShareAccount = await _dbContext.ShareAccounts.Where(sa=>sa.ClientId==updateClient.Id).SingleOrDefaultAsync();
+            if(updateClient.IsShareAllowed && existingShareAccount==null)
+            {
+               await _shareRepository.CreateShareAccount(updateClient);
+               return;
+            }
+            else if(!updateClient.IsShareAllowed && existingShareAccount!=null)
+            {
+                existingShareAccount.IsActive=false;
+                existingShareAccount.IsClose = true;
+            }
+            else if(updateClient.IsShareAllowed && existingShareAccount!=null)
+            {
+                existingShareAccount.IsActive = updateClient.IsActive;
+                if(existingShareAccount.IsClose)
+                    existingShareAccount.IsClose = false;
+            }
+            await _shareRepository.UpdateShareAccount(existingShareAccount);
+            return;
+        }
         public async Task<int> UpdateClient(Client updateClient)
         {
-            var existingClient = await _dbContext.Clients.FindAsync(updateClient.Id);
-            if (updateClient.IsActive && !existingClient.IsActive)
+            using var transaction = await  _dbContext.Database.BeginTransactionAsync();
+            try
             {
-                _logger.LogInformation($"{DateTime.Now}: Activating inactive client {updateClient.ClientId} by employee {updateClient.ModifiedBy}");
+                var existingClient = await _dbContext.Clients.FindAsync(updateClient.Id);
+                if (updateClient.IsActive && !existingClient.IsActive)
+                {
+                    _logger.LogInformation($"{DateTime.Now}: Activating inactive client {updateClient.ClientId} by employee {updateClient.ModifiedBy}");
+                }
+                else if (!updateClient.IsActive && existingClient.IsActive)
+                {
+                    _logger.LogInformation($"{DateTime.Now}: Deactivating active client {updateClient.ClientId} by employee {updateClient.ModifiedBy}");
+                }
+
+                _dbContext.Entry(existingClient).State = EntityState.Detached;
+                _dbContext.Clients.Attach(updateClient);
+                _dbContext.Entry(updateClient).State = EntityState.Modified;
+                var status = await _dbContext.SaveChangesAsync();
+                if(status<1) throw new Exception("Unable to Update the client details");
+                await HandleShareAccount(updateClient);
+                transaction.CommitAsync();
+                return 1;
             }
-            else if (!updateClient.IsActive && existingClient.IsActive)
+            catch(Exception ex)
             {
-                _logger.LogInformation($"{DateTime.Now}: Deactivating active client {updateClient.ClientId} by employee {updateClient.ModifiedBy}");
+                transaction.RollbackAsync();
+                throw new Exception(ex.Message);
             }
-            _dbContext.Entry(existingClient).State = EntityState.Detached;
-            _dbContext.Clients.Attach(updateClient);
-            _dbContext.Entry(updateClient).State = EntityState.Modified;
-            var status = await _dbContext.SaveChangesAsync();
-            if (status >= 1)
-            {
-                _logger.LogInformation($"{DateTime.Now}: client {updateClient.ClientId} update successfully by employee {updateClient.ModifiedBy}");
-            }
-            else
-            {
-                _logger.LogError($"{DateTime.Now}: Failed to update the Client");
-            }
-            return status;
         }
 
         public async Task<Client> GetClientByClientId(string clientId)

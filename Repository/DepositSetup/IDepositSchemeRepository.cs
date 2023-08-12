@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using MicroFinance.Models.DepositSetup;
 using MicroFinance.Models.Wrapper;
 
@@ -19,12 +20,13 @@ namespace MicroFinance.Repository.DepositSetup
         Task<int> CreateDepositAccount(DepositAccount depositAccount);
         Task<int> CreateJointAccount(List<JointAccount> jointAccounts, DepositAccount depositAccount);
         Task<int> UpdateDepositAccount(DepositAccount updateDepositAccount);
-        Task<List<DepositAccountWrapper>> GetAllNonClosedDepositAccounts();
-        Task<DepositAccountWrapper> GetNonClosedDepositAccount(int id);
-        Task<DepositAccountWrapper> GetNonClosedDepositAccountByAccountNumber(string accountNumber);
-        Task<List<DepositAccountWrapper>> GetNonClosedDepositAccountByDepositScheme(int depositSchemeId);
-        Task<DepositAccount> GetDepositAccountByDepositSchemeIdAndClientId(int depositSchemeId, int clientId);
-        Task<DepositAccount> GetNonClosedDepositAccountById(int id);
+        Task<List<DepositAccountWrapper>> GetAllDepositAccountsWrapper(Expression<Func<DepositAccount, bool>> expression);
+        Task<DepositAccountWrapper> GetDepositAccountWrapper(Expression<Func<DepositAccount, bool>> expression);
+        // Task<DepositAccountWrapper> GetDepositAccountByAccountNumber(string accountNumber);
+        // Task<List<DepositAccountWrapper>> GetNonClosedDepositAccountByDepositScheme(int depositSchemeId);
+        //Task<DepositAccount> GetDepositAccountByDepositSchemeIdAndClientId(int depositSchemeId, int clientId);
+        Task<DepositAccount> GetDepositAccount(Expression<Func<DepositAccount, bool>> expression);
+        //Task<DepositAccount> GetNonClosedDepositAccountById(int id);
 
         // // Flexible Interest Rate
 

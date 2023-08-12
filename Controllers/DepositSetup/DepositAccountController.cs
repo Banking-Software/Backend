@@ -40,7 +40,7 @@ namespace MicroFinance.Controllers.DepositSetup
         }
 
 
-        [HttpPost("createDepositAccount")]
+        [HttpPost("create")]
         public async Task<ActionResult<ResponseDto>> CreateDepositAccount([FromForm] CreateDepositAccountDto createDepositAccountDto)
         {
 
@@ -49,7 +49,7 @@ namespace MicroFinance.Controllers.DepositSetup
 
         }
 
-        [HttpPut("updateDepositAccount")]
+        [HttpPut("update")]
         public async Task<ActionResult<ResponseDto>> UpdateNonClosedDepositAccount([FromForm] UpdateDepositAccountDto updateDepositAccountDto)
         {
 
@@ -58,32 +58,32 @@ namespace MicroFinance.Controllers.DepositSetup
 
         }
 
-        [HttpGet("getAllNonClosedDepositAccount")]
-        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetAllNonClosedDepositAccount()
+        [HttpGet("all")]
+        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetAllDepositAccount()
         {
             var decodedToken = GetDecodedToken();
-            return Ok(await _depositService.GetAllNonClosedDepositAccountService(decodedToken));
+            return Ok(await _depositService.GetAllDepositAccountWrapperService(decodedToken));
         }
 
-        [HttpGet("getNonClosedDepositAccountById")]
-        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetNonClosedDepositAccountById([FromQuery] int depositAccountId)
+        [HttpGet("byId")]
+        public async Task<ActionResult<DepositAccountWrapperDto>> GetDepositAccountById([FromQuery] int depositAccountId)
         {
             var decodedToken = GetDecodedToken();
-            return Ok(await _depositService.GetNonClosedDepositAccountByIdService(depositAccountId, decodedToken));
+            return Ok(await _depositService.GetDepositAccountWrapperByIdService(depositAccountId, null,decodedToken));
         }
 
-        [HttpGet("getNonClosedDepositAccountByDepositSchemeId")]
-        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetAllNonClosedDepositAccountByDepositScheme([FromQuery] int depositSchemeId)
+        [HttpGet("byDepositSchemeId")]
+        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetDepositAccountByDepositScheme([FromQuery] int depositSchemeId)
         {
             var decodedToken = GetDecodedToken();
-            return Ok(await _depositService.GetNonClosedDepositAccountByDepositSchemeService(depositSchemeId, decodedToken));
+            return Ok(await _depositService.GetDepositAccountWrapperByDepositSchemeService(depositSchemeId, decodedToken));
         }
 
-        [HttpGet("getNonClosedDepositAccountByAccountNumber")]
-        public async Task<ActionResult<List<DepositAccountWrapperDto>>> GetAllNonClosedDepositAccountByAccountNumber([FromQuery] string accountNumber)
+        [HttpGet("byAccountNumber")]
+        public async Task<ActionResult<DepositAccountWrapperDto>> GetDepositAccountByAccountNumber([FromQuery] string accountNumber)
         {
             var decodedToken = GetDecodedToken();
-            return Ok(await _depositService.GetNonClosedDepositAccountByAccountNumberService(accountNumber, decodedToken));
+            return Ok(await _depositService.GetDepositAccountWrapperByAccountNumberService(accountNumber, null,decodedToken));
         }
         [HttpPost("getMatureDate")]
         public async Task<ActionResult<string>> GetMatureDate(GenerateMatureDateDto generateMatureDateDto)

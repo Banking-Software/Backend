@@ -50,7 +50,7 @@ namespace MicroFinance.Dtos.CompanyProfile
                 throw new ValidationException("Year should be same for all the months");
 
             int activeCalendarCount=  calenderList.Count(c=>c.IsActive==true);
-            if(activeCalendarCount!=1)
+            if(activeCalendarCount>1)
             {
                 throw new ValidationException("Only one month can be active at a time");
             }

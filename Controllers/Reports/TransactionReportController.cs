@@ -1,4 +1,5 @@
 using MicroFinance.Dtos;
+using MicroFinance.Dtos.Reports;
 using MicroFinance.Models.Wrapper.Reports;
 using MicroFinance.Services.Reports;
 using MicroFinance.Token;
@@ -25,9 +26,9 @@ public class TransactionReportController : BaseApiController
     }
 
     [HttpGet("depositAccount")]
-    public async Task<ActionResult<DepositAccountTransactionReportWrapper>> GetDepositAccountTransactionReport([FromQuery] string fromDate, [FromQuery] string toDate, [FromQuery] int depositAccountId)
+    public async Task<ActionResult<DepositAccountTransactionReportWrapperDto>> GetDepositAccountTransactionReport([FromQuery] GetDepositAccountTransactionReport getDepositAccountTransactionReport)
     {
         var decodedToken = GetDecodedToken();
-        return Ok(await _transactionReportService.GetDepositAccountTransactionReportService(fromDate, toDate, depositAccountId, decodedToken));
+        return Ok(await _transactionReportService.GetDepositAccountTransactionReportService(getDepositAccountTransactionReport, decodedToken));
     }
 }

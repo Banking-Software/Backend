@@ -262,10 +262,10 @@ namespace MicroFinance.Repository.Transaction
 
         public async Task<BaseTransaction> BaseTransaction(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, int? bankDetailId, string? bankChequeNumber)
         {
-            var transactionDate = baseTransaction.CompanyCalendarCreationDate.Split("/");
-            baseTransaction.TransactionYear = Int32.Parse(transactionDate[0]);
-            baseTransaction.TransactionMonth = Int32.Parse(transactionDate[1]);
-            baseTransaction.TransactionDay = Int32.Parse(transactionDate[0]);
+            // var transactionDate = baseTransaction.CompanyCalendarCreationDate.Split("/");
+            // baseTransaction.TransactionYear = Int32.Parse(transactionDate[0]);
+            // baseTransaction.TransactionMonth = Int32.Parse(transactionDate[1]);
+            // baseTransaction.TransactionDay = Int32.Parse(transactionDate[0]);
             if (paymentType == PaymentTypeEnum.Bank && bankDetailId!=null)
             {
                 var bankDetail = await _transactionDbContext.BankSetups.FindAsync(bankDetailId);

@@ -102,6 +102,11 @@ namespace MicroFinance.Repository.CompanyProfile
             return await _companyProfileDbContex.Calendars.Where(c=>c.IsActive==true).FirstOrDefaultAsync();
         }
 
+        public async Task<int> GetActiveYear()
+        {
+            return await _companyProfileDbContex.Calendars.Where(c=>c.IsActive).Select(c=>c.Year).FirstOrDefaultAsync();
+        }
+
         public async Task<List<Calendar>> GetAllCalendars()
         {
             return await _companyProfileDbContex.Calendars.ToListAsync();

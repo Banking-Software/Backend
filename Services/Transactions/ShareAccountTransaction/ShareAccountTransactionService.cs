@@ -5,6 +5,7 @@ using MicroFinance.Enums.Deposit.Account;
 using MicroFinance.Enums.Transaction;
 using MicroFinance.Enums.Transaction.ShareTransaction;
 using MicroFinance.Exceptions;
+using MicroFinance.Helper;
 using MicroFinance.Models.Wrapper.TrasactionWrapper;
 using MicroFinance.Repository.Transaction;
 using MicroFinance.Services.AccountSetup.MainLedger;
@@ -24,6 +25,7 @@ namespace MicroFinance.Services.Transactions
         private readonly IDepositSchemeService _depositSchemeService;
         private readonly ICompanyProfileService _companyProfileService;
         private readonly IMapper _mapper;
+        private readonly INepaliCalendarFormat _nepaliCalendarFormat;
 
         public ShareAccountTransactionService
         (
@@ -33,7 +35,8 @@ namespace MicroFinance.Services.Transactions
             IClientService clientService,
             IMainLedgerService mainLedgerService,
             IDepositSchemeService depositSchemeService,
-            ICompanyProfileService companyProfileService
+            ICompanyProfileService companyProfileService,
+            INepaliCalendarFormat nepaliCalendarFormat
         )
         {
             _shareAccountTransactionRepository=shareAccountTransactionRepository;
@@ -43,6 +46,7 @@ namespace MicroFinance.Services.Transactions
             _depositSchemeService = depositSchemeService;
             _companyProfileService=companyProfileService;
             _mapper=mapper;
+            _nepaliCalendarFormat=nepaliCalendarFormat;
         }
 
         private async Task AddBasicInfo(ShareAccountTransactionWrapper shareAccountTransactionWrapper, TokenDto decodedToken)
@@ -52,7 +56,10 @@ namespace MicroFinance.Services.Transactions
             shareAccountTransactionWrapper.CreatorId = decodedToken.UserId;
             shareAccountTransactionWrapper.BranchCode = decodedToken.BranchCode;
             shareAccountTransactionWrapper.RealWorldCreationDate = DateTime.Now;
-            shareAccountTransactionWrapper.CompanyCalendarCreationDate = $"{companyCalendar.Year}/{companyCalendar.Month}/{companyCalendar.RunningDay}";
+            string nepaliCreationDate =  await _nepaliCalendarFormat.GetNepaliFormatDate(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            if(string.IsNullOrEmpty(nepaliCreationDate)) throw new Exception("Unable to assign the creation date");
+            shareAccountTransactionWrapper.NepaliCreationDate = nepaliCreationDate;
+            shareAccountTransactionWrapper.EnglishCreationDate = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(nepaliCreationDate);
         }
         public async Task<string> MakeShareTransaction(MakeShareTransactionDto makeShareTransactionDto, TokenDto decodedToken)
         {
@@ -65,7 +72,7 @@ namespace MicroFinance.Services.Transactions
             shareAccountTransactionWrapper.ShareKittaId = shareKitta.Id;
             if(makeShareTransactionDto.ShareTransactionType==ShareTransactionTypeEnum.Transfer)
             {
-                var transferToDepositAccount = await _depositSchemeService.GetNonClosedDepositAccountByIdService((int) makeShareTransactionDto.TransferToDepositAccountId, decodedToken); 
+                var transferToDepositAccount = await _depositSchemeService.GetDepositAccountWrapperByIdService((int) makeShareTransactionDto.TransferToDepositAccountId, null, decodedToken); 
                 if(transferToDepositAccount.DepositAccount.Status!=AccountStatusEnum.Active || !transferToDepositAccount.DepositScheme.IsActive)
                 {
                     throw new BadRequestExceptionHandler("Either Deposit Account or Deposit Scheme is not active");
@@ -82,7 +89,7 @@ namespace MicroFinance.Services.Transactions
             }
             else if(makeShareTransactionDto.PaymentType == PaymentTypeEnum.Account)
             {
-                var paymentDepositAccountNumber = await _depositSchemeService.GetNonClosedDepositAccountByIdService((int) makeShareTransactionDto.PaymentDepositAccountId, decodedToken);
+                var paymentDepositAccountNumber = await _depositSchemeService.GetDepositAccountWrapperByIdService((int) makeShareTransactionDto.PaymentDepositAccountId, null,decodedToken);
                 if(paymentDepositAccountNumber.DepositAccount.Status!=AccountStatusEnum.Active || !paymentDepositAccountNumber.DepositScheme.IsActive)
                 {
                      throw new BadRequestExceptionHandler("Either Deposit Account or Deposit Scheme is not active");

@@ -12,11 +12,14 @@ namespace MicroFinance.Models.DepositSetup
         public int DepositSchemeId { get; set; }
         public virtual DepositScheme DepositScheme { get; set; }
         public string? AccountNumber { get; set; }
-        public string OpeningDate { get; set; }
+        public string NepaliOpeningDate { get; set; }
+        public DateTime EnglishOpeningDate { get; set; }
         public int Period { get; set; }
         public PeriodTypeEnum PeriodType { get; set; }
         public AccountTypeEnum AccountType { get; set; }
-        public string MatureDate { get; set; }
+        public string NepaliMatureDate { get; set; }
+        public DateTime EnglishMatureDate { get; set; }
+        public DateTime NextInterestPostingDate {get; set;}
         public decimal InterestRate { get; set; }
         public decimal PrincipalAmount { get; set; } = 0;
         public decimal InterestAmount { get; set; } = 0;

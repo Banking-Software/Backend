@@ -13,6 +13,8 @@ using MicroFinance.Services.CompanyProfile;
 using MicroFinance.Services.DepositSetup;
 using MicroFinance.Services.UserManagement;
 using MicroFinance.Helper;
+using MicroFinance.Models.DepositSetup;
+using System.Linq.Expressions;
 
 namespace MicroFinance.Services.Transactions
 {
@@ -26,6 +28,7 @@ namespace MicroFinance.Services.Transactions
         private readonly IMapper _mapper;
         private readonly ICompanyProfileService _companyProfile;
         private readonly IEmployeeService _employeeService;
+        private readonly INepaliCalendarFormat _nepaliCalendarFormat;
 
         public DepositAccountTransactionService
         (
@@ -36,7 +39,8 @@ namespace MicroFinance.Services.Transactions
             IClientService clientService,
             ICompanyProfileService companyProfile,
             IMainLedgerService mainLedgerService,
-            IEmployeeService employeeService
+            IEmployeeService employeeService,
+            INepaliCalendarFormat nepaliCalendarFormat
         )
         {
             _logger = logger;
@@ -47,6 +51,7 @@ namespace MicroFinance.Services.Transactions
             _mainLedgerService = mainLedgerService;
             _companyProfile = companyProfile;
             _employeeService = employeeService;
+            _nepaliCalendarFormat=nepaliCalendarFormat;
         }
         private async Task<BankSetupDto> GetBankDetails(int bankId, TokenDto decodedToken)
         {
@@ -59,9 +64,10 @@ namespace MicroFinance.Services.Transactions
         }
         private async Task<DepositAccountWrapperDto> GetDepositAccount(int depositAccountId, TokenDto decodedToken)
         {
-            var depositAccountWrapper = await _depositSchemeService.GetNonClosedDepositAccountByIdService(depositAccountId, decodedToken);
-            if (depositAccountWrapper.DepositAccount.Status != AccountStatusEnum.Active)
-                throw new Exception("Deposit Account is not active");
+            Expression<Func<DepositAccount, bool>> expressionToQueryDepositAccount
+            = da=>da.Id==depositAccountId && da.Status==AccountStatusEnum.Active;
+
+            var depositAccountWrapper = await _depositSchemeService.GetDepositAccountWrapperByIdService(null, expressionToQueryDepositAccount, decodedToken);
             return depositAccountWrapper;
         }
         private async Task VerifyAmountCollectedEmployee(int employeeId, TokenDto decodedToken)
@@ -93,8 +99,10 @@ namespace MicroFinance.Services.Transactions
             transactionData.CreatorId = decodedToken.UserId;
             transactionData.BranchCode = decodedToken.BranchCode;
             transactionData.RealWorldCreationDate = DateTime.Now;
-            transactionData.CompanyCalendarCreationDate = $"{companyCalendar.Year}/{companyCalendar.Month}/{companyCalendar.RunningDay}";
-            
+            string nepaliCreationDate = await _nepaliCalendarFormat.GetNepaliFormatDate(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            if(string.IsNullOrEmpty(nepaliCreationDate)) throw new Exception("Unable to assign the creation date");
+            transactionData.NepaliCreationDate = nepaliCreationDate;
+            transactionData.EnglishCreationDate = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(transactionData.NepaliCreationDate);
             return transactionData;
             
         }

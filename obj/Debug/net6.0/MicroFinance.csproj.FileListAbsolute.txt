@@ -400,3 +400,4 @@
 /media/ashish/New Volume1/FinTechProject/MicroFinance/obj/Debug/net6.0/ref/MicroFinance.dll
 /media/ashish/New Volume1/FinTechProject/MicroFinance/bin/Debug/net6.0/Microsoft.Extensions.Configuration.dll
 /media/ashish/New Volume/FinTechProject/MicroFinance/bin/Debug/net6.0/Microsoft.Extensions.Configuration.dll
+/media/ashish/New Volume/FinTechProject/MicroFinance/bin/Debug/net6.0/NepaliCalendar.dll

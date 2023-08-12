@@ -38,27 +38,27 @@ namespace MicroFinance.Controllers.DepositSetup
             return decodedToken;
         }
 
-        [HttpPost("createDepositScheme")]
+        [HttpPost("create")]
         public async Task<ActionResult<ResponseDto>> CreateDepositScheme(CreateDepositSchemeDto createDepositSchemeDto)
         {
             var decodedToken = GetDecodedToken();
             return await _depositSchemeService.CreateDepositSchemeService(createDepositSchemeDto, decodedToken);
         }
 
-        [HttpPut("updateDepositScheme")]
+        [HttpPut("update")]
         public async Task<ActionResult<ResponseDto>> UpdateDepositScheme(UpdateDepositSchemeDto updateDepositSchemeDto)
         {
             var decodedToken = GetDecodedToken();
             return await _depositSchemeService.UpdateDepositSchemeService(updateDepositSchemeDto, decodedToken);
         }
 
-        [HttpGet("getAllDepositScheme")]
+        [HttpGet("all")]
         public async Task<ActionResult<List<DepositSchemeDto>>> GetAllDepositScheme()
         {
            return await _depositSchemeService.GetAllDepositSchemeService();
         }
 
-        [HttpGet("getDepositSchemeById")]
+        [HttpGet("byId")]
         public async Task<ActionResult<DepositSchemeDto>> GetDepositSchemeById([FromQuery] int id)
         {
             return Ok(await _depositSchemeService.GetDepositSchemeByIdService(id));

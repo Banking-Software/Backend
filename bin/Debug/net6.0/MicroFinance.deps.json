@@ -19,6 +19,7 @@
           "Microsoft.EntityFrameworkCore.SqlServer": "7.0.4",
           "Microsoft.EntityFrameworkCore.Tools": "7.0.4",
           "Microsoft.Extensions.Configuration": "7.0.0",
+          "NepaliCalendarCore": "1.3.0",
           "Newtonsoft.Json": "13.0.3",
           "Serilog.AspNetCore": "6.1.0",
           "Serilog.Sinks.Console": "4.1.0",
@@ -742,6 +743,14 @@
           "lib/netstandard2.0/Mono.TextTemplating.dll": {
             "assemblyVersion": "2.2.0.0",
             "fileVersion": "2.2.1.1"
+          }
+        }
+      },
+      "NepaliCalendarCore/1.3.0": {
+        "runtime": {
+          "lib/net5.0/NepaliCalendar.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.0"
           }
         }
       },
@@ -1722,6 +1731,13 @@
       "sha512": "sha512-KZYeKBET/2Z0gY1WlTAK7+RHTl7GSbtvTLDXEZZojUdAPqpQNDL6tHv7VUpqfX5VEOh+uRGKaZXkuD253nEOBQ==",
       "path": "mono.texttemplating/2.2.1",
       "hashPath": "mono.texttemplating.2.2.1.nupkg.sha512"
+    },
+    "NepaliCalendarCore/1.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-4478PErAiAZ+v0fq8SOrOHfzsZ945tNHJVcGic1rdSGzOImJQ0v5TEGKEOnxJI21pSk8cyrVmeV2XPODo0c8Pw==",
+      "path": "nepalicalendarcore/1.3.0",
+      "hashPath": "nepalicalendarcore.1.3.0.nupkg.sha512"
     },
     "Newtonsoft.Json/13.0.3": {
       "type": "package",

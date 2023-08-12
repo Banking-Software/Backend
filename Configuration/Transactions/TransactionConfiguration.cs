@@ -13,7 +13,8 @@ namespace MicroFinance.Configuration.Transactions
             builder.HasIndex(tsc=>tsc.VoucherNumber).IsUnique();
             builder.Property(tsc=>tsc.TransactionAmount).HasPrecision(18,4).IsRequired(true);
             builder.Property(tsc=>tsc.RealWorldCreationDate).IsRequired(true);
-            builder.Property(tsc=>tsc.CompanyCalendarCreationDate).IsRequired(true);
+            builder.Property(tsc=>tsc.EnglishCreationDate).IsRequired(true);
+            builder.Property(tsc=>tsc.NepaliCreationDate).IsRequired(true);
 
              builder.HasOne(dt=>dt.BankDetail)
             .WithMany(bnk=>bnk.BaseTransactions)

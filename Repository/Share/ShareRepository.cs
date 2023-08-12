@@ -32,9 +32,15 @@ namespace MicroFinance.Repository.Share
             if(status<1) throw new NotImplementedException("Unable to create Share Account");
             return shareAccount.Id;
         }
-        public Task<int> UpdateShareAccount(ShareAccount shareAccount)
+        public async Task<int> UpdateShareAccount(ShareAccount shareAccount)
         {
-            throw new NotImplementedException();
+            string closeStatement = shareAccount.IsClose?"closing":"opening";
+            string activeStatement = shareAccount.IsActive?"activating":"deactivating";
+            _logger.LogInformation($"{DateTime.Now}: Share Account of client with Id '{shareAccount.ClientId} is {closeStatement}...");
+            _logger.LogInformation($"{DateTime.Now}: Share Account of client with Id '{shareAccount.ClientId} is {activeStatement}...");
+            int result = await _dbContext.SaveChangesAsync();
+            if(result<1) throw new Exception("Unable to update Share Account");
+            return result;
         }
 
         public async Task<List<ShareAccountWrapper>> GetAllActiveShareAccount()

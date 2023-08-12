@@ -10,6 +10,7 @@ namespace MicroFinance.Models.Share
         public int ClientId { get; set; }
         public decimal CurrentShareBalance { get; set; }=0;
         public bool IsActive { get; set; }
+        public bool IsClose { get; set; }
 
         public virtual ICollection<ShareTransaction> ShareTransactions { get; set; }
     }

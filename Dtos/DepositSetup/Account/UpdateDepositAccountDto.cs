@@ -10,8 +10,6 @@ namespace MicroFinance.Dtos.DepositSetup
         public int Id { get; set; }
         [Required]
         public decimal InterestRate { get; set; }
-        [Required]
-        public AccountStatusEnum Status { get; set; }
         public int? InterestPostingAccountId { get; set; }
         public int? MatureInterestPostingAccountId { get; set; }
         public string? Description { get; set; }

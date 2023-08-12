@@ -20,6 +20,7 @@ namespace MicroFinance.Services.CompanyProfile
         Task<CalendarDto> GetCalendarByIdService(int id);
         Task<CalendarDto> GetCurrentActiveCalenderService();
         Task<List<CalendarDto>> GetCalendarByYearService(int year);
+        Task<int> GetActiveYearService();
         Task<List<CalendarDto>> GetAllCalenderService();
         Task<CalendarDto> GetCalendarByYearAndMonthService(int year, int month);
     }

@@ -1,9 +1,11 @@
 
+using MicroFinance.Helper;
 using MicroFinance.Repository.AccountSetup.MainLedger;
 using MicroFinance.Repository.ClientSetup;
 using MicroFinance.Repository.CompanyProfile;
 using MicroFinance.Repository.DepositSetup;
 using MicroFinance.Repository.RecordsWithCode;
+using MicroFinance.Repository.Reports;
 using MicroFinance.Repository.Share;
 using MicroFinance.Repository.Transaction;
 using MicroFinance.Repository.UserManagement;
@@ -12,6 +14,7 @@ using MicroFinance.Services.ClientSetup;
 using MicroFinance.Services.CompanyProfile;
 using MicroFinance.Services.DepositSetup;
 using MicroFinance.Services.RecordsWithCode;
+using MicroFinance.Services.Reports;
 using MicroFinance.Services.Share;
 using MicroFinance.Services.Transactions;
 using MicroFinance.Services.UserManagement;
@@ -51,6 +54,11 @@ namespace MicroFinance.ServiceExtensions.ApplicationService
 
             services.AddTransient<IShareRepository, ShareRepository>();
             services.AddTransient<IShareService, ShareService>();
+
+            services.AddTransient<ITransactionReportRepository, TransactionReportrepository>();
+            services.AddTransient<ITransactionReportService, TransactionReportService>();
+
+            services.AddTransient<INepaliCalendarFormat, NepaliCalendarFormat>();
 
             
             

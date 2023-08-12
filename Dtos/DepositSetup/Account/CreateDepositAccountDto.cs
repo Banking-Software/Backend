@@ -11,7 +11,7 @@ namespace MicroFinance.Dtos.DepositSetup
         [Required]
         public int ClientId { get; set; }
         [Required]
-        public string OpeningDate { get; set; }
+        public string NepaliOpeningDate { get; set; }
         [Required]
         public int Period { get; set; }
         [Required]
@@ -44,14 +44,7 @@ namespace MicroFinance.Dtos.DepositSetup
             {
                 yield return new ValidationResult("No Joint Client Received. Please provide Client Id if you want to create joint account, otherwise select single account type");
             }
-            if(PeriodType==PeriodTypeEnum.Month && (Period < 1 || Period > 12))
-            {
-                yield return new ValidationResult("1<=Months<=12 constraint dosesn't meet in the Period and PeriodType");
-            }
-            if(PeriodType==PeriodTypeEnum.Day && (Period<1 || Period > 32))
-            {
-                yield return new ValidationResult("1<=Days<=32 constraint dosesn't meet in the Period and PeriodType");
-            }
+            
         }
     }
 }
