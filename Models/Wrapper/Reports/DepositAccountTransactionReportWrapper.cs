@@ -14,5 +14,5 @@ public class DepositAccountTransactionReportWrapper
    public decimal? PreviousBalanceAfterTransaction { get; set; }
    public decimal? DebitSum {get; set;}
    public decimal? CreditSum{get; set;}
-   public IList<DepositAccountTransactionReport> DepositAccountTransactionReports;
+   public List<DepositAccountTransactionReport> DepositAccountTransactionReports {get;set;}
 }

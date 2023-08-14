@@ -12,6 +12,7 @@ namespace MicroFinance.Models.Transactions
         public int? LedgerId { get; set; }
         public TransactionTypeEnum TransactionType { get; set; }
         public string? Remarks { get; set; }
+        public string? Narration { get; set; }
         public decimal BalanceAfterTransaction { get; set; }
     }
 }

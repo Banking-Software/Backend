@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MicroFinance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230812180738_Initial")]
-    partial class Initial
+    [Migration("20230814184044_Report")]
+    partial class Report
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -832,7 +832,7 @@ namespace MicroFinance.Migrations
                     b.Property<DateTime>("EnglishMatureDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EnglishModificationDate")
+                    b.Property<DateTime?>("EnglishModificationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("EnglishOpeningDate")
@@ -891,7 +891,6 @@ namespace MicroFinance.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NepaliModificationDate")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NepaliOpeningDate")
@@ -917,7 +916,7 @@ namespace MicroFinance.Migrations
                     b.Property<DateTime>("RealWorldCreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("RealWorldModificationDate")
+                    b.Property<DateTime?>("RealWorldModificationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("ReferredByEmployeeId")
@@ -985,7 +984,7 @@ namespace MicroFinance.Migrations
                     b.Property<DateTime>("EnglishCreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EnglishModificationDate")
+                    b.Property<DateTime?>("EnglishModificationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("InterestRate")
@@ -1028,7 +1027,6 @@ namespace MicroFinance.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NepaliModificationDate")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PostingScheme")
@@ -1037,7 +1035,7 @@ namespace MicroFinance.Migrations
                     b.Property<DateTime>("RealWorldCreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("RealWorldModificationDate")
+                    b.Property<DateTime?>("RealWorldModificationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("SchemeName")
@@ -1516,6 +1514,9 @@ namespace MicroFinance.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
+                    b.Property<string>("Narration")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
@@ -1600,6 +1601,9 @@ namespace MicroFinance.Migrations
                     b.Property<decimal>("BalanceAfterTransaction")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("Narration")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
@@ -1798,6 +1802,9 @@ namespace MicroFinance.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -1822,7 +1829,35 @@ namespace MicroFinance.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("RoleId");
+
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.UserManagement.UserRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("RoleCode")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("RoleCode")
+                        .IsUnique();
+
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1850,43 +1885,6 @@ namespace MicroFinance.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "cfa33577-db62-455f-a52a-d55e4bdc9f93",
-                            ConcurrencyStamp = "0b16d4f7-27c4-461f-89f1-995bccbe9012",
-                            Name = "Marketing",
-                            NormalizedName = "MARKETING"
-                        },
-                        new
-                        {
-                            Id = "81faa567-90a6-402d-898a-877ecb623a12",
-                            ConcurrencyStamp = "54a01895-abc1-46dd-97c4-7c4b199a3cf7",
-                            Name = "Assistant",
-                            NormalizedName = "ASSISTANT"
-                        },
-                        new
-                        {
-                            Id = "3aac356f-292c-42fd-a26d-e3cdda262b0e",
-                            ConcurrencyStamp = "1ef524bf-6a97-4890-a4ef-67eb99d017c0",
-                            Name = "SeniorAssistant",
-                            NormalizedName = "SENIORASSISTANT"
-                        },
-                        new
-                        {
-                            Id = "4acbdd75-a4b9-4444-8f78-86c713da3054",
-                            ConcurrencyStamp = "2ce7bcf3-6cff-4a57-8131-401f98a958a8",
-                            Name = "Officer",
-                            NormalizedName = "OFFICER"
-                        },
-                        new
-                        {
-                            Id = "025fed80-e073-4d0d-b7d6-fdcfc8d8eea1",
-                            ConcurrencyStamp = "d8d796cd-0877-4928-8268-c823f6acd133",
-                            Name = "SuperAdmin",
-                            NormalizedName = "SUPERADMIN"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -2278,7 +2276,15 @@ namespace MicroFinance.Migrations
                         .WithOne("User")
                         .HasForeignKey("MicroFinance.Models.UserManagement.User", "EmployeeId");
 
+                    b.HasOne("MicroFinance.Models.UserManagement.UserRole", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
                     b.Navigation("Employee");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -2452,6 +2458,11 @@ namespace MicroFinance.Migrations
                 {
                     b.Navigation("User")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.UserManagement.UserRole", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

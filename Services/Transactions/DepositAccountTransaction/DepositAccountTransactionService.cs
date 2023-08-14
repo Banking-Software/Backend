@@ -29,6 +29,7 @@ namespace MicroFinance.Services.Transactions
         private readonly ICompanyProfileService _companyProfile;
         private readonly IEmployeeService _employeeService;
         private readonly INepaliCalendarFormat _nepaliCalendarFormat;
+        private readonly ICommonExpression _commonExpression;
 
         public DepositAccountTransactionService
         (
@@ -40,7 +41,8 @@ namespace MicroFinance.Services.Transactions
             ICompanyProfileService companyProfile,
             IMainLedgerService mainLedgerService,
             IEmployeeService employeeService,
-            INepaliCalendarFormat nepaliCalendarFormat
+            INepaliCalendarFormat nepaliCalendarFormat,
+            ICommonExpression commonExpression
         )
         {
             _logger = logger;
@@ -52,6 +54,7 @@ namespace MicroFinance.Services.Transactions
             _companyProfile = companyProfile;
             _employeeService = employeeService;
             _nepaliCalendarFormat=nepaliCalendarFormat;
+            _commonExpression = commonExpression;
         }
         private async Task<BankSetupDto> GetBankDetails(int bankId, TokenDto decodedToken)
         {
@@ -62,11 +65,9 @@ namespace MicroFinance.Services.Transactions
                 throw new Exception("Provided Bank doesnot belong to your branch");
             return bankdetail;
         }
-        private async Task<DepositAccountWrapperDto> GetDepositAccount(int depositAccountId, TokenDto decodedToken)
+        private async Task<DepositAccountWrapperDto> GetDepositAccount(int depositAccountId, TokenDto decodedToken, bool isDeposit)
         {
-            Expression<Func<DepositAccount, bool>> expressionToQueryDepositAccount
-            = da=>da.Id==depositAccountId && da.Status==AccountStatusEnum.Active;
-
+            Expression<Func<DepositAccount, bool>> expressionToQueryDepositAccount = await _commonExpression.GetExpressionOfDepositAccountForTransaction(depositAccountId, isDeposit);
             var depositAccountWrapper = await _depositSchemeService.GetDepositAccountWrapperByIdService(null, expressionToQueryDepositAccount, decodedToken);
             return depositAccountWrapper;
         }
@@ -74,7 +75,7 @@ namespace MicroFinance.Services.Transactions
         {
             var employee = await _employeeService.GetEmployeeByIdFromUserBranch(employeeId, decodedToken);
         }
-        private async Task<DepositAccountTransactionWrapper> BaseDepositAccountTransactionService(dynamic transactionDto, TokenDto decodedToken)
+        private async Task<DepositAccountTransactionWrapper> BaseDepositAccountTransactionService(dynamic transactionDto, TokenDto decodedToken, bool isDeposit)
         {
             if (!(transactionDto is MakeDepositTransactionDto) && !(transactionDto is MakeWithDrawalTransactionDto))
                 throw new Exception("Invalid Model is Passed");
@@ -83,7 +84,7 @@ namespace MicroFinance.Services.Transactions
             {
                 await VerifyAmountCollectedEmployee((int)transactionDto.CollectedByEmployeeId, decodedToken);
             }
-            var depositAccountWrapper = await GetDepositAccount((int)transactionDto.DepositAccountId, decodedToken);
+            var depositAccountWrapper = await GetDepositAccount((int)transactionDto.DepositAccountId, decodedToken, isDeposit);
             var companyCalendar = await _companyProfile.GetCurrentActiveCalenderService();
             DepositAccountTransactionWrapper transactionData = _mapper.Map<DepositAccountTransactionWrapper>(transactionDto);
             transactionData.DepositSchemeId = depositAccountWrapper.DepositScheme.Id;
@@ -108,7 +109,7 @@ namespace MicroFinance.Services.Transactions
         }
         public async Task<string> MakeDepositTransactionService(MakeDepositTransactionDto makeDepositTransactionDto, TokenDto decodedToken)
         {
-            var depositTransactionData = await BaseDepositAccountTransactionService(makeDepositTransactionDto, decodedToken);
+            var depositTransactionData = await BaseDepositAccountTransactionService(makeDepositTransactionDto, decodedToken, true);
             depositTransactionData.TransactionType = TransactionTypeEnum.Credit;
             return await _depositAccountTransactionRepo.MakeTransaction(depositTransactionData);
             //return voucherNumber;
@@ -116,7 +117,7 @@ namespace MicroFinance.Services.Transactions
 
         public async Task<string> MakeWithDrawalTransactionService(MakeWithDrawalTransactionDto makeWithDrawalTransactionDto, TokenDto decodedToken)
         {
-            var withDrawalTransactionData = await BaseDepositAccountTransactionService(makeWithDrawalTransactionDto, decodedToken);
+            var withDrawalTransactionData = await BaseDepositAccountTransactionService(makeWithDrawalTransactionDto, decodedToken, false);
             withDrawalTransactionData.TransactionType = TransactionTypeEnum.Debit;
             return await _depositAccountTransactionRepo.MakeTransaction(withDrawalTransactionData);
         }

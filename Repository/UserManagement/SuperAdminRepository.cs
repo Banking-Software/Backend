@@ -1,6 +1,6 @@
 // using MicroFinance.DBContext.UserManagement;
 using MicroFinance.DBContext;
-using MicroFinance.Exceptions;
+using MicroFinance.Enums;
 using MicroFinance.Models.UserManagement;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +15,6 @@ namespace MicroFinance.Repository.UserManagement
         private readonly SignInManager<User> _signInManager;
         // private readonly UserManager<User> _userManagerFinance;
         private readonly ILogger<SuperAdminRepository> _logger;
-        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _superAdminDbContex;
 
         // private readonly SuperAdminDbContext _superAdminDbContext;
@@ -29,7 +28,6 @@ namespace MicroFinance.Repository.UserManagement
             // SignInManager<SuperAdmin> signInManager,
             SignInManager<User> signInManager,
             // UserManager<User> userManagerFinance,
-            RoleManager<IdentityRole> roleManager,
             ILogger<SuperAdminRepository> logger
         )
         {
@@ -37,7 +35,6 @@ namespace MicroFinance.Repository.UserManagement
             _signInManager =signInManager;
             // _userManagerFinance=userManagerFinance;
             _logger = logger;
-            _roleManager=roleManager;
             // _superAdminDbContext=superAdminDbContext;
             _superAdminDbContex=superAdminDbContex;
 
@@ -78,21 +75,19 @@ namespace MicroFinance.Repository.UserManagement
         // public async Task<SuperAdmin> GetSuperAdminByUserName(string userName)
         public async Task<User> GetSuperAdminByUserName(string userName)
         {
-            return await _userManager.FindByNameAsync(userName);
+            return await _userManager.Users.Include(usr=>usr.Role).Where(usr=>usr.UserName==userName).SingleOrDefaultAsync();
         }
         // public async Task<SuperAdmin> GetSuperAdminById(string id)
         public async Task<User> GetSuperAdminById(string id)
         {
-            return await _userManager.FindByIdAsync(id);
+            return await _userManager.Users.Include(usr=>usr.Role).Where(usr=>usr.Id==id).SingleOrDefaultAsync();
         }
 
         // public async Task<string> GetRole(SuperAdmin user)
-        public async Task<string> GetRole(User user)
+        public async Task<UserRole> GetRole(int roleCode)
         {
-            var roles = await _userManager.GetRolesAsync(user);
-            if(!roles.Any())
-                throw new Exception("No Roles found");
-            return roles[0];
+            var role = await _superAdminDbContex.UserRoles.Where(rl=>rl.RoleCode==roleCode).SingleOrDefaultAsync();
+            return role;
         }
 
         // public async Task<bool> UpdatePassword(SuperAdmin superAdmin, string oldPassword, string newPassword)
@@ -114,14 +109,36 @@ namespace MicroFinance.Repository.UserManagement
 
 
         // Related to SuperAdmin Functionalities
-        public async Task<IdentityResult> CreateAdminProfile(User user, string password)
+        public async Task CreateAdminProfile(User user, Employee employee ,string password)
         {
-            var result = await _userManager.CreateAsync(user, password);
-            return result;
+            using var transaction = await _superAdminDbContex.Database.BeginTransactionAsync();
+            try
+            {
+                await _superAdminDbContex.Employees.AddAsync(employee);
+                int employeeCreateStatus = await _superAdminDbContex.SaveChangesAsync();
+                if(employeeCreateStatus<1) throw new Exception("Failed to create employee profile");
+                user.Employee = employee;
+                user.Role = await _superAdminDbContex.UserRoles.Where(rl=>rl.RoleCode==(int) RoleEnum.Officer).SingleOrDefaultAsync();
+                var userResult = await _userManager.CreateAsync(user, password);
+                if(!userResult.Succeeded)
+                {
+                    throw new Exception(userResult.Errors?.FirstOrDefault()?.Description);
+                }
+                await transaction.CommitAsync();
+                return;
+            }
+            catch(Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception(ex.Message);
+            }
+            
         }
         public async Task<List<User>> GetAllUsers()
         {
-            return await _userManager.Users.ToListAsync();
+            return await _userManager.Users
+            .Include(usr=>usr.Role)
+            .Where(usr=>usr.Role.RoleCode!=(int) RoleEnum.SuperAdmin).ToListAsync();
         }       
     }
 }

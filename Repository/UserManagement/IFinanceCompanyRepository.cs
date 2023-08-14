@@ -6,9 +6,9 @@ namespace MicroFinance.Repository.UserManagement
     public interface IEmployeeRepository
     {
         // START: User
-        Task<User> Register(User user, string password, string role);
+        Task<IdentityResult> Register(User user, string password);
         Task<SignInResult> Login(User user, string password, bool stayLogin);
-        Task<bool> UpdatePassword(User user, string oldPassword, string newPassword);
+        Task<IdentityResult> UpdatePassword(User user, string oldPassword, string newPassword);
         Task<IdentityResult> UpdateUserProfile(User user);
         Task<User> GetUserDetailsByUsername(string userName);
         Task<User> GetUserByUsername(string userName);
@@ -17,8 +17,8 @@ namespace MicroFinance.Repository.UserManagement
 
         Task<User> GetUserById(string id);
         Task<List<User>> GetUsers();
-        Task<IdentityResult> AssignRole(User user, string role);
-        Task<string> GetRole(User user);
+        Task<int> AssignRoleToUser(User user);
+        Task<UserRole> GetRole(int roleCode);
         Task<IdentityResult> DeleteUser(User user);
         Task<IdentityResult> ActivateOrDeactivateUser(User user);
         // END 

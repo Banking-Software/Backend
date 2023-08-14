@@ -1,4 +1,5 @@
 using System.Data;
+using System.Linq.Expressions;
 using AutoMapper;
 using MicroFinance.DBContext;
 using MicroFinance.Enums;
@@ -22,17 +23,20 @@ namespace MicroFinance.Repository.Transaction
         private readonly ILogger<DepositAccountTransactionRepository> _logger;
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _transactionDbContext;
+        private readonly ICommonExpression _commonExpression;
 
         public DepositAccountTransactionRepository
         (
             ILogger<DepositAccountTransactionRepository> logger,
             ApplicationDbContext transactionDbContext,
-            IMapper mapper
+            IMapper mapper,
+            ICommonExpression commonExpression
         )
         {
             _logger = logger;
             _mapper = mapper;
             _transactionDbContext = transactionDbContext;
+            _commonExpression=commonExpression;
         }
         public async Task<string> MakeTransaction(DepositAccountTransactionWrapper transactionData)
         {
@@ -101,8 +105,18 @@ namespace MicroFinance.Repository.Transaction
                         ledgerTransactionType = TransactionTypeEnum.Debit;
                     }
                     BaseTransaction baseTransaction = await MakeBaseTransaction(depositAccountTransactionWrapper);
-                    await BaseTransactionOnDepositAccount(depositAccountTransactionWrapper, baseTransaction);
-                    await BaseTransactionOnLedger(baseTransaction, depositAccountTransactionWrapper.PaymentType, ledgerTransactionType, isDeposit);
+                    var depositAccount = await BaseTransactionOnDepositAccount(depositAccountTransactionWrapper, baseTransaction);
+                    LedgerTransactionWrapper ledgerTransactionWrapper = new()
+                    {
+                        BaseTransaction = baseTransaction,
+                        LedgerTransactionType = ledgerTransactionType,
+                        PaymentType=depositAccountTransactionWrapper.PaymentType,
+                        IsDeposit = isDeposit,
+                        ledgerRemarks=$"{depositAccount.AccountNumber} - {depositAccount.Client.ClientFirstName} {depositAccount.Client.ClientLastName}",
+                        LedgerNarration = depositAccountTransactionWrapper.Narration
+                    };
+                    
+                    await BaseTransactionOnLedger(ledgerTransactionWrapper);
                     int transactionStatus = await _transactionDbContext.SaveChangesAsync();
                     if (transactionStatus < 1) throw new Exception("Unable to make Deposit Transaction");
                     // processTransaction.Commit();
@@ -131,15 +145,32 @@ namespace MicroFinance.Repository.Transaction
         {
             var depositAccount = await TransactionOnDepositAccount(depositAccountTransactionWrapper);
             await CreateDepositAccountTransactionEntry(depositAccountTransactionWrapper, baseTransaction, depositAccount);
-            await BaseTransactionOnSubLedger(baseTransaction, depositAccountTransactionWrapper);
+            SubLedgerTransactionWrapper subLedgerTransactionWrapper = new()
+            {
+                BaseTransaction=baseTransaction,
+                LedgerTransactionType = depositAccountTransactionWrapper.TransactionType,
+                PaymentType = depositAccountTransactionWrapper.PaymentType,
+                IsDeposit = depositAccountTransactionWrapper.TransactionType==TransactionTypeEnum.Credit?true:false,
+                ledgerRemarks = $"{depositAccount.AccountNumber} - {depositAccount.Client.ClientFirstName} {depositAccount.Client.ClientLastName}",
+                LedgerNarration = depositAccountTransactionWrapper.Narration,
+                SubLedgerId = depositAccountTransactionWrapper.DepositSchemeSubLedgerId
+            };
+            await BaseTransactionOnSubLedger(subLedgerTransactionWrapper);
             return depositAccount;
         }
 
         private async Task<DepositAccount> TransactionOnDepositAccount(DepositAccountTransactionWrapper depositAccountTransactionWrapper)
         {
+            Expression<Func<DepositAccount, bool>> expressionToGetAccountDetail = await _commonExpression.GetExpressionOfDepositAccountForTransaction
+            (
+                depositAccountId:depositAccountTransactionWrapper.DepositAccountId,
+                isDeposit: depositAccountTransactionWrapper.TransactionType == TransactionTypeEnum.Credit?true:false
+            );
+           
             DepositAccount depositAccount = await _transactionDbContext.DepositAccounts
-            .Where(da => da.Id == depositAccountTransactionWrapper.DepositAccountId && da.Status != AccountStatusEnum.Close)
-            .SingleOrDefaultAsync();
+            .Include(da=>da.Client)
+            .Include(da=>da.DepositScheme)
+            .Where(expressionToGetAccountDetail).SingleOrDefaultAsync();
             if (depositAccount != null)
             {
                 depositAccount.PrincipalAmount = depositAccountTransactionWrapper.TransactionType == TransactionTypeEnum.Credit
@@ -153,7 +184,7 @@ namespace MicroFinance.Repository.Transaction
                 }
                 return depositAccount;
             }
-            throw new Exception("No Deposit Account found");
+            throw new Exception("No account found to make a transaction");
         }
         private async Task CreateDepositAccountTransactionEntry(DepositAccountTransactionWrapper depositAccountTransactionWrapper, BaseTransaction baseTransaction, DepositAccount depositAccount)
         {
@@ -173,29 +204,29 @@ namespace MicroFinance.Repository.Transaction
             await _transactionDbContext.DepositAccountTransactions.AddAsync(depositAccountTransaction);
         }
 
-        private async Task BaseTransactionOnSubLedger(BaseTransaction baseTransaction, DepositAccountTransactionWrapper depositAccountTransactionWrapper)
+        private async Task BaseTransactionOnSubLedger(SubLedgerTransactionWrapper subLedgerTransactionWrapper )
         {
-            var depositSchemeSubLedger = await TransactionOnSubLedger(baseTransaction, depositAccountTransactionWrapper);
-            await CreateDepositSchemeSubLedgerTransactionEntry(baseTransaction, depositSchemeSubLedger, depositAccountTransactionWrapper);
+            var depositSchemeSubLedger = await TransactionOnSubLedger(subLedgerTransactionWrapper);
+            await CreateDepositSchemeSubLedgerTransactionEntry(subLedgerTransactionWrapper, depositSchemeSubLedger);
         }
 
-        private async Task<SubLedger> TransactionOnSubLedger(BaseTransaction baseTransaction, DepositAccountTransactionWrapper depositAccountTransactionWrapper)
+        private async Task<SubLedger> TransactionOnSubLedger(SubLedgerTransactionWrapper subLedgerTransactionWrapper )
         {
             SubLedger depositSchemeSubledger = await _transactionDbContext.SubLedgers
             .Include(sl => sl.Ledger)
-            .Where(sl => sl.Id == depositAccountTransactionWrapper.DepositSchemeSubLedgerId)
+            .Where(sl => sl.Id == subLedgerTransactionWrapper.SubLedgerId)
             .SingleOrDefaultAsync();
             if (depositSchemeSubledger != null)
             {
-                if (depositAccountTransactionWrapper.TransactionType == TransactionTypeEnum.Credit)
+                if (subLedgerTransactionWrapper.LedgerTransactionType == TransactionTypeEnum.Credit)
                 {
-                    depositSchemeSubledger.CurrentBalance += depositAccountTransactionWrapper.TransactionAmount;
-                    depositSchemeSubledger.Ledger.CurrentBalance += depositAccountTransactionWrapper.TransactionAmount;
+                    depositSchemeSubledger.CurrentBalance += subLedgerTransactionWrapper.BaseTransaction.TransactionAmount;
+                    depositSchemeSubledger.Ledger.CurrentBalance += subLedgerTransactionWrapper.BaseTransaction.TransactionAmount;
                 }
                 else
                 {
-                    depositSchemeSubledger.CurrentBalance -= depositAccountTransactionWrapper.TransactionAmount;
-                    depositSchemeSubledger.Ledger.CurrentBalance -= depositAccountTransactionWrapper.TransactionAmount;
+                    depositSchemeSubledger.CurrentBalance -= subLedgerTransactionWrapper.BaseTransaction.TransactionAmount;
+                    depositSchemeSubledger.Ledger.CurrentBalance -= subLedgerTransactionWrapper.BaseTransaction.TransactionAmount;
                 }
                 if (depositSchemeSubledger.CurrentBalance < 0 || depositSchemeSubledger.Ledger.CurrentBalance < 0)
                 {
@@ -205,39 +236,40 @@ namespace MicroFinance.Repository.Transaction
             }
             throw new Exception("No subLedger found for given deposit account");
         }
-        private async Task CreateDepositSchemeSubLedgerTransactionEntry(BaseTransaction baseTransaction, SubLedger depositSchemeSubLedger, DepositAccountTransactionWrapper depositAccountTransactionWrapper)
+        private async Task CreateDepositSchemeSubLedgerTransactionEntry(SubLedgerTransactionWrapper subLedgerTransactionWrapper ,SubLedger depositSchemeSubLedger)
         {
             SubLedgerTransaction subLedgerTransaction = new()
             {
-                Transaction = baseTransaction,
+                Transaction = subLedgerTransactionWrapper.BaseTransaction,
                 SubLedger = depositSchemeSubLedger,
-                TransactionType = depositAccountTransactionWrapper.TransactionType,
-                Remarks = $"Transaction done as {baseTransaction.Remarks}",
-                BalanceAfterTransaction = depositSchemeSubLedger.CurrentBalance
+                TransactionType = subLedgerTransactionWrapper.LedgerTransactionType,
+                Remarks = subLedgerTransactionWrapper.ledgerRemarks,
+                BalanceAfterTransaction = depositSchemeSubLedger.CurrentBalance,
+                Narration=subLedgerTransactionWrapper.LedgerNarration
             };
             await _transactionDbContext.SubLedgerTransactions.AddAsync(subLedgerTransaction);
         }
 
-        public async Task BaseTransactionOnLedger(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, TransactionTypeEnum ledgerTransactionType, bool isDeposit)
+        public async Task BaseTransactionOnLedger(LedgerTransactionWrapper ledgerTransactionWrapper)
         {
-            Ledger paymentMethodLedger = await TransactionOnLedger(baseTransaction, paymentType, ledgerTransactionType, isDeposit);
-            await CreateLedgerTransactionEntry(baseTransaction, paymentMethodLedger, ledgerTransactionType);
+            Ledger paymentMethodLedger = await TransactionOnLedger(ledgerTransactionWrapper);
+            await CreateLedgerTransactionEntry(ledgerTransactionWrapper, paymentMethodLedger);
         }
-        private async Task<Ledger> TransactionOnLedger(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, TransactionTypeEnum ledgerTransactionType, bool isDeposit)
+        private async Task<Ledger> TransactionOnLedger(LedgerTransactionWrapper ledgerTransactionWrapper)
         {
-            Ledger ledger = paymentType == PaymentTypeEnum.Cash
+            Ledger ledger = ledgerTransactionWrapper.PaymentType == PaymentTypeEnum.Cash
             ?
             await _transactionDbContext.Ledgers.Where(l => l.LedgerCode == 1).SingleOrDefaultAsync() // In Cash of Cash Transaction
             :
-            await _transactionDbContext.Ledgers.Where(l => l.Id == baseTransaction.BankDetail.LedgerId).SingleOrDefaultAsync();
+            await _transactionDbContext.Ledgers.Where(l => l.Id == ledgerTransactionWrapper.BaseTransaction.BankDetail.LedgerId).SingleOrDefaultAsync();
 
             if (ledger != null)
             {
-                ledger.CurrentBalance = isDeposit
+                ledger.CurrentBalance = ledgerTransactionWrapper.IsDeposit
                 ?
-                ledger.CurrentBalance + baseTransaction.TransactionAmount
+                ledger.CurrentBalance + ledgerTransactionWrapper.BaseTransaction.TransactionAmount
                 :
-                ledger.CurrentBalance - baseTransaction.TransactionAmount;
+                ledger.CurrentBalance - ledgerTransactionWrapper.BaseTransaction.TransactionAmount;
                 if (ledger.CurrentBalance < 0)
                 {
                     throw new Exception("Negative Balance: Your payment method leads to negative balance in ledger");
@@ -247,15 +279,16 @@ namespace MicroFinance.Repository.Transaction
             throw new Exception("No Ledger Found that satisfy your payment method");
         }
 
-        private async Task CreateLedgerTransactionEntry(BaseTransaction baseTransaction, Ledger paymentMethodLedger, TransactionTypeEnum ledgerTransactionType)
+        private async Task CreateLedgerTransactionEntry(LedgerTransactionWrapper ledgerTransactionWrapper, Ledger paymentMethodLedger)
         {
             LedgerTransaction ledgerTransaction = new()
             {
-                Transaction = baseTransaction,
+                Transaction = ledgerTransactionWrapper.BaseTransaction,
                 Ledger = paymentMethodLedger,
-                TransactionType = ledgerTransactionType,
-                Remarks = $"Transaction done as {baseTransaction.Remarks}",
-                BalanceAfterTransaction = paymentMethodLedger.CurrentBalance
+                TransactionType = ledgerTransactionWrapper.LedgerTransactionType,
+                Remarks = ledgerTransactionWrapper.ledgerRemarks,
+                BalanceAfterTransaction = paymentMethodLedger.CurrentBalance,
+                Narration = ledgerTransactionWrapper.LedgerNarration
             };
             await _transactionDbContext.LedgerTransactions.AddAsync(ledgerTransaction);
         }

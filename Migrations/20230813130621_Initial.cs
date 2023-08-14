@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace MicroFinance.Migrations
 {
     /// <inheritdoc />
@@ -362,6 +360,20 @@ namespace MicroFinance.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserRoles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleCode = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GroupTypes",
                 columns: table => new
                 {
@@ -419,6 +431,7 @@ namespace MicroFinance.Migrations
                     ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EmployeeId = table.Column<int>(type: "int", nullable: true),
+                    RoleId = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -441,6 +454,11 @@ namespace MicroFinance.Migrations
                         name: "FK_AspNetUsers_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_UserRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "UserRoles",
                         principalColumn: "Id");
                 });
 
@@ -832,9 +850,9 @@ namespace MicroFinance.Migrations
                     ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifierId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifierBranchCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EnglishModificationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    NepaliModificationDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RealWorldModificationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    EnglishModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    NepaliModificationDate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RealWorldModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -961,9 +979,9 @@ namespace MicroFinance.Migrations
                     ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifierId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifierBranchCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EnglishModificationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    NepaliModificationDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RealWorldModificationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    EnglishModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    NepaliModificationDate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RealWorldModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1114,18 +1132,6 @@ namespace MicroFinance.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "025fed80-e073-4d0d-b7d6-fdcfc8d8eea1", "d8d796cd-0877-4928-8268-c823f6acd133", "SuperAdmin", "SUPERADMIN" },
-                    { "3aac356f-292c-42fd-a26d-e3cdda262b0e", "1ef524bf-6a97-4890-a4ef-67eb99d017c0", "SeniorAssistant", "SENIORASSISTANT" },
-                    { "4acbdd75-a4b9-4444-8f78-86c713da3054", "2ce7bcf3-6cff-4a57-8131-401f98a958a8", "Officer", "OFFICER" },
-                    { "81faa567-90a6-402d-898a-877ecb623a12", "54a01895-abc1-46dd-97c4-7c4b199a3cf7", "Assistant", "ASSISTANT" },
-                    { "cfa33577-db62-455f-a52a-d55e4bdc9f93", "0b16d4f7-27c4-461f-89f1-995bccbe9012", "Marketing", "MARKETING" }
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AccountTypes_Name",
                 table: "AccountTypes",
@@ -1170,6 +1176,11 @@ namespace MicroFinance.Migrations
                 column: "EmployeeId",
                 unique: true,
                 filter: "[EmployeeId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_RoleId",
+                table: "AspNetUsers",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
@@ -1465,6 +1476,18 @@ namespace MicroFinance.Migrations
                 column: "VoucherNumber",
                 unique: true,
                 filter: "[VoucherNumber] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRoles_Name",
+                table: "UserRoles",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRoles_RoleCode",
+                table: "UserRoles",
+                column: "RoleCode",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -1562,6 +1585,9 @@ namespace MicroFinance.Migrations
 
             migrationBuilder.DropTable(
                 name: "Employees");
+
+            migrationBuilder.DropTable(
+                name: "UserRoles");
 
             migrationBuilder.DropTable(
                 name: "DepositSchemes");

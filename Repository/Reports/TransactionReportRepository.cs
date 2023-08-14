@@ -36,9 +36,11 @@ namespace MicroFinance.Repository.Reports
         {
             DepositAccountTransactionReportWrapper depositAccountTransactionReportWrapper = new();
             // Get the report based on provided date
-            IList<DepositAccountTransactionReport> depositAccountTransactionReport =
+            List<DepositAccountTransactionReport> depositAccountTransactionReport =
             await _dbContext.DepositAccountTransactions.Include(dat => dat.Transaction).Include(dat => dat.DepositAccount)
-            .Where(expressionOnDepositAccountTransaction).Select
+            .Where(expressionOnDepositAccountTransaction)
+            .OrderBy(dat=>dat.Transaction.RealWorldCreationDate)
+            .Select
             (dat=>
                 new DepositAccountTransactionReport
                 {
@@ -54,7 +56,8 @@ namespace MicroFinance.Repository.Reports
                     NepaliCreationDate = dat.Transaction.NepaliCreationDate,
                     EnglishCreationDate = dat.Transaction.EnglishCreationDate,
                     BalanceAfterTransaction = dat.BalanceAfterTransaction,
-                    TransactionDoneBy = dat.Transaction.CreatedBy
+                    TransactionDoneBy = dat.Transaction.CreatedBy,
+                    Status=dat.DepositAccount.Status
                 }
             ).AsNoTracking().ToListAsync();
 
@@ -86,34 +89,83 @@ namespace MicroFinance.Repository.Reports
             return depositAccountTransactionReportWrapper;
         }
 
-        public async Task<ShareTransactionReportWrapper> GetShareTransactionReport(Expression<Func<BaseTransaction, bool>> expressionOnBaseTransaction, Expression<Func<ShareAccount, bool>> expressionOnShareAccount)
+        public async Task<LedgerTransactionReportWrapper> GetLedgerTransactionReport(Expression<Func<LedgerTransaction, bool>> expressionOnLedgerTransaction)
+        {
+            LedgerTransactionReportWrapper ledgerTransactionReportWrapper = new();
+            var ledgerTransactionReport =  await _dbContext.LedgerTransactions
+            .Include(lt=>lt.Transaction)
+            .Include(lt=>lt.Ledger)
+            .Where(expressionOnLedgerTransaction)
+            .OrderBy(lt=>lt.Transaction.RealWorldCreationDate)
+            .Select
+            (lt=>
+                new LedgerTransactionReport
+                {
+                    BaseTransactionId = lt.Transaction.Id,
+                    LedgerTransactionId = lt.Id,
+                    VoucherNumber = lt.Transaction.VoucherNumber,
+                    TransactionRemarks = lt.Transaction.Remarks,
+                    TransactionType = lt.TransactionType,
+                    TransactionAmount = lt.Transaction.TransactionAmount,
+                    Narration = lt.Narration,
+                    Description = lt.Remarks,
+                    RealWorldCreationDate = lt.Transaction.RealWorldCreationDate,
+                    NepaliCreationDate = lt.Transaction.NepaliCreationDate,
+                    EnglishCreationDate = lt.Transaction.EnglishCreationDate,
+                    BalanceAfterTransaction = lt.BalanceAfterTransaction,
+                    TransactionDoneBy = lt.Transaction.CreatedBy
+                }
+            ).AsNoTracking().ToListAsync();
+
+             if (ledgerTransactionReport != null && ledgerTransactionReport.Any())
+            {
+                var transactionSum = ledgerTransactionReport
+                .GroupBy(report => report.TransactionType)
+                .Select(grp => new
+                {
+                    TransactionType = grp.Key,
+                    TransactionSumAmount = grp.Sum(report => report.TransactionAmount)
+                });
+
+                var firstReport = ledgerTransactionReport[0];
+
+                var previousAccount = await _dbContext.LedgerTransactions
+                .Include(st => st.Transaction)
+                .Where(st => st.Transaction.RealWorldCreationDate < firstReport.RealWorldCreationDate)
+                .OrderByDescending(st => st.Transaction.RealWorldCreationDate)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+                ledgerTransactionReportWrapper.LedgerTransactionReports = ledgerTransactionReport;
+                ledgerTransactionReportWrapper.PreviousBalanceAfterTransaction = previousAccount?.BalanceAfterTransaction;
+                ledgerTransactionReportWrapper.CreditSum = transactionSum.Where(ts => ts.TransactionType == TransactionTypeEnum.Credit).SingleOrDefault()?.TransactionSumAmount;
+                ledgerTransactionReportWrapper.DebitSum = transactionSum.Where(ts => ts.TransactionType == TransactionTypeEnum.Debit).SingleOrDefault()?.TransactionSumAmount;
+            }
+            return ledgerTransactionReportWrapper;
+        }
+
+        public async Task<ShareTransactionReportWrapper> GetShareTransactionReport(Expression<Func<ShareTransaction, bool>> expressionOnShareTransaction)
         {
             // Expression<Func<BaseTransaction, bool>> dateFilterPredicate = GetDateFilterPredicate(dateFrom, dateTo);
             ShareTransactionReportWrapper shareTransactionReportWrappr = new();
-            var shareTransactionReport =
-            await (from st in _dbContext.ShareTransactions
-                   join trasc in _dbContext.Transactions on st.TransactionId equals trasc.Id
-                   join sa in _dbContext.ShareAccounts on st.ShareAccountId equals sa.Id
-                   where expressionOnShareAccount.Compile()(sa)
-                   && expressionOnBaseTransaction.Compile()(trasc)
-                   //&& dateFilterPredicate.Compile()(trasc)
-                   orderby trasc.RealWorldCreationDate
-                   select new ShareTransactionReport
-                   {
-                       BaseTransactionId = trasc.Id,
-                       ShareTransactionId = st.Id,
-                       VoucherNumber = trasc.VoucherNumber,
-                       TransactionRemarks = trasc.Remarks,
-                       TransactionType = st.TransactionType,
-                       TransactionAmount = trasc.TransactionAmount,
-                       Narration = st.Narration,
-                       Description = st.Remarks,
-                       RealWorldCreationDate = trasc.RealWorldCreationDate,
-                       NepaliCreationDate = trasc.NepaliCreationDate,
-                       EnglishCreationDate = trasc.EnglishCreationDate,
-                       BalanceAfterTransaction = st.BalanceAfterTransaction,
-                       TransactionDoneBy = trasc.CreatedBy
-                   }).AsNoTracking().ToListAsync();
+            var shareTransactionReport = await _dbContext.ShareTransactions.Include(st=>st.Transaction).Include(st=>st.ShareAccount)
+            .Where(expressionOnShareTransaction).OrderBy(st=>st.Transaction.RealWorldCreationDate)
+            .Select(st=>new ShareTransactionReport
+            {
+                BaseTransactionId=st.TransactionId,
+                ShareTransactionId = st.Id,
+                VoucherNumber=st.Transaction.VoucherNumber,
+                TransactionRemarks = st.Transaction.Remarks,
+                TransactionType = st.TransactionType,
+                TransactionAmount = st.Transaction.TransactionAmount,
+                BalanceAfterTransaction = st.BalanceAfterTransaction,
+                EnglishCreationDate = st.Transaction.EnglishCreationDate,
+                NepaliCreationDate = st.Transaction.NepaliCreationDate,
+                RealWorldCreationDate = st.Transaction.RealWorldCreationDate,
+                Narration = st.Narration,
+                Description = st.Remarks,
+                TransactionDoneBy = st.Transaction.CreatedBy
+
+            }).AsNoTracking().ToListAsync();
 
             if (shareTransactionReport != null && shareTransactionReport.Any())
             {
@@ -128,17 +180,71 @@ namespace MicroFinance.Repository.Reports
                 var firstReport = shareTransactionReport[0];
 
                 var previousAccount = await _dbContext.ShareTransactions
-                .Include(dat => dat.Transaction)
-                .Where(dat => dat.Transaction.RealWorldCreationDate < firstReport.RealWorldCreationDate)
-                .OrderByDescending(dat => dat.Transaction.RealWorldCreationDate)
+                .Include(st => st.Transaction)
+                .Where(st => st.Transaction.RealWorldCreationDate < firstReport.RealWorldCreationDate)
+                .OrderByDescending(st => st.Transaction.RealWorldCreationDate)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
                 shareTransactionReportWrappr.ShareTransactionReports = shareTransactionReport;
                 shareTransactionReportWrappr.PreviousBalanceAfterTransaction = previousAccount?.BalanceAfterTransaction;
-                shareTransactionReportWrappr.CreditSum = transactionSum.Where(ts => ts.TransactionType == TransactionTypeEnum.Credit).SingleOrDefault().TransactionSumAmount;
-                shareTransactionReportWrappr.DebitSum = transactionSum.Where(ts => ts.TransactionType == TransactionTypeEnum.Debit).SingleOrDefault().TransactionSumAmount;
+                shareTransactionReportWrappr.CreditSum = transactionSum.Where(ts => ts.TransactionType == TransactionTypeEnum.Credit).SingleOrDefault()?.TransactionSumAmount;
+                shareTransactionReportWrappr.DebitSum = transactionSum.Where(ts => ts.TransactionType == TransactionTypeEnum.Debit).SingleOrDefault()?.TransactionSumAmount;
             }
             return shareTransactionReportWrappr;
+        }
+
+        public async Task<SubLedgerTransactionReportWrapper> GetSubLedgerTransactionReport(Expression<Func<SubLedgerTransaction, bool>> expressionOnSubLedgerTransaction)
+        {
+            SubLedgerTransactionReportWrapper subLedgerTransactionReportWrapper = new();
+            var subLedgerTransactionReport =  await _dbContext.SubLedgerTransactions
+            .Include(lt=>lt.Transaction)
+            .Include(lt=>lt.SubLedger)
+            .Where(expressionOnSubLedgerTransaction)
+            .OrderBy(lt=>lt.Transaction.RealWorldCreationDate)
+            .Select
+            (lt=>
+                new SubLedgerTransactionReport
+                {
+                    BaseTransactionId = lt.Transaction.Id,
+                    SubLedgerTransactionId = lt.Id,
+                    VoucherNumber = lt.Transaction.VoucherNumber,
+                    TransactionRemarks = lt.Transaction.Remarks,
+                    TransactionType = lt.TransactionType,
+                    TransactionAmount = lt.Transaction.TransactionAmount,
+                    Narration = lt.Narration,
+                    Description = lt.Remarks,
+                    RealWorldCreationDate = lt.Transaction.RealWorldCreationDate,
+                    NepaliCreationDate = lt.Transaction.NepaliCreationDate,
+                    EnglishCreationDate = lt.Transaction.EnglishCreationDate,
+                    BalanceAfterTransaction = lt.BalanceAfterTransaction,
+                    TransactionDoneBy = lt.Transaction.CreatedBy
+                }
+            ).AsNoTracking().ToListAsync();
+
+             if (subLedgerTransactionReport != null && subLedgerTransactionReport.Any())
+            {
+                var transactionSum = subLedgerTransactionReport
+                .GroupBy(report => report.TransactionType)
+                .Select(grp => new
+                {
+                    TransactionType = grp.Key,
+                    TransactionSumAmount = grp.Sum(report => report.TransactionAmount)
+                });
+
+                var firstReport = subLedgerTransactionReport[0];
+
+                var previousAccount = await _dbContext.SubLedgerTransactions
+                .Include(st => st.Transaction)
+                .Where(st => st.Transaction.RealWorldCreationDate < firstReport.RealWorldCreationDate)
+                .OrderByDescending(st => st.Transaction.RealWorldCreationDate)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+                subLedgerTransactionReportWrapper.SubLedgerTransactionReports = subLedgerTransactionReport;
+                subLedgerTransactionReportWrapper.PreviousBalanceAfterTransaction = previousAccount?.BalanceAfterTransaction;
+                subLedgerTransactionReportWrapper.CreditSum = transactionSum.Where(ts => ts.TransactionType == TransactionTypeEnum.Credit).SingleOrDefault()?.TransactionSumAmount;
+                subLedgerTransactionReportWrapper.DebitSum = transactionSum.Where(ts => ts.TransactionType == TransactionTypeEnum.Debit).SingleOrDefault()?.TransactionSumAmount;
+            }
+            return subLedgerTransactionReportWrapper;
         }
     }
 }

@@ -8,7 +8,9 @@ using MicroFinance.Models.Wrapper.Reports;
 namespace MicroFinance.Repository.Reports;
 public interface ITransactionReportRepository
 {
-    Task<ShareTransactionReportWrapper> GetShareTransactionReport(Expression<Func<BaseTransaction, bool>> expressionOnBaseTransaction, Expression<Func<ShareAccount, bool>> expressionOnShareAccount);
+    Task<ShareTransactionReportWrapper> GetShareTransactionReport(Expression<Func<ShareTransaction, bool>> expressionOnShareTransaction);
     Task<DepositAccountTransactionReportWrapper> GetDepositAccountTransactionReport(Expression<Func<DepositAccountTransaction, bool>> expressionOnDepositAccountTransaction);
+    Task<LedgerTransactionReportWrapper> GetLedgerTransactionReport(Expression<Func<LedgerTransaction, bool>> expressionOnLedgerTransaction);
+    Task<SubLedgerTransactionReportWrapper> GetSubLedgerTransactionReport(Expression<Func<SubLedgerTransaction, bool>> expressionOnSubLedgerTransaction);
 
 }

@@ -5,6 +5,8 @@ using MicroFinance.Models.Wrapper.Reports;
 namespace MicroFinance.Services.Reports;
 public interface ITransactionReportService
 {
-    Task<DepositAccountTransactionReportWrapperDto> GetDepositAccountTransactionReportService(GetDepositAccountTransactionReport getDepositAccountTransactionReport, TokenDto decodedToken);
-    Task<ShareTransactionReportWrapper> GetShareAccountTransactionReportService(string fromDate, string toDate, int shareAccountId, TokenDto decodedToken);
+    Task<DepositAccountTransactionReportWrapperDto> GetDepositAccountTransactionReportService(DepositAccountTransactionReportParams depositAccountTransactionReportParams, TokenDto decodedToken);
+    Task<LedgerTransactionReportWrapperDto> GetLedgerTransactionReportService(LedgerTransactionReportParams ledgerTransactionReportParams, TokenDto decodedToken);
+    Task<SubLedgerTransactionReportWrapperDto> GetSubLedgerTransactionReportService(SubLedgerTransactionReportParams suLedgerTransactionReportParams, TokenDto decodedToken);
+    Task<ShareAccountTransactionReportWrapperDto> GetShareAccountTransactionReportService(ShareTransactionReportParams shareTransactionReportParams ,TokenDto decodedToken);
 }

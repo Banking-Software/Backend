@@ -22,6 +22,7 @@ public class TransactionReportService : ITransactionReportService
     private readonly IShareService _shareService;
     private readonly INepaliCalendarFormat _nepaliCalendarFormat;
     private readonly IMapper _mapper;
+    private readonly ICommonExpression _commonExpression;
 
     public TransactionReportService
     (
@@ -29,6 +30,7 @@ public class TransactionReportService : ITransactionReportService
         IDepositSchemeRepository depositSchemeRepository,
         IShareService shareService,
         INepaliCalendarFormat nepaliCalendarFormat,
+        ICommonExpression commonExpression,
         IMapper mapper
     )
     {
@@ -37,6 +39,7 @@ public class TransactionReportService : ITransactionReportService
         _shareService = shareService;
         _nepaliCalendarFormat=nepaliCalendarFormat;
         _mapper=mapper;
+        _commonExpression=commonExpression;
     }
 
     // private bool checkInputDateFormat(string input)
@@ -70,34 +73,14 @@ public class TransactionReportService : ITransactionReportService
         return await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(formattedDate);
     }
 
-    public async Task<DepositAccountTransactionReportWrapperDto> GetDepositAccountTransactionReportService(GetDepositAccountTransactionReport getDepositAccountTransactionReport, TokenDto decodedToken)
+    public async Task<DepositAccountTransactionReportWrapperDto> GetDepositAccountTransactionReportService(DepositAccountTransactionReportParams depositAccountTransactionReportParams, TokenDto decodedToken)
     {
-        DateTime fromDate = await GetEnglishDate(getDepositAccountTransactionReport.FromDate);
-        DateTime toDate = await GetEnglishDate(getDepositAccountTransactionReport.ToDate);
+        DateTime fromDate = await GetEnglishDate(depositAccountTransactionReportParams.FromDate);
+        DateTime toDate = await GetEnglishDate(depositAccountTransactionReportParams.ToDate);
+        if(fromDate>toDate)
+            throw new BadRequestExceptionHandler("From Date connot be greater than To Date");
 
-        Expression<Func<DepositAccount, bool>> expressionOnDepositAccount; 
-        Expression<Func<DepositAccountTransaction,bool>> expressionOnDepositAccountTransaction;
-        if(getDepositAccountTransactionReport.AccountStatus!=null)
-        {
-            expressionOnDepositAccount = da => da.Id == getDepositAccountTransactionReport.DepositAccountId && da.Status==getDepositAccountTransactionReport.AccountStatus;
-            
-            expressionOnDepositAccountTransaction 
-            = dat=>dat.DepositAccountId==getDepositAccountTransactionReport.DepositAccountId 
-            && dat.DepositAccount.Status==getDepositAccountTransactionReport.AccountStatus
-            && dat.Transaction.EnglishCreationDate >= fromDate && dat.Transaction.EnglishCreationDate <= toDate;
-        }
-        else
-        {
-            expressionOnDepositAccount=da=>da.Id==getDepositAccountTransactionReport.DepositAccountId;
-
-            expressionOnDepositAccountTransaction 
-            = dat=>dat.DepositAccountId==getDepositAccountTransactionReport.DepositAccountId
-            && dat.Transaction.EnglishCreationDate >= fromDate && dat.Transaction.EnglishCreationDate <= toDate;
-        }
-        var depositAccount = await _depositSchemeRepository.GetDepositAccount(expressionOnDepositAccount);
-        if (depositAccount == null) throw new NotFoundExceptionHandler("No Account Found");
-        var depositTransactionReport = await _transactionReportrepository.GetDepositAccountTransactionReport(expressionOnDepositAccountTransaction);
-
+        var depositTransactionReport = await _transactionReportrepository.GetDepositAccountTransactionReport(await _commonExpression.GetExpressionForDepositAccountTransactionReport(depositAccountTransactionReportParams, fromDate, toDate));
         return new DepositAccountTransactionReportWrapperDto()
         {
             PreviousBalanceAfterTransaction = depositTransactionReport.PreviousBalanceAfterTransaction,
@@ -107,9 +90,51 @@ public class TransactionReportService : ITransactionReportService
         };
     }
 
-    public Task<ShareTransactionReportWrapper> GetShareAccountTransactionReportService(string fromDate, string toDate, int shareAccountId, TokenDto decodedToken)
+    public async Task<LedgerTransactionReportWrapperDto> GetLedgerTransactionReportService(LedgerTransactionReportParams ledgerTransactionReportParams, TokenDto decodedToken)
     {
-        throw new NotImplementedException();
+        DateTime fromDate = await GetEnglishDate(ledgerTransactionReportParams.FromDate);
+        DateTime toDate = await GetEnglishDate(ledgerTransactionReportParams.ToDate);
+        if(fromDate>toDate)
+            throw new BadRequestExceptionHandler("From Date connot be greater than To Date");
+        var ledgerTransactionReport = await _transactionReportrepository.GetLedgerTransactionReport(await _commonExpression.GetExpressionForLedgerTransactionReport(ledgerTransactionReportParams, fromDate, toDate));
+        return new LedgerTransactionReportWrapperDto()
+        {
+            PreviousBalanceAfterTransaction = ledgerTransactionReport.PreviousBalanceAfterTransaction,
+            DebitSum = ledgerTransactionReport.DebitSum,
+            CreditSum = ledgerTransactionReport.CreditSum,
+            LedgerTransactionReportDtos = _mapper.Map<List<LedgerTransactionReportDto>>(ledgerTransactionReport.LedgerTransactionReports)
+        };
     }
 
+    public async Task<ShareAccountTransactionReportWrapperDto> GetShareAccountTransactionReportService(ShareTransactionReportParams shareTransactionReportParams, TokenDto decodedToken)
+    {
+        DateTime fromDate = await GetEnglishDate(shareTransactionReportParams.FromDate);
+        DateTime toDate = await GetEnglishDate(shareTransactionReportParams.ToDate);
+        if(fromDate>toDate)
+            throw new BadRequestExceptionHandler("From Date connot be greater than To Date");
+        var shareTransactionReport = await _transactionReportrepository.GetShareTransactionReport(await _commonExpression.GetExpressionForShareTransactionReport(shareTransactionReportParams, fromDate, toDate));
+        return new ShareAccountTransactionReportWrapperDto()
+        {
+            PreviousBalanceAfterTransaction = shareTransactionReport.PreviousBalanceAfterTransaction,
+            DebitSum = shareTransactionReport.DebitSum,
+            CreditSum = shareTransactionReport.CreditSum,
+            ShareAccountTransactionReportDtos = _mapper.Map<List<ShareAccountTransactionReportDto>>(shareTransactionReport.ShareTransactionReports)
+        };
+    }
+
+    public async Task<SubLedgerTransactionReportWrapperDto> GetSubLedgerTransactionReportService(SubLedgerTransactionReportParams suLedgerTransactionReportParams, TokenDto decodedToken)
+    {
+        DateTime fromDate = await GetEnglishDate(suLedgerTransactionReportParams.FromDate);
+        DateTime toDate = await GetEnglishDate(suLedgerTransactionReportParams.ToDate);
+        if(fromDate>toDate)
+            throw new BadRequestExceptionHandler("From Date connot be greater than To Date");
+        var subLedgerTransactionReport = await _transactionReportrepository.GetSubLedgerTransactionReport(await _commonExpression.GetExpressionForSubLedgerTransactionReport(suLedgerTransactionReportParams, fromDate, toDate));
+        return new SubLedgerTransactionReportWrapperDto()
+        {
+            PreviousBalanceAfterTransaction = subLedgerTransactionReport.PreviousBalanceAfterTransaction,
+            DebitSum = subLedgerTransactionReport.DebitSum,
+            CreditSum = subLedgerTransactionReport.CreditSum,
+            SubLedgerTransactionReportDtos = _mapper.Map<List<SubLedgerTransactionReportDto>>(subLedgerTransactionReport.SubLedgerTransactionReports)
+        };
+    }
 }

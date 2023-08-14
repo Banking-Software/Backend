@@ -13,7 +13,7 @@ public class BaseReportWrapper
     public DateTime EnglishCreationDate { get; set; }
     public string NepaliCreationDate { get; set; }
     public DateTime RealWorldCreationDate { get; set; }
-    public string Narration { get; set; }
+    public string? Narration { get; set; }
     public string? Description { get; set; }
     public string TransactionDoneBy { get; set; }
 }

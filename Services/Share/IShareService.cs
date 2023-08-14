@@ -6,7 +6,7 @@ namespace MicroFinance.Services.Share
 {
     public interface IShareService
     {
-        Task<ShareAccountDto> GetShareAccountService(int id, bool isClientId, TokenDto decodedToken);
+        Task<ShareAccountDto> GetShareAccountService(int? shareId, string clientMemberId, TokenDto decodedToken);
         Task<List<ShareAccountDto>> GetAllActiveShareAccountsService(TokenDto decodedToken);
 
         Task<ResponseDto> CreateShareKittaService(CreateShareKittaDto createShareKitta, TokenDto decodedToken);

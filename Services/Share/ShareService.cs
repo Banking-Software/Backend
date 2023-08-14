@@ -3,6 +3,7 @@ using AutoMapper;
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.Share;
 using MicroFinance.Exceptions;
+using MicroFinance.Helper;
 using MicroFinance.Models.Share;
 using MicroFinance.Repository.Share;
 
@@ -13,12 +14,14 @@ namespace MicroFinance.Services.Share
         private readonly IShareRepository _shareRepository;
         private readonly ILogger<ShareService> _logger;
         private readonly IMapper _mapper;
+        private readonly ICommonExpression _commonExpression;
 
-        public ShareService(IShareRepository shareRepository, ILogger<ShareService> logger, IMapper mapper)
+        public ShareService(IShareRepository shareRepository, ILogger<ShareService> logger, IMapper mapper, ICommonExpression commonExpression)
         {
             _shareRepository = shareRepository;
             _logger = logger;
             _mapper= mapper;
+            _commonExpression=commonExpression;
         }
 
         
@@ -37,11 +40,11 @@ namespace MicroFinance.Services.Share
             return shareAccountDtos;
 
         }
-        public async Task<ShareAccountDto> GetShareAccountService(int id, bool isClientId, TokenDto decodedToken)
+        public async Task<ShareAccountDto> GetShareAccountService(int? shareId, string? clientMemberId, TokenDto decodedToken)
         {
-            string requestingId = isClientId?"Client":"Share Account";
-           _logger.LogInformation($"{DateTime.Now}: {decodedToken.UserName} is requesting for share account of '{requestingId}' Id of {id}");
-           Expression<Func<ShareAccount, bool>> checksOnData = check => check.IsActive && (isClientId?check.ClientId.Equals(id):check.Id.Equals(id));
+            string requestingId = clientMemberId!=null?"Client":"Share Account";
+           _logger.LogInformation($"{DateTime.Now}: {decodedToken.UserName} is requesting for share account of '{requestingId}' Id of {shareId}");
+           Expression<Func<ShareAccount, bool>> checksOnData =await _commonExpression.GetExpressionOfShareAccountForTransaction(shareId, clientMemberId);
            var shareAccount =  await _shareRepository.GetShareAccount(checksOnData);
            if(shareAccount!=null)
            {

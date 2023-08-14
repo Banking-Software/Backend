@@ -16,6 +16,8 @@ namespace MicroFinance.Models.UserManagement
         public DateTime? ModifiedOn { get; set; }
         public int? EmployeeId { get; set; }
         public Employee Employee { get; set; }
+        public virtual UserRole Role { get; set; }
+        public int RoleId { get; set; }
 
     }
 }

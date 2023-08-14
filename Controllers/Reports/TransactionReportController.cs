@@ -26,9 +26,27 @@ public class TransactionReportController : BaseApiController
     }
 
     [HttpGet("depositAccount")]
-    public async Task<ActionResult<DepositAccountTransactionReportWrapperDto>> GetDepositAccountTransactionReport([FromQuery] GetDepositAccountTransactionReport getDepositAccountTransactionReport)
+    public async Task<ActionResult<DepositAccountTransactionReportWrapperDto>> GetDepositAccountTransactionReport([FromQuery] DepositAccountTransactionReportParams depositAccountTransactionReportParams)
     {
         var decodedToken = GetDecodedToken();
-        return Ok(await _transactionReportService.GetDepositAccountTransactionReportService(getDepositAccountTransactionReport, decodedToken));
+        return Ok(await _transactionReportService.GetDepositAccountTransactionReportService(depositAccountTransactionReportParams, decodedToken));
+    }
+    [HttpGet("share")]
+    public async Task<ActionResult<ShareAccountTransactionReportWrapperDto>> GetShareAccountTransactionReport([FromQuery] ShareTransactionReportParams shareTransactionReportParams)
+    {
+        var decodedToken = GetDecodedToken();
+        return Ok(await _transactionReportService.GetShareAccountTransactionReportService(shareTransactionReportParams, decodedToken));
+    }
+    [HttpGet("ledger")]
+    public async Task<ActionResult<LedgerTransactionReportWrapperDto>> GetLedgerTransactionReport([FromQuery] LedgerTransactionReportParams ledgerTransactionReportParams)
+    {
+        var decodedToken = GetDecodedToken();
+        return Ok(await _transactionReportService.GetLedgerTransactionReportService(ledgerTransactionReportParams, decodedToken));
+    }
+    [HttpGet("subledger")]
+    public async Task<ActionResult<SubLedgerTransactionReportWrapperDto>> GetSubLedgerTransactionReport([FromQuery] SubLedgerTransactionReportParams subLedgerTransactionReportParams)
+    {
+        var decodedToken = GetDecodedToken();
+        return Ok(await _transactionReportService.GetSubLedgerTransactionReportService(subLedgerTransactionReportParams, decodedToken));
     }
 }

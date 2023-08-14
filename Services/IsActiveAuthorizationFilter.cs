@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using MicroFinance.Enums;
 using MicroFinance.Role;
 using MicroFinance.Services.CompanyProfile;
 using MicroFinance.Services.UserManagement;
@@ -15,15 +16,15 @@ namespace MicroFinance.Services
         private readonly ILogger<IsActiveAuthorizationFilter> _logger;
 
         public IsActiveAuthorizationFilter(
-            IEmployeeService employeeService, 
-            ISuperAdminService superAdminService, 
+            IEmployeeService employeeService,
+            ISuperAdminService superAdminService,
             ICompanyProfileService companyProfile,
             ILogger<IsActiveAuthorizationFilter> logger
             )
-        {   
-            _employeeService= employeeService;
+        {
+            _employeeService = employeeService;
             _superAdminService = superAdminService;
-            _companyProfile=companyProfile;
+            _companyProfile = companyProfile;
             _logger = logger;
         }
 
@@ -33,35 +34,43 @@ namespace MicroFinance.Services
             string currentUserId = context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             string role = context.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
             string branchCode = context.HttpContext.User.FindFirst("BranchCode")?.Value;
-            // if role is superadmin call superadmin service
-            if(role!=UserRole.SuperAdmin.ToString())
+            var companyDetail = await _companyProfile.GetCompanyProfileService();
+            var branch = await _companyProfile.GetBranchServiceByBranchCodeService(branchCode);
+            if (companyDetail.CompanyValidityEndDate < DateTime.Now)
             {
-                var user = await _employeeService.GetUserByIdService(currentUserId);
-                var branch = await _companyProfile.GetBranchServiceByBranchCodeService(branchCode);
-                var companyDetail = await _companyProfile.GetCompanyProfileService();
-                if(user.Message!="Success" || user.IsActive==false || branch==null || branch.IsActive==false)
+                string errorMessage = $"Software Validity ended on {companyDetail.CompanyValidityEndDate}. Please contact software provider";
+                _logger.LogError($"{DateTime.Now}: Tried to Use software even after validity ended on {companyDetail.CompanyValidityEndDate}");
+                context.Result = new ObjectResult(errorMessage)
                 {
-                    _logger.LogError($"{DateTime.Now}: Failed to give access to {user.UserName}. 'User Active Status': {user.IsActive}, 'Branch':{branch?.BranchCode}, 'Branch Status':{branch?.IsActive}");
-                    context.Result=new UnauthorizedResult();
-                }
-                if(companyDetail.CompanyValidityEndDate < DateTime.Now)
-                {
-                    string errorMessage = $"Software Validity ended on {companyDetail.CompanyValidityEndDate}. Please contact software provider";
-                    _logger.LogError($"{DateTime.Now}: Tried to Use software even after validity ended on {companyDetail.CompanyValidityEndDate}");
-                    context.Result=new ObjectResult(errorMessage)
-                    {
-                        StatusCode = 401
-                    };
-                }
+                    StatusCode = 401
+                };
             }
+            else if (branch == null || !branch.IsActive)
+            {
+                context.Result = new UnauthorizedResult();
+            }
+            // if role is superadmin call superadmin service
             else
             {
-                var user = await _superAdminService.GetUserByIdService(currentUserId);
-                if(user.Message!="Success" || user.IsActive==false)
+                if (role != RoleEnum.SuperAdmin.ToString())
                 {
-                    context.Result=new UnauthorizedResult();
+                    var user = await _employeeService.GetUserByIdService(currentUserId);
+                    if (user.IsActive == false)
+                    {
+                        _logger.LogError($"{DateTime.Now}: Inactive user tried to enter the system. Username: {user.UserName}");
+                        context.Result = new UnauthorizedResult();
+                    }
+                }
+                else
+                {
+                    var user = await _superAdminService.GetUserByIdService(currentUserId);
+                    if (user.Message != "Success" || user.IsActive == false)
+                    {
+                        context.Result = new UnauthorizedResult();
+                    }
                 }
             }
+
 
         }
     }

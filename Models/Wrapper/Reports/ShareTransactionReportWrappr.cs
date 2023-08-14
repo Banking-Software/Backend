@@ -8,7 +8,7 @@ public class ShareTransactionReport : BaseReportWrapper
 public class ShareTransactionReportWrapper
 {
     public decimal? PreviousBalanceAfterTransaction { get; set; }
-    public decimal DebitSum {get; set;}
-    public decimal CreditSum{get; set;}
+    public decimal? DebitSum {get; set;}
+    public decimal? CreditSum{get; set;}
     public List<ShareTransactionReport> ShareTransactionReports { get; set; }
 }

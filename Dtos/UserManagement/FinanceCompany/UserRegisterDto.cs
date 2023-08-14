@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using MicroFinance.Role;
+using MicroFinance.Enums;
 
 namespace MicroFinance.Dtos.UserManagement
 {
@@ -17,7 +17,7 @@ namespace MicroFinance.Dtos.UserManagement
         public string Email { get; set; }
         public bool IsActive { get; set; } =false;
         [Required]
-        public UserRole Role { get; set; }
+        public RoleEnum Role { get; set; }
 
         // END: Optional Field
         public double? DepositLimit { get; set; }

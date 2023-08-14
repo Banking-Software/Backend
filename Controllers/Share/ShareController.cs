@@ -23,10 +23,10 @@ namespace MicroFinance.Controllers.Share
             return decodedToken;
         }
         [HttpGet]
-        public async Task<ActionResult<ShareAccountDto>> GetActiveShareAccount([FromQuery] int id, [FromQuery] bool isClientId)
+        public async Task<ActionResult<ShareAccountDto>> GetActiveShareAccount([FromQuery] int? shareId, [FromQuery] string? clientMemberId)
         {
             TokenDto decodedToken = GetDecodedToken();
-            return Ok(await _shareService.GetShareAccountService(id, isClientId, decodedToken));
+            return Ok(await _shareService.GetShareAccountService(shareId, clientMemberId, decodedToken));
         }
         [HttpGet("allActive")]
         public async Task<ActionResult<List<ShareAccountDto>>> GetAllActiveShareAccount()

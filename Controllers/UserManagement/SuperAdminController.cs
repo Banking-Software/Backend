@@ -6,6 +6,7 @@ using AutoMapper;
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.CompanyProfile;
 using MicroFinance.Dtos.UserManagement;
+using MicroFinance.Enums;
 using MicroFinance.ErrorManage;
 using MicroFinance.Exceptions;
 using MicroFinance.Models.UserManagement;
@@ -77,7 +78,7 @@ namespace MicroFinance.Controllers.UserManagement
         public async Task<ActionResult<ResponseDto>> CreateAdmin(CreateAdminBySuperAdminDto createAdmin)
         {
             string currentUser = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-            if (createAdmin.Role != UserRole.Officer)
+            if (createAdmin.Role != RoleEnum.Officer)
                 throw new UnAuthorizedExceptionHandler("You are only authorized to create 'Officer'");
             var userCreate = await _superAdminService.CreateAdminService(createAdmin, currentUser);
             return Ok(userCreate);

@@ -2,7 +2,6 @@ using System.Text;
 using MicroFinance.DBContext;
 // using MicroFinance.DBContext.UserManagement;
 using MicroFinance.Models.UserManagement;
-using MicroFinance.Role;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -15,7 +14,7 @@ namespace MicroFinance.ServiceExtensions.IdentityService
         {
             var builder = services.AddIdentityCore<User>();
             builder = new IdentityBuilder(builder.UserType, builder.Services);
-            builder.AddRoles<IdentityRole>();
+            //builder.AddRoles<IdentityRole>();
             //builder.AddEntityFrameworkStores<UserDbContext>();
             builder.AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.Configure<IdentityOptions>(options =>

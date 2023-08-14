@@ -108,7 +108,7 @@ using (var scope = app.Services.CreateScope())
             var dbContext = services.GetRequiredService<ApplicationDbContext>();
             await dbContext.Database.MigrateAsync();
             var superAdminUserManager = services.GetRequiredService<UserManager<User>>();
-            await UserDbContextSeed.SeedSuperAdminRoleAsync(dbContext, superAdminUserManager);
+            await UserDbContextSeed.SeedSuperAdminAndRoleAsync(dbContext, superAdminUserManager);
 
             await LedgerDbContextSeed.SeedMainLedgerAsync(dbContext);
             await ClientDbContextSeed.SeedClientInfoAsync(dbContext);

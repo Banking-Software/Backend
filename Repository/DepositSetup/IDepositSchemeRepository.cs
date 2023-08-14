@@ -22,11 +22,8 @@ namespace MicroFinance.Repository.DepositSetup
         Task<int> UpdateDepositAccount(DepositAccount updateDepositAccount);
         Task<List<DepositAccountWrapper>> GetAllDepositAccountsWrapper(Expression<Func<DepositAccount, bool>> expression);
         Task<DepositAccountWrapper> GetDepositAccountWrapper(Expression<Func<DepositAccount, bool>> expression);
-        // Task<DepositAccountWrapper> GetDepositAccountByAccountNumber(string accountNumber);
-        // Task<List<DepositAccountWrapper>> GetNonClosedDepositAccountByDepositScheme(int depositSchemeId);
-        //Task<DepositAccount> GetDepositAccountByDepositSchemeIdAndClientId(int depositSchemeId, int clientId);
         Task<DepositAccount> GetDepositAccount(Expression<Func<DepositAccount, bool>> expression);
-        //Task<DepositAccount> GetNonClosedDepositAccountById(int id);
+
 
         // // Flexible Interest Rate
 

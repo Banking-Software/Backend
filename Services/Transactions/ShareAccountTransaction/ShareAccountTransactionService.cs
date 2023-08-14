@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AutoMapper;
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.Transactions.ShareTransaction;
@@ -6,6 +7,7 @@ using MicroFinance.Enums.Transaction;
 using MicroFinance.Enums.Transaction.ShareTransaction;
 using MicroFinance.Exceptions;
 using MicroFinance.Helper;
+using MicroFinance.Models.DepositSetup;
 using MicroFinance.Models.Wrapper.TrasactionWrapper;
 using MicroFinance.Repository.Transaction;
 using MicroFinance.Services.AccountSetup.MainLedger;
@@ -26,6 +28,7 @@ namespace MicroFinance.Services.Transactions
         private readonly ICompanyProfileService _companyProfileService;
         private readonly IMapper _mapper;
         private readonly INepaliCalendarFormat _nepaliCalendarFormat;
+        private readonly ICommonExpression _commonExpression;
 
         public ShareAccountTransactionService
         (
@@ -36,7 +39,8 @@ namespace MicroFinance.Services.Transactions
             IMainLedgerService mainLedgerService,
             IDepositSchemeService depositSchemeService,
             ICompanyProfileService companyProfileService,
-            INepaliCalendarFormat nepaliCalendarFormat
+            INepaliCalendarFormat nepaliCalendarFormat,
+            ICommonExpression commonExpression
         )
         {
             _shareAccountTransactionRepository=shareAccountTransactionRepository;
@@ -47,6 +51,7 @@ namespace MicroFinance.Services.Transactions
             _companyProfileService=companyProfileService;
             _mapper=mapper;
             _nepaliCalendarFormat=nepaliCalendarFormat;
+            _commonExpression=commonExpression;
         }
 
         private async Task AddBasicInfo(ShareAccountTransactionWrapper shareAccountTransactionWrapper, TokenDto decodedToken)
@@ -64,7 +69,7 @@ namespace MicroFinance.Services.Transactions
         public async Task<string> MakeShareTransaction(MakeShareTransactionDto makeShareTransactionDto, TokenDto decodedToken)
         {
             var shareAccountTransactionWrapper = _mapper.Map<ShareAccountTransactionWrapper>(makeShareTransactionDto);
-            var shareAccount = await _shareService.GetShareAccountService(id: makeShareTransactionDto.ShareAccountId, isClientId: false, decodedToken:decodedToken);
+            var shareAccount = await _shareService.GetShareAccountService(shareId: makeShareTransactionDto.ShareAccountId, null ,decodedToken:decodedToken);
             var client = await _clientService.GetClientByIdService(makeShareTransactionDto.ClientId, decodedToken);
             if(!shareAccount.IsActive || !client.IsActive || shareAccount.ClientId!=client.Id)
                 throw new Exception("Transaction Failed and possible reason might be: provided share account might not be of provided client or share account and client is inactive");
@@ -72,12 +77,12 @@ namespace MicroFinance.Services.Transactions
             shareAccountTransactionWrapper.ShareKittaId = shareKitta.Id;
             if(makeShareTransactionDto.ShareTransactionType==ShareTransactionTypeEnum.Transfer)
             {
-                var transferToDepositAccount = await _depositSchemeService.GetDepositAccountWrapperByIdService((int) makeShareTransactionDto.TransferToDepositAccountId, null, decodedToken); 
-                if(transferToDepositAccount.DepositAccount.Status!=AccountStatusEnum.Active || !transferToDepositAccount.DepositScheme.IsActive)
-                {
-                    throw new BadRequestExceptionHandler("Either Deposit Account or Deposit Scheme is not active");
-                }
-                // var transferToDepositAccountSubLedger = await _mainLedgerService.GetSubLedgerByIdService(transferToDepositAccount.DepositScheme.DepositSubledgerId);
+                Expression<Func<DepositAccount, bool>> expressionOnTransferAccount = await _commonExpression.GetExpressionOfDepositAccountForTransaction
+                (
+                    depositAccountId:(int) makeShareTransactionDto.TransferToDepositAccountId,
+                    isDeposit:true
+                );
+                var transferToDepositAccount = await _depositSchemeService.GetDepositAccountWrapperByIdService(null,expressionOnTransferAccount ,decodedToken); 
                 shareAccountTransactionWrapper.TransferToDepositSchemeId = transferToDepositAccount.DepositScheme.Id;
                 shareAccountTransactionWrapper.TransferToDepositSchemeSubLedgerId = transferToDepositAccount.DepositScheme.DepositSubledgerId;
                 shareAccountTransactionWrapper.TransferToDepositSchemeLedgerId = transferToDepositAccount.DepositScheme.SchemeTypeId;
@@ -89,11 +94,13 @@ namespace MicroFinance.Services.Transactions
             }
             else if(makeShareTransactionDto.PaymentType == PaymentTypeEnum.Account)
             {
-                var paymentDepositAccountNumber = await _depositSchemeService.GetDepositAccountWrapperByIdService((int) makeShareTransactionDto.PaymentDepositAccountId, null,decodedToken);
-                if(paymentDepositAccountNumber.DepositAccount.Status!=AccountStatusEnum.Active || !paymentDepositAccountNumber.DepositScheme.IsActive)
-                {
-                     throw new BadRequestExceptionHandler("Either Deposit Account or Deposit Scheme is not active");
-                }
+                Expression<Func<DepositAccount, bool>> expressionOnPaymentType = await _commonExpression.GetExpressionOfDepositAccountForTransaction
+                (
+                    depositAccountId:(int) makeShareTransactionDto.PaymentDepositAccountId,
+                    isDeposit: makeShareTransactionDto.ShareTransactionType==ShareTransactionTypeEnum.Refund?true:false
+                );
+                var paymentDepositAccountNumber = await _depositSchemeService.GetDepositAccountWrapperByIdService(null, expressionOnPaymentType ,decodedToken);
+                
                 shareAccountTransactionWrapper.PaymentDepositSchemeId = paymentDepositAccountNumber.DepositScheme.Id;
                 shareAccountTransactionWrapper.PaymentDepositSchemeSubLedgerId = paymentDepositAccountNumber.DepositScheme.DepositSubledgerId;
                 shareAccountTransactionWrapper.PaymentDepositSchemeLedgerId = paymentDepositAccountNumber.DepositScheme.SchemeTypeId;

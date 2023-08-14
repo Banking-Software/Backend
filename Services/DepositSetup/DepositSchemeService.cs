@@ -32,6 +32,7 @@ namespace MicroFinance.Services.DepositSetup
         private readonly IEmployeeService _employeeService;
         private readonly IConfiguration _config;
         private readonly INepaliCalendarFormat _nepaliCalendarFormat;
+        private readonly ICommonExpression _commonExpression;
 
         public DepositSchemeService
         (
@@ -43,7 +44,8 @@ namespace MicroFinance.Services.DepositSetup
         ICompanyProfileService companyProfileService,
         IEmployeeService employeeService,
         IConfiguration config,
-        INepaliCalendarFormat nepaliCalendarFormat
+        INepaliCalendarFormat nepaliCalendarFormat,
+        ICommonExpression commonExpression
         )
         {
             _loggger = logger;
@@ -55,6 +57,7 @@ namespace MicroFinance.Services.DepositSetup
             _employeeService = employeeService;
             _config = config;
             _nepaliCalendarFormat = nepaliCalendarFormat;
+            _commonExpression=commonExpression;
         }
 
         private List<string> GetSubLedgerNameForDepositScheme(CreateDepositSchemeDto createDepositScheme)
@@ -216,7 +219,7 @@ namespace MicroFinance.Services.DepositSetup
             if (existingDepositAccount == null)
                 throw new Exception("No Non-close deposit account found");
 
-            if (decodedToken.Role != UserRole.Officer.ToString() && existingDepositAccount.BranchCode != decodedToken.BranchCode)
+            if (decodedToken.Role != RoleEnum.Officer.ToString() && existingDepositAccount.BranchCode != decodedToken.BranchCode)
                 throw new Exception("You are authorized to update other branch details");
             if (updateDepositAccountDto.InterestRate < existingDepositAccount.DepositScheme.MinimumInterestRate && updateDepositAccountDto.InterestRate > existingDepositAccount.DepositScheme.MaximumInterestRate)
                 throw new Exception("MinimumInterestRate<=InterestRate<=MaximumInterestRate  constraint doesnot match");
@@ -295,7 +298,7 @@ namespace MicroFinance.Services.DepositSetup
             List<DepositAccountWrapperDto> allDepositAccountWrapperDto = new List<DepositAccountWrapperDto>();
             foreach (var depositAccountWrapper in allNonClosedDepositAccounts)
             {
-                if (decodedToken.Role == UserRole.Officer.ToString() || depositAccountWrapper.DepositAccount.BranchCode == decodedToken.BranchCode)
+                if (decodedToken.Role == RoleEnum.Officer.ToString() || depositAccountWrapper.DepositAccount.BranchCode == decodedToken.BranchCode)
                 {
                     var depositAccountWrapperDto = await MapDepositAccountWrapperToDepositAccountWrapperDto(depositAccountWrapper);
                     allDepositAccountWrapperDto.Add(depositAccountWrapperDto);
@@ -316,10 +319,9 @@ namespace MicroFinance.Services.DepositSetup
             var depositAccountWrapper = await _depositSchemeRepository.GetDepositAccountWrapper(expressionToQueryDepositAccount);
             if (depositAccountWrapper != null && depositAccountWrapper.DepositAccount != null)
             {
-                if (decodedToken.Role == UserRole.Officer.ToString() || depositAccountWrapper.DepositAccount.BranchCode == decodedToken.BranchCode)
+                if (decodedToken.Role == RoleEnum.Officer.ToString() || depositAccountWrapper.DepositAccount.BranchCode == decodedToken.BranchCode)
                     return await MapDepositAccountWrapperToDepositAccountWrapperDto(depositAccountWrapper);
             }
-
             throw new Exception("No data found");
         }
 
@@ -334,7 +336,7 @@ namespace MicroFinance.Services.DepositSetup
             var depositAccountWrapper = await _depositSchemeRepository.GetDepositAccountWrapper(expressionToQueryDepositAccount);
             if (depositAccountWrapper != null && depositAccountWrapper.DepositAccount != null)
             {
-                if (decodedToken.Role == UserRole.Officer.ToString() || depositAccountWrapper.DepositAccount.BranchCode == decodedToken.BranchCode)
+                if (decodedToken.Role == RoleEnum.Officer.ToString() || depositAccountWrapper.DepositAccount.BranchCode == decodedToken.BranchCode)
                     return await MapDepositAccountWrapperToDepositAccountWrapperDto(depositAccountWrapper);
             }
             throw new Exception("No data found");
@@ -349,7 +351,7 @@ namespace MicroFinance.Services.DepositSetup
             {
                 foreach (var depositAccountWrapper in depositAccountWrappers)
                 {
-                    if (decodedToken.Role == UserRole.Officer.ToString() || depositAccountWrapper.DepositAccount.BranchCode == decodedToken.BranchCode)
+                    if (decodedToken.Role == RoleEnum.Officer.ToString() || depositAccountWrapper.DepositAccount.BranchCode == decodedToken.BranchCode)
                     {
                         depositAccountWrappersDto.Add(await MapDepositAccountWrapperToDepositAccountWrapperDto(depositAccountWrapper));
                     }

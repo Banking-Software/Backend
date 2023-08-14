@@ -44,86 +44,90 @@ namespace MicroFinance.Services.UserManagement
         public async Task<TokenResponseDto> LoginService(UserLoginDto userLoginDto)
         {
             var user = await _employeeRepo.GetUserByUsername(userLoginDto.UserName);
-            if(user==null)
+            var branchCode = await _companyProfile.GetBranchServiceByBranchCodeService(user.Employee.BranchCode);
+            if (user == null)
             {
                 _logger.LogError($"{DateTime.Now} Attempting to login with invalid user > {userLoginDto.UserName}");
                 throw new UnAuthorizedExceptionHandler("UnAuthorized");
             }
-            var branchCode = await _companyProfile.GetBranchServiceByBranchCodeService(user.Employee.BranchCode);
-            if (branchCode.IsActive)
+            if (!branchCode.IsActive) throw new BadRequestExceptionHandler("Your Branch is inactive at the moment");
+            var loginResult = await _employeeRepo.Login(user, userLoginDto.Password, userLoginDto.StayLogin);
+            if (loginResult.Succeeded)
             {
-                var loginResult = await _employeeRepo.Login(user, userLoginDto.Password, userLoginDto.StayLogin);
-                if (loginResult.Succeeded)
+                _logger.LogInformation($"{DateTime.Now} User '{userLoginDto.UserName}' login to the system");
+                var tokenData = new TokenDto()
                 {
-                    _logger.LogInformation($"{DateTime.Now} User Logged In > {userLoginDto.UserName}");
-                    var tokenData = new TokenDto()
-                    {
-                        UserName = user.UserName,
-                        UserId = user.Id,
-                        Role = await _employeeRepo.GetRole(user),
-                        IsActive = user.IsActive.ToString(),
-                        Email = user.Email,
-                        BranchCode = user.Employee.BranchCode
-                    };
-                    var token = _tokenService.CreateToken(tokenData);
-                    return new TokenResponseDto() { Token = token };
-                }
-                _logger.LogError($"{DateTime.Now} Invalid Login {loginResult.ToString()} > {userLoginDto.UserName}");
-                throw new Exception("Invalid Credentials...");
+                    UserName = user.UserName,
+                    UserId = user.Id,
+                    Role = user.Role.Name,
+                    IsActive = user.IsActive.ToString(),
+                    Email = user.Email,
+                    BranchCode = user.Employee.BranchCode
+                };
+                var token = _tokenService.CreateToken(tokenData);
+                return new TokenResponseDto() { Token = token };
             }
-            throw new Exception("Your branch is In-active at the moment, please try again later");
-           
+            _logger.LogError($"{DateTime.Now}: Login failed for user '{user.UserName}'");
+            throw new UnAuthorizedExceptionHandler("Not Authorized");
         }
 
         public async Task<ResponseDto> RegisterService(UserRegisterDto userRegisterDto, string createdBy)
         {
             var employee = await _employeeRepo.GetEmployeeByEmail(userRegisterDto.Email);
+            var role = await _employeeRepo.GetRole((int)userRegisterDto.Role);
             if (employee == null)
                 throw new NotImplementedExceptionHandler("Create Employee before creating login credentials");
-
+            if (role == null)
+                throw new NotImplementedExceptionHandler("Given Role is not available in the database");
             var user = _mapper.Map<User>(userRegisterDto);
+            user.Role = role;
             user.Employee = employee;
             user.CreatedBy = createdBy;
             user.CreatedOn = DateTime.Now;
-            var userCredentials =
-            await _employeeRepo.Register(user, userRegisterDto.Password, userRegisterDto.Role.ToString());
-            _logger.LogInformation($"{DateTime.Now}: User Login Credentails Created > {userRegisterDto.UserName}");
-            return new ResponseDto()
+            var userCreate =
+            await _employeeRepo.Register(user, userRegisterDto.Password);
+            if (userCreate.Succeeded)
             {
-                Message = "User Credentials Created",
-                StatusCode = "200",
-                Status = true
-            };
+                _logger.LogInformation($"{DateTime.Now}: User Login Credentails Created for {userRegisterDto.UserName} by {createdBy}");
+                return new ResponseDto()
+                {
+                    Message = "User Credentials Created",
+                    StatusCode = "200",
+                    Status = true
+                };
+            }
+            List<IdentityError> errorList = userCreate.Errors.ToList();
+            _logger.LogInformation($"{DateTime.Now}: User Login create for {user.UserName} failed due to following reason: ");
+            foreach (var err in errorList)
+            {
+                _logger.LogInformation($"{DateTime.Now}:> {err.Description}");
+            }
+            throw new BadRequestExceptionHandler("Failed to create credentials. Please Try again latter");
         }
 
-        public async Task<string> GetRole(string id)
-        {
-            var user = await _employeeRepo.GetUserById(id);
-            var role = await _employeeRepo.GetRole(user);
-            return role;
-        }
+        // public async Task<string> GetRole(string id)
+        // {
+        //     var user = await _employeeRepo.GetUserById(id);
+        //     var role = await _employeeRepo.GetRole(user);
+        //     return role;
+        // }
 
         public async Task<ResponseDto> UpdatePasswordService(UpdateUserPasswordDto updateUserPasswordDto, string userName)
         {
             var user = await _employeeRepo.GetUserByUsername(userName);
-            if (user != null)
+            if (user == null) throw new UnAuthorizedExceptionHandler("Not Authorized");
+
+            _logger.LogInformation($"{DateTime.Now}: User '{user.UserName}' changing password...");
+            var updateStatus = await _employeeRepo.UpdatePassword(user, updateUserPasswordDto.OldPassword, updateUserPasswordDto.NewPassword);
+            if(updateStatus.Succeeded)
+                return new ResponseDto(){Message="Password Update Successfully", Status=true, StatusCode="200"};
+            _logger.LogInformation($"{DateTime.Now}: Failed to Update the '{user.UserName}' password. Possible Reasons are: ");
+            var errorList = updateStatus.Errors.ToList();
+            foreach (var err in errorList)
             {
-                var updateStatus = await _employeeRepo
-                .UpdatePassword(user, updateUserPasswordDto.OldPassword, updateUserPasswordDto.NewPassword);
-                if (updateStatus)
-                {
-                    return new ResponseDto()
-                    {
-                        Message = "Update Successfull",
-                        StatusCode = "200",
-                        Status = true
-                    };
-                }
-                _logger.LogError($"{DateTime.Now}: Attempting to Update Password with invalid credentials > {userName}");
-                throw new BadRequestExceptionHandler("Update Failed");
+                _logger.LogError($"{DateTime.Now}: {err.Description}");
             }
-            _logger.LogError($"{DateTime.Now}: Attempting to Update Password of invalid user > {userName}");
-            throw new UnAuthorizedExceptionHandler("UnAuthorized");
+            throw new BadRequestExceptionHandler("Update Failed");
         }
 
         public async Task<ResponseDto> UpdateUserProfileService(UserProfileUpdateDto userProfileUpdateDto, string modifiedBy)
@@ -163,8 +167,8 @@ namespace MicroFinance.Services.UserManagement
             var userDto = _mapper.Map<UserDto>(user);
             Employee employee = user.Employee;
             EmployeeDto employeeDto = _mapper.Map<EmployeeDto>(employee);
-            var userRole = await _employeeRepo.GetRole(user);
-            userDto.Role = userRole;
+            // var userRole = await _employeeRepo.GetRole(user);
+            userDto.Role = user.Role.Name;
             UserDetailsDto userDetailsDto = new UserDetailsDto()
             {
                 Message = "Success",
@@ -185,8 +189,8 @@ namespace MicroFinance.Services.UserManagement
             var userDto = _mapper.Map<UserDto>(user);
             Employee employee = user.Employee;
             EmployeeDto employeeDto = _mapper.Map<EmployeeDto>(employee);
-            var userRole = await _employeeRepo.GetRole(user);
-            userDto.Role = userRole;
+            // var userRole = await _employeeRepo.GetRole(user);
+            userDto.Role = user.Role.Name;
             UserDetailsDto userDetailsDto = new UserDetailsDto()
             {
                 Message = "Success",
@@ -208,8 +212,8 @@ namespace MicroFinance.Services.UserManagement
             var userDto = _mapper.Map<UserDto>(user);
             Employee employee = user.Employee;
             EmployeeDto employeeDto = _mapper.Map<EmployeeDto>(employee);
-            var userRole = await _employeeRepo.GetRole(user);
-            userDto.Role = userRole;
+            // var userRole = await _employeeRepo.GetRole(user);
+            userDto.Role = user.Role.Name;
             UserDetailsDto userDetailsDto = new UserDetailsDto()
             {
                 Message = "Success",
@@ -229,6 +233,7 @@ namespace MicroFinance.Services.UserManagement
                 throw new UnAuthorizedExceptionHandler("UnAuthorized");
             }
             var userDto = _mapper.Map<UserDto>(user);
+            userDto.Role = user.Role.Name;
             userDto.Message = "Success";
             return userDto;
         }
@@ -243,6 +248,7 @@ namespace MicroFinance.Services.UserManagement
                 throw new UnAuthorizedExceptionHandler("UnAuthorized");
             }
             var userDto = _mapper.Map<UserDto>(user);
+            userDto.Role= user.Role.Name;
             userDto.Message = "Success";
             return userDto;
         }
@@ -255,6 +261,7 @@ namespace MicroFinance.Services.UserManagement
                 throw new UnAuthorizedExceptionHandler("UnAuthorized");
             }
             var userDto = _mapper.Map<UserDto>(user);
+            userDto.Role = user.Role.Name;
             userDto.Message = "Success";
             return userDto;
         }
@@ -278,8 +285,6 @@ namespace MicroFinance.Services.UserManagement
                 var userDto = _mapper.Map<UserDto>(user);
                 Employee employee = user.Employee;
                 EmployeeDto employeeDto = _mapper.Map<EmployeeDto>(employee);
-                var userRole = await _employeeRepo.GetRole(user);
-                userDto.Role = userRole;
                 UserDetailsDto userDetailsDto = new UserDetailsDto()
                 {
                     EmployeeData = employeeDto,
@@ -290,13 +295,15 @@ namespace MicroFinance.Services.UserManagement
             return userDetailsDtos;
         }
 
-        public async Task<ResponseDto> AssignRoleService(string userName, string role)
+        public async Task<ResponseDto> AssignRoleService(string userName, RoleEnum role)
         {
             var user = await _employeeRepo.GetUserByUsername(userName);
-            if (user != null)
+            var newRole = await _employeeRepo.GetRole((int) role);
+            if (user != null && newRole!=null)
             {
-                var status = await _employeeRepo.AssignRole(user, role);
-                if (status.Succeeded)
+                user.Role = newRole;
+                var status = await _employeeRepo.AssignRoleToUser(user);
+                if (status>=1)
                 {
                     _logger.LogInformation($"{DateTime.Now} new role '{role}' assiged to > {userName}");
                     return new ResponseDto()
@@ -306,10 +313,10 @@ namespace MicroFinance.Services.UserManagement
                         Status = true
                     };
                 }
-                _logger.LogError($"{DateTime.Now} Role assignment failed due to {status.Errors} > {userName}");
+                _logger.LogError($"{DateTime.Now} Failed to assign role '{role.ToString()}' to '{userName}'");
                 return new ResponseDto()
                 {
-                    Message = $"Assignment Failed. {status.Errors}",
+                    Message = $"Failed to assign role",
                     StatusCode = "400",
                     Status = false
                 };
@@ -333,19 +340,19 @@ namespace MicroFinance.Services.UserManagement
             var company = await _companyProfile.GetCompanyProfileService();
             if (branch == null || !branch.IsActive || company == null)
                 throw new Exception("Branch and company details should exist and they need to be active inorder to proceed.");
-            
+
             var employee = _mapper.Map<Employee>(createEmployeeDto);
             employee.CreatedBy = createdBy;
-            employee.CreatedOn = DateTime.Now;  
-                      
-            List<string> listOfProfileProperty = new List<string>(){nameof(Employee.ProfilePicFileData),  nameof(Employee.ProfilePicFileName),nameof(Employee.ProfilePicFileType)};
-            List<string> listOfCitizenProperty = new List<string>(){nameof(Employee.CitizenShipFileData), nameof(Employee.CitizenShipFileName),nameof(Employee.CitizenShipFileType)};
-            List<string> listOfSignatureProperty = new List<string>(){nameof(Employee.SignatureFileData), nameof(Employee.SignatureFileName),nameof(Employee.SignatureFileType)};
+            employee.CreatedOn = DateTime.Now;
+
+            List<string> listOfProfileProperty = new List<string>() { nameof(Employee.ProfilePicFileData), nameof(Employee.ProfilePicFileName), nameof(Employee.ProfilePicFileType) };
+            List<string> listOfCitizenProperty = new List<string>() { nameof(Employee.CitizenShipFileData), nameof(Employee.CitizenShipFileName), nameof(Employee.CitizenShipFileType) };
+            List<string> listOfSignatureProperty = new List<string>() { nameof(Employee.SignatureFileData), nameof(Employee.SignatureFileName), nameof(Employee.SignatureFileType) };
             ImageUploadService uploadService = new ImageUploadService(_config);
-            employee = await uploadService.UploadImage(employee, createEmployeeDto?.ProfilePic,listOfProfileProperty);
-            employee = await uploadService.UploadImage(employee, createEmployeeDto?.CitizenShipPic,listOfCitizenProperty);
-            employee = await uploadService.UploadImage(employee, createEmployeeDto?.SignaturePic,listOfSignatureProperty);
-            
+            employee = await uploadService.UploadImage(employee, createEmployeeDto?.ProfilePic, listOfProfileProperty);
+            employee = await uploadService.UploadImage(employee, createEmployeeDto?.CitizenShipPic, listOfCitizenProperty);
+            employee = await uploadService.UploadImage(employee, createEmployeeDto?.SignaturePic, listOfSignatureProperty);
+
             var newUserStaff = await _employeeRepo.CreateEmployee(employee);
             if (newUserStaff >= 1)
             {
@@ -366,10 +373,10 @@ namespace MicroFinance.Services.UserManagement
         {
             ImageUploadService uploadService = new ImageUploadService(_config);
 
-            if(updateEmployeeDto.IsProfilePicChanged)
+            if (updateEmployeeDto.IsProfilePicChanged)
             {
-                List<string> listOfProfileProperty = new List<string>(){nameof(Employee.ProfilePicFileData),  nameof(Employee.ProfilePicFileName),nameof(Employee.ProfilePicFileType)};
-                updateEmployee = await uploadService.UploadImage(updateEmployee, updateEmployeeDto?.ProfilePic,listOfProfileProperty);
+                List<string> listOfProfileProperty = new List<string>() { nameof(Employee.ProfilePicFileData), nameof(Employee.ProfilePicFileName), nameof(Employee.ProfilePicFileType) };
+                updateEmployee = await uploadService.UploadImage(updateEmployee, updateEmployeeDto?.ProfilePic, listOfProfileProperty);
             }
             else
             {
@@ -377,10 +384,10 @@ namespace MicroFinance.Services.UserManagement
                 updateEmployee.ProfilePicFileName = existingEmployee.ProfilePicFileName;
                 updateEmployee.ProfilePicFileType = existingEmployee.ProfilePicFileType;
             }
-            if(updateEmployeeDto.IsCitizenPicChanged)
+            if (updateEmployeeDto.IsCitizenPicChanged)
             {
-                List<string> listOfCitizenProperty = new List<string>(){nameof(Employee.CitizenShipFileData), nameof(Employee.CitizenShipFileName),nameof(Employee.CitizenShipFileType)};
-                updateEmployee = await uploadService.UploadImage(updateEmployee, updateEmployeeDto?.CitizenShipPic,listOfCitizenProperty);
+                List<string> listOfCitizenProperty = new List<string>() { nameof(Employee.CitizenShipFileData), nameof(Employee.CitizenShipFileName), nameof(Employee.CitizenShipFileType) };
+                updateEmployee = await uploadService.UploadImage(updateEmployee, updateEmployeeDto?.CitizenShipPic, listOfCitizenProperty);
 
             }
             else
@@ -389,15 +396,15 @@ namespace MicroFinance.Services.UserManagement
                 updateEmployee.CitizenShipFileName = existingEmployee.CitizenShipFileName;
                 updateEmployee.CitizenShipFileType = existingEmployee.CitizenShipFileType;
             }
-            if(updateEmployeeDto.IsSignaturePicChanged)
+            if (updateEmployeeDto.IsSignaturePicChanged)
             {
-                List<string> listOfSignatureProperty = new List<string>(){nameof(Employee.SignatureFileData), nameof(Employee.SignatureFileName),nameof(Employee.SignatureFileType)};
-                updateEmployee = await uploadService.UploadImage(updateEmployee, updateEmployeeDto?.SignaturePic,listOfSignatureProperty);
+                List<string> listOfSignatureProperty = new List<string>() { nameof(Employee.SignatureFileData), nameof(Employee.SignatureFileName), nameof(Employee.SignatureFileType) };
+                updateEmployee = await uploadService.UploadImage(updateEmployee, updateEmployeeDto?.SignaturePic, listOfSignatureProperty);
             }
             else
             {
                 updateEmployee.SignatureFileData = existingEmployee.SignatureFileData;
-                updateEmployee.SignatureFileName= existingEmployee.SignatureFileName;
+                updateEmployee.SignatureFileName = existingEmployee.SignatureFileName;
                 updateEmployee.SignatureFileType = existingEmployee.SignatureFileType;
             }
 
@@ -406,14 +413,14 @@ namespace MicroFinance.Services.UserManagement
 
         public async Task<ResponseDto> EditProfileService(UpdateEmployeeDto updateEmployeeDto, TokenDto decodedToken)
         {
-            var existingEmployee =  await _employeeRepo.GetEmployeeById(updateEmployeeDto.Id);
+            var existingEmployee = await _employeeRepo.GetEmployeeById(updateEmployeeDto.Id);
             var branch = await _companyProfile.GetBranchServiceByBranchCodeService(updateEmployeeDto.BranchCode);
-            if(existingEmployee==null) 
+            if (existingEmployee == null)
                 throw new Exception("Invalid Employee Request");
-            if(branch.IsActive==false)
+            if (branch.IsActive == false)
                 throw new Exception("Provided Branch code is inactive");
             var employee = _mapper.Map<Employee>(updateEmployeeDto);
-            employee.Id= existingEmployee.Id;
+            employee.Id = existingEmployee.Id;
             employee.CreatedBy = existingEmployee.CreatedBy;
             employee.CreatedOn = existingEmployee.CreatedOn;
             employee.ModifiedBy = decodedToken.UserName;
@@ -470,43 +477,43 @@ namespace MicroFinance.Services.UserManagement
 
         }
 
-        public  async Task<List<LimitedEmployeeInfoDto>> GetAllEmployeeFromUserBranch(TokenDto decodedToken)
+        public async Task<List<LimitedEmployeeInfoDto>> GetAllEmployeeFromUserBranch(TokenDto decodedToken)
         {
             var employees = await _employeeRepo.GetEmployees();
             List<LimitedEmployeeInfoDto> employeesFromSameBranch = new List<LimitedEmployeeInfoDto>();
             if (employees.Count < 1 || employees == null) throw new Exception("No Employee Found");
             foreach (var employee in employees)
             {
-                if(employee.BranchCode==decodedToken.BranchCode)
+                if (employee.BranchCode == decodedToken.BranchCode)
                 {
                     var employeeDetail = new LimitedEmployeeInfoDto()
                     {
                         Id = employee.Id,
-                        Name= employee.Name,
-                        Email=employee.Email,
-                        PhoneNumber=employee.PhoneNumber,
-                        BranchCode=employee.BranchCode
+                        Name = employee.Name,
+                        Email = employee.Email,
+                        PhoneNumber = employee.PhoneNumber,
+                        BranchCode = employee.BranchCode
                     };
                     employeesFromSameBranch.Add(employeeDetail);
                 }
             }
-            if(employeesFromSameBranch.Count<1) throw new Exception("No Employee Data Found for your branch");
+            if (employeesFromSameBranch.Count < 1) throw new Exception("No Employee Data Found for your branch");
             return employeesFromSameBranch;
         }
         public async Task<LimitedEmployeeInfoDto> GetEmployeeByIdFromUserBranch(int id, TokenDto decodedToken)
         {
             var employee = await _employeeRepo.GetEmployeeById(id);
-            if (employee == null || employee.BranchCode!=decodedToken.BranchCode)
+            if (employee == null || employee.BranchCode != decodedToken.BranchCode)
                 throw new UnAuthorizedExceptionHandler("Not authorized to act on given employee");
 
-            
+
             return new LimitedEmployeeInfoDto()
             {
                 Id = employee.Id,
-                Name= employee.Name,
-                Email=employee.Email,
-                PhoneNumber=employee.PhoneNumber,
-                BranchCode=employee.BranchCode
+                Name = employee.Name,
+                Email = employee.Email,
+                PhoneNumber = employee.PhoneNumber,
+                BranchCode = employee.BranchCode
             };
         }
 

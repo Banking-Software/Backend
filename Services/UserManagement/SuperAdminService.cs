@@ -48,7 +48,7 @@ namespace MicroFinance.Services.UserManagement
                     {
                         UserName=superadmin.UserName,
                         UserId = superadmin.Id,
-                        Role=await _superAdminRepo.GetRole(superadmin),
+                        Role=superadmin.Role.Name,
                         IsActive = superadmin.IsActive.ToString(),
                         Email=superadmin.Email,
                         BranchCode="Fintex"
@@ -76,7 +76,7 @@ namespace MicroFinance.Services.UserManagement
             {
                 Message="Success",
                 UserName=user.UserName,
-                Role=await _superAdminRepo.GetRole(user),
+                Role=user.Role.Name,
                 IsActive=user.IsActive
             };
             return superAdminDto;
@@ -107,12 +107,22 @@ namespace MicroFinance.Services.UserManagement
         // Handle MicroFinance
         public async Task<ResponseDto> CreateAdminService(CreateAdminBySuperAdminDto createAdminBySuperAdminDto, string createdBy)
         {
-            var responseDto = new ResponseDto();
-            var userStaff = _mapper.Map<CreateEmployeeDto>(createAdminBySuperAdminDto);
-            responseDto = await _employeeService.CreateEmployeeService(userStaff, createdBy);
-            var user = _mapper.Map<UserRegisterDto>(createAdminBySuperAdminDto);
-            responseDto = await _employeeService.RegisterService(user, createdBy);
-            return responseDto;
+            var employeeExist = await _employeeRepository.GetEmployeeByEmail(createAdminBySuperAdminDto.Email);
+            if(employeeExist!=null)
+                throw new BadRequestExceptionHandler("Employee Already Exist for given email");
+            var employee = _mapper.Map<Employee>(createAdminBySuperAdminDto);
+            employee.CreatedBy = createdBy;
+            employee.CreatedOn= DateTime.Now;
+            var user = _mapper.Map<User>(createAdminBySuperAdminDto);
+            user.CreatedBy = createdBy;
+            user.CreatedOn = DateTime.Now;
+            await _superAdminRepo.CreateAdminProfile(user, employee, createAdminBySuperAdminDto.Password);
+            return new ResponseDto()
+            {
+                Message=$"Successfully Created Admin. Username: {user.UserName}, Password: {createAdminBySuperAdminDto.Password}",
+                Status=true,
+                StatusCode="200"
+            };
            
         }
         public async Task<ResponseDto> ActivateDeactivateMicroFinanceUserService(string userName, bool isActive)

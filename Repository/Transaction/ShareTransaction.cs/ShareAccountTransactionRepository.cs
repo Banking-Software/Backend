@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AutoMapper;
 using MicroFinance.DBContext;
 using MicroFinance.Enums;
@@ -20,19 +21,22 @@ namespace MicroFinance.Repository.Transaction
         private readonly ILogger<ShareAccountTransactionRepository> _logger;
         private readonly IMapper _mapper;
         private readonly IDepositAccountTransactionRepository _depositAccountTransactionRepository;
+        private readonly ICommonExpression _commonExpression;
 
         public ShareAccountTransactionRepository
         (
             ApplicationDbContext dbContext,
             ILogger<ShareAccountTransactionRepository> logger,
             IMapper mapper,
-            IDepositAccountTransactionRepository depositAccountTransactionRepository
+            IDepositAccountTransactionRepository depositAccountTransactionRepository,
+            ICommonExpression commonExpression
         )
         {
             _dbContext = dbContext;
             _logger = logger;
             _mapper = mapper;
-            _depositAccountTransactionRepository=depositAccountTransactionRepository;
+            _depositAccountTransactionRepository = depositAccountTransactionRepository;
+            _commonExpression = commonExpression;
         }
         public async Task<string> LockAndMakeShareTransaction(ShareAccountTransactionWrapper shareAccountTransactionWrapper)
         {
@@ -90,7 +94,7 @@ namespace MicroFinance.Repository.Transaction
                 {
                     var baseTransaction = await MakeTransaction(shareAccountTransactionWrapper);
                     var transactionStatus = await _dbContext.SaveChangesAsync();
-                    if(transactionStatus<1) throw new Exception("Not able to Make the transaction");
+                    if (transactionStatus < 1) throw new Exception("Not able to Make the transaction");
                     await processTransaction.CommitAsync();
                     return baseTransaction.VoucherNumber;
                 }
@@ -120,24 +124,36 @@ namespace MicroFinance.Repository.Transaction
         {
             bool isDepositInShareAccount = false;
             TransactionTypeEnum ledgerTransactionType = TransactionTypeEnum.Credit;
-            if(shareAccountTransactionWrapper.ShareTransactionType == ShareTransactionTypeEnum.Issue)
+            if (shareAccountTransactionWrapper.ShareTransactionType == ShareTransactionTypeEnum.Issue)
             {
                 isDepositInShareAccount = true;
                 ledgerTransactionType = TransactionTypeEnum.Debit;
             }
             var baseTransaction = await MakeBaseTransaction(shareAccountTransactionWrapper);
             DepositAccount depositAccountForTransferOrPayment = null;
-            if(shareAccountTransactionWrapper.ShareTransactionType == ShareTransactionTypeEnum.Transfer || shareAccountTransactionWrapper.PaymentType==PaymentTypeEnum.Account)
+            var client = await _dbContext.Clients.Where(c => c.Id == shareAccountTransactionWrapper.ClientId).AsNoTracking().SingleOrDefaultAsync();
+            if (shareAccountTransactionWrapper.ShareTransactionType == ShareTransactionTypeEnum.Transfer || shareAccountTransactionWrapper.PaymentType == PaymentTypeEnum.Account)
                 depositAccountForTransferOrPayment = await BaseTransactionOnDepositAccount(baseTransaction, shareAccountTransactionWrapper);
             else
-                await _depositAccountTransactionRepository.BaseTransactionOnLedger(baseTransaction, shareAccountTransactionWrapper.PaymentType, ledgerTransactionType, isDepositInShareAccount);
+            {
+                LedgerTransactionWrapper ledgerTransactionWrapper = new()
+                {
+                    BaseTransaction = baseTransaction,
+                    LedgerTransactionType = ledgerTransactionType,
+                    PaymentType = shareAccountTransactionWrapper.PaymentType,
+                    IsDeposit = isDepositInShareAccount,
+                    ledgerRemarks = $"Share Transaction by {client.ClientId} - {client.ClientFirstName} {client.ClientLastName}",
+                    LedgerNarration = shareAccountTransactionWrapper.Narration
+                };
+                await _depositAccountTransactionRepository.BaseTransactionOnLedger(ledgerTransactionWrapper);
+            }
             await BaseTransactionOnShareAccount(baseTransaction, shareAccountTransactionWrapper, depositAccountForTransferOrPayment);
-            if(shareAccountTransactionWrapper.ShareTransactionType==ShareTransactionTypeEnum.Issue)
+            if (shareAccountTransactionWrapper.ShareTransactionType == ShareTransactionTypeEnum.Issue)
                 await ModifyShareKittaNumber(shareAccountTransactionWrapper.ShareAccountId, shareAccountTransactionWrapper.TransactionAmount);
             return baseTransaction;
         }
 
-        
+
 
         private async Task<DepositAccount> BaseTransactionOnDepositAccount(BaseTransaction baseTransaction, ShareAccountTransactionWrapper shareAccountTransactionWrapper)
         {
@@ -156,30 +172,30 @@ namespace MicroFinance.Repository.Transaction
                 TransactionType = isDeposit ? TransactionTypeEnum.Credit : TransactionTypeEnum.Debit,
                 Narration = shareAccountTransactionWrapper.Narration,
                 WithDrawalType = !isDeposit ? WithDrawalTypeEnum.ByShare : null,
-                Source="FROM SHARE TRANSACTION"
+                Source = "FROM SHARE TRANSACTION"
             };
             int depositAccountId;
             int depositSchemeId;
             int depositSchemeSubLedgerId;
-            if(isTransfer)
+            if (isTransfer)
             {
                 depositAccountId = (int)shareAccountTransactionWrapper.TransferToDepositAccountId;
-                depositSchemeId = (int) shareAccountTransactionWrapper.TransferToDepositSchemeId;
-                depositSchemeSubLedgerId = (int) shareAccountTransactionWrapper.TransferToDepositSchemeSubLedgerId;
+                depositSchemeId = (int)shareAccountTransactionWrapper.TransferToDepositSchemeId;
+                depositSchemeSubLedgerId = (int)shareAccountTransactionWrapper.TransferToDepositSchemeSubLedgerId;
             }
             else
             {
                 depositAccountId = (int)shareAccountTransactionWrapper.PaymentDepositAccountId;
-                depositSchemeId = (int) shareAccountTransactionWrapper.PaymentDepositSchemeId;
-                depositSchemeSubLedgerId = (int) shareAccountTransactionWrapper.PaymentDepositSchemeSubLedgerId; 
+                depositSchemeId = (int)shareAccountTransactionWrapper.PaymentDepositSchemeId;
+                depositSchemeSubLedgerId = (int)shareAccountTransactionWrapper.PaymentDepositSchemeSubLedgerId;
             }
             depositAccountTransactionWrapper.DepositAccountId = depositAccountId;
             depositAccountTransactionWrapper.DepositSchemeSubLedgerId = depositSchemeSubLedgerId;
             depositAccountTransactionWrapper.DepositSchemeId = depositSchemeId;
             return depositAccountTransactionWrapper;
         }
-     
-        private async Task BaseTransactionOnShareAccount(BaseTransaction baseTransaction,ShareAccountTransactionWrapper shareAccountTransactionWrapper, DepositAccount paymentOrTransferDepositAccount)
+
+        private async Task BaseTransactionOnShareAccount(BaseTransaction baseTransaction, ShareAccountTransactionWrapper shareAccountTransactionWrapper, DepositAccount paymentOrTransferDepositAccount)
         {
             var shareAccount = await TransactionOnShareAccount(shareAccountTransactionWrapper);
             await CreateShareTransactionEntry(shareAccountTransactionWrapper, baseTransaction, shareAccount, paymentOrTransferDepositAccount);
@@ -189,31 +205,32 @@ namespace MicroFinance.Repository.Transaction
         {
             ShareTransaction shareTransaction = new()
             {
-                ShareTransactionType=shareAccountTransactionWrapper.ShareTransactionType,
+                ShareTransactionType = shareAccountTransactionWrapper.ShareTransactionType,
                 ShareCertificateNumber = shareAccountTransactionWrapper.ShareCertificateNumber,
                 Narration = shareAccountTransactionWrapper.Narration,
-                TransactionType = shareAccountTransactionWrapper.ShareTransactionType==ShareTransactionTypeEnum.Issue?TransactionTypeEnum.Credit:TransactionTypeEnum.Debit,
+                TransactionType = shareAccountTransactionWrapper.ShareTransactionType == ShareTransactionTypeEnum.Issue ? TransactionTypeEnum.Credit : TransactionTypeEnum.Debit,
                 Transaction = baseTransaction,
                 ShareAccount = shareAccount,
                 Remarks = $"Share is {shareAccountTransactionWrapper.ShareTransactionType}",
                 BalanceAfterTransaction = shareAccount.CurrentShareBalance
             };
-            if(shareAccountTransactionWrapper.ShareTransactionType == ShareTransactionTypeEnum.Transfer)
+            if (shareAccountTransactionWrapper.ShareTransactionType == ShareTransactionTypeEnum.Transfer)
             {
                 shareTransaction.TransferToAccount = paymentOrTransferDepositAccount;
-                shareTransaction.Remarks =$"Share is Transfered to {paymentOrTransferDepositAccount.AccountNumber}";
+                shareTransaction.Remarks = $"Share is Transfered to {paymentOrTransferDepositAccount.AccountNumber}";
             }
-            else if(shareAccountTransactionWrapper.PaymentType == PaymentTypeEnum.Account)
+            else if (shareAccountTransactionWrapper.PaymentType == PaymentTypeEnum.Account)
             {
                 shareTransaction.PaymentDepositAccount = paymentOrTransferDepositAccount;
-                shareTransaction.Remarks =$"Share is {shareAccountTransactionWrapper.ShareTransactionType} through {paymentOrTransferDepositAccount.AccountNumber} account";
+                shareTransaction.Remarks = $"Share is {shareAccountTransactionWrapper.ShareTransactionType} through {paymentOrTransferDepositAccount.AccountNumber} account";
             }
             await _dbContext.ShareTransactions.AddAsync(shareTransaction);
         }
 
         private async Task<ShareAccount> TransactionOnShareAccount(ShareAccountTransactionWrapper shareAccountTransactionWrapper)
         {
-            ShareAccount transactionShareAccount = await _dbContext.ShareAccounts.Where(sa=>sa.Id==shareAccountTransactionWrapper.ShareAccountId && sa.IsActive).SingleOrDefaultAsync();
+            Expression<Func<ShareAccount, bool>> expression = await _commonExpression.GetExpressionOfShareAccountForTransaction(shareAccountTransactionWrapper.ShareAccountId, null);
+            ShareAccount transactionShareAccount = await _dbContext.ShareAccounts.Include(sa => sa.Client).Where(expression).SingleOrDefaultAsync();
             if (transactionShareAccount != null)
             {
                 transactionShareAccount.CurrentShareBalance =
@@ -237,8 +254,8 @@ namespace MicroFinance.Repository.Transaction
         private async Task ModifyShareKittaNumber(int shareKittaId, decimal TransactionAmount)
         {
             var shareKitta = await _dbContext.ShareKittas.FindAsync(shareKittaId);
-            if(shareKitta==null) throw new Exception("No any available kitta");
-            shareKitta.CurrentKitta += TransactionAmount / shareKitta.PriceOfOneKitta ;
+            if (shareKitta == null) throw new Exception("No any available kitta");
+            shareKitta.CurrentKitta += TransactionAmount / shareKitta.PriceOfOneKitta;
         }
         // private async Task<BaseTransaction> GenerateVoucherNumber(BaseTransaction baseTransaction)
         // {

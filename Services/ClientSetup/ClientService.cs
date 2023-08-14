@@ -1,6 +1,7 @@
 using AutoMapper;
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.ClientSetup;
+using MicroFinance.Enums;
 using MicroFinance.Exceptions;
 using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.ClientSetup;
@@ -94,7 +95,7 @@ namespace MicroFinance.Services.ClientSetup
                 ||
                 (!updateClientDto.IsShareAllowed && updateClientDto.ShareType == null)
                 )
-                && (decodedToken.Role == UserRole.Officer.ToString() || existingClient.BranchCode == decodedToken.BranchCode)
+                && (decodedToken.Role == RoleEnum.Officer.ToString() || existingClient.BranchCode == decodedToken.BranchCode)
             )
             {
                 var updateClient = _mapper.Map<Client>(updateClientDto);
@@ -121,7 +122,7 @@ namespace MicroFinance.Services.ClientSetup
             {
                 foreach (var client in allClients)
                 {
-                    if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == UserRole.Officer.ToString())
+                    if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == RoleEnum.Officer.ToString())
                     {
                         clientDtos.Add(_mapper.Map<ClientDto>(client));
                     }
@@ -148,7 +149,7 @@ namespace MicroFinance.Services.ClientSetup
                 {
                     foreach (var client in clientsByShareType)
                     {
-                        if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == UserRole.Officer.ToString())
+                        if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == RoleEnum.Officer.ToString())
                         {
                             clientDtos.Add(_mapper.Map<ClientDto>(client));
                         }
@@ -166,7 +167,7 @@ namespace MicroFinance.Services.ClientSetup
             (
                 clientByClientId != null
                 &&
-                (clientByClientId.BranchCode == decodedToken.BranchCode || decodedToken.Role == UserRole.Officer.ToString())
+                (clientByClientId.BranchCode == decodedToken.BranchCode || decodedToken.Role == RoleEnum.Officer.ToString())
             )
             {
                 return _mapper.Map<ClientDto>(clientByClientId);
@@ -183,7 +184,7 @@ namespace MicroFinance.Services.ClientSetup
                 List<ClientDto> clientDtos = new List<ClientDto>();
                 foreach (var client in clientsByGroupAndUnit)
                 {
-                    if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == UserRole.Officer.ToString())
+                    if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == RoleEnum.Officer.ToString())
                     {
                         clientDtos.Add(_mapper.Map<ClientDto>(client));
                     }
@@ -201,7 +202,7 @@ namespace MicroFinance.Services.ClientSetup
                 List<ClientDto> clientDtos = new List<ClientDto>();
                 foreach (var client in clientsByGroup)
                 {
-                    if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == UserRole.Officer.ToString())
+                    if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == RoleEnum.Officer.ToString())
                     {
                         clientDtos.Add(_mapper.Map<ClientDto>(client));
                     }
@@ -219,7 +220,7 @@ namespace MicroFinance.Services.ClientSetup
                 List<ClientDto> clientDtos = new List<ClientDto>();
                 foreach (var client in clientsByUnit)
                 {
-                    if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == UserRole.Officer.ToString())
+                    if (client.BranchCode == decodedToken.BranchCode || decodedToken.Role == RoleEnum.Officer.ToString())
                     {
                         clientDtos.Add(_mapper.Map<ClientDto>(client));
                     }

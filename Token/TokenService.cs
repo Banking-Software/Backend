@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using MicroFinance.Dtos;
-using MicroFinance.Role;
+using MicroFinance.Enums;
 using Microsoft.IdentityModel.Tokens;
 
 namespace MicroFinance.Token
@@ -30,7 +30,7 @@ namespace MicroFinance.Token
                 new Claim(ClaimTypes.Email, tokenDto.Email)            
             };            
             var issuer = _config["Token:SuperIssuer"];
-            if(tokenDto.Role!=UserRole.SuperAdmin.ToString())
+            if(tokenDto.Role!=RoleEnum.SuperAdmin.ToString())
                 issuer = _config["Token:Issuer"];
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256Signature);

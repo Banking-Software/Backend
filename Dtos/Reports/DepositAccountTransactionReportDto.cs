@@ -8,7 +8,7 @@ public class DepositAccountTransactionReportWrapperDto
     public decimal? PreviousBalanceAfterTransaction { get; set; }
     public decimal? DebitSum { get; set; }
     public decimal? CreditSum { get; set; }
-    public ICollection<DepositAccountTransactionReportDto> DepositAccountTransactionDtos;
+    public List<DepositAccountTransactionReportDto> DepositAccountTransactionDtos {get;set;}
 }
 
 public class DepositAccountTransactionReportDto : BaseReportDto

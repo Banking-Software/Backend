@@ -59,6 +59,7 @@ namespace MicroFinance.ServiceExtensions.ApplicationService
             services.AddTransient<ITransactionReportService, TransactionReportService>();
 
             services.AddTransient<INepaliCalendarFormat, NepaliCalendarFormat>();
+            services.AddTransient<ICommonExpression, CommonExpression>();
 
             
             

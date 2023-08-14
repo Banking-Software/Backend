@@ -1511,6 +1511,9 @@ namespace MicroFinance.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
+                    b.Property<string>("Narration")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
@@ -1595,6 +1598,9 @@ namespace MicroFinance.Migrations
                     b.Property<decimal>("BalanceAfterTransaction")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("Narration")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
@@ -1793,6 +1799,9 @@ namespace MicroFinance.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -1817,7 +1826,35 @@ namespace MicroFinance.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("RoleId");
+
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.UserManagement.UserRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("RoleCode")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("RoleCode")
+                        .IsUnique();
+
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1845,43 +1882,6 @@ namespace MicroFinance.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "64c30543-93e4-4f77-b6ad-2b51207e16e5",
-                            ConcurrencyStamp = "1f06c358-e0ca-4284-a772-9f5cd96ba045",
-                            Name = "Marketing",
-                            NormalizedName = "MARKETING"
-                        },
-                        new
-                        {
-                            Id = "d28a4610-6c63-4f26-8601-224a6a8f2f15",
-                            ConcurrencyStamp = "ef5baa18-68fd-4137-b4d8-f64a7da0bcec",
-                            Name = "Assistant",
-                            NormalizedName = "ASSISTANT"
-                        },
-                        new
-                        {
-                            Id = "4ed7a3b5-32d0-49f5-8d8b-b3f4a0767db6",
-                            ConcurrencyStamp = "68ee3cf1-052c-4512-a47a-3613d5be7f46",
-                            Name = "SeniorAssistant",
-                            NormalizedName = "SENIORASSISTANT"
-                        },
-                        new
-                        {
-                            Id = "f14fd079-da32-4824-b5a4-6d95f4fd5324",
-                            ConcurrencyStamp = "dd8c76fe-cdb3-4548-a977-5caa7e1a3f00",
-                            Name = "Officer",
-                            NormalizedName = "OFFICER"
-                        },
-                        new
-                        {
-                            Id = "870b93e3-b883-43b4-a65d-3c95887253fb",
-                            ConcurrencyStamp = "68060219-3e03-45e1-be74-362c1f00f4b6",
-                            Name = "SuperAdmin",
-                            NormalizedName = "SUPERADMIN"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -2273,7 +2273,15 @@ namespace MicroFinance.Migrations
                         .WithOne("User")
                         .HasForeignKey("MicroFinance.Models.UserManagement.User", "EmployeeId");
 
+                    b.HasOne("MicroFinance.Models.UserManagement.UserRole", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
                     b.Navigation("Employee");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -2447,6 +2455,11 @@ namespace MicroFinance.Migrations
                 {
                     b.Navigation("User")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.UserManagement.UserRole", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

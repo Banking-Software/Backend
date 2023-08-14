@@ -1,5 +1,6 @@
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.UserManagement;
+using MicroFinance.Enums;
 using MicroFinance.Models.UserManagement;
 using Microsoft.AspNetCore.Identity;
 
@@ -17,10 +18,10 @@ namespace MicroFinance.Services.UserManagement
         Task<UserDetailsDto> GetUserDetailsByUserNameService(string userName);
         Task<UserDetailsDto> GetUserDetailsByEmailService(string email);
         Task<UserDto> GetUserByIdService(string id);
-        Task<string> GetRole(string id);
+        //Task<string> GetRole(string id);
         Task<UserDetailsDto> GetUserDetailsByIdService(string userName);
         Task<List<UserDetailsDto>> GetUsersDetailsService();
-        Task<ResponseDto> AssignRoleService(string userName, string role);
+        Task<ResponseDto> AssignRoleService(string userName, RoleEnum role);
 
         // END
 

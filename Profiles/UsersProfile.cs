@@ -19,6 +19,10 @@ namespace MicroFinance.Profiles
             // START: ADMIN CREATION BY SUPERADMIN Mapping
             CreateMap<CreateAdminBySuperAdminDto, CreateEmployeeDto>();
             CreateMap<CreateAdminBySuperAdminDto, UserRegisterDto>();
+            CreateMap<CreateAdminBySuperAdminDto, Employee>();
+            CreateMap<CreateAdminBySuperAdminDto, User>()
+            .ForMember(dest=>dest.Role, opt=>opt.Ignore());
+
             CreateMap<UserDetailsDto, UserDetailsToSuperAdmin>()
             .ForMember(dest=>dest.UserId, opt=>opt.MapFrom(src=>src.UserData.UserId))
             .ForMember(dest=>dest.UserName, opt=>opt.MapFrom(src=>src.UserData.UserName))
@@ -27,12 +31,14 @@ namespace MicroFinance.Profiles
             // END
 
             // START: Create Employee by Admin Mapping
-            CreateMap<UserRegisterDto, User>();
+            CreateMap<UserRegisterDto, User>()
+            .ForMember(dest=>dest.Role, opt=>opt.Ignore());
             CreateMap<UserRegisterDto, Employee>();
             CreateMap<CreateEmployeeDto, Employee>();
             CreateMap<UpdateEmployeeDto, Employee>();
             CreateMap<User, UserDto>()
-            .ForMember(dest=>dest.UserId, opt=> opt.MapFrom(src=>src.Id));
+            .ForMember(dest=>dest.UserId, opt=> opt.MapFrom(src=>src.Id))
+            .ForMember(dest=>dest.Role, opt=>opt.MapFrom(src=>src.Role.Name));
             CreateMap<Employee, EmployeeDto>()
             .ForMember(dest=>dest.Gender, opt=>opt.MapFrom(src=>src.GenderCode==1?"पुरूष":(src.GenderCode==2?"महिला":null)))
             .ForMember(dest=>dest.CitizenShipFileData, opt=>opt.MapFrom(src => (src.CitizenShipFileData != null ? Convert.ToBase64String(src.CitizenShipFileData) : null)))

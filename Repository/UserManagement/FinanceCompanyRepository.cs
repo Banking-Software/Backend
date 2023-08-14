@@ -1,7 +1,7 @@
 using System.Transactions;
 using MicroFinance.DBContext;
+using MicroFinance.Enums;
 // using MicroFinance.DBContext.UserManagement;
-using MicroFinance.Exceptions;
 using MicroFinance.Models.UserManagement;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,6 @@ namespace MicroFinance.Repository.UserManagement
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<User> _signInManager;
         // private readonly UserDbContext _userDbContext;
         private readonly ILogger<EmployeeRepository> _logger;
@@ -22,13 +21,11 @@ namespace MicroFinance.Repository.UserManagement
             ILogger<EmployeeRepository> logger,
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            RoleManager<IdentityRole> roleManager,
             // UserDbContext userDbContext,
             ApplicationDbContext dbContext
         )
         {
             _userManager = userManager;
-            _roleManager = roleManager;
             _signInManager = signInManager;
             // _userDbContext = userDbContext;
             _logger = logger;
@@ -41,46 +38,36 @@ namespace MicroFinance.Repository.UserManagement
             return await _signInManager.CheckPasswordSignInAsync(user, password, stayLogin);
         }
 
-        public async Task<User> Register(User user, string password, string role)
+        public async Task<IdentityResult> Register(User user, string password)
         {
-            using var transaction = await _dbContext.Database.BeginTransactionAsync();
             var userCreate = await _userManager.CreateAsync(user, password);
-            string errorDescription = "Not able to Create User";
-            string errorCode = "Invalid";
-            if (userCreate.Succeeded)
-            {
-                var roleAssign = await _userManager.AddToRoleAsync(user, role);
-                if (!roleAssign.Succeeded)
-                {
-                    await transaction.RollbackAsync();
-                    await DeleteUser(user);
-                    errorDescription = roleAssign.Errors.FirstOrDefault()?.Description;
-                    errorCode = roleAssign.Errors.FirstOrDefault()?.Code;
-                    _logger.LogError($"{DateTime.Now}: {errorCode}. {errorDescription}");
-                    throw new NotImplementedExceptionHandler($"{errorCode}. {errorDescription}");
-                }
-                _logger.LogInformation($"{DateTime.Now}: {user.UserName} is created");
-                await transaction.CommitAsync();
-                return user;
-            }
-            await transaction.RollbackAsync();
-            errorDescription = userCreate.Errors.FirstOrDefault()?.Description;
-            errorCode = userCreate.Errors.FirstOrDefault()?.Code;
-            _logger.LogError($"{DateTime.Now}: {errorCode}. {errorDescription}");
-            throw new NotImplementedExceptionHandler($"{errorCode}. {errorDescription}");
+            return userCreate;
+
+            // var roleAssign = await _userManager.AddToRoleAsync(user, role);
+            // if (!roleAssign.Succeeded)
+            // {
+            //     await transaction.RollbackAsync();
+            //     await DeleteUser(user);
+            //     errorDescription = roleAssign.Errors.FirstOrDefault()?.Description;
+            //     errorCode = roleAssign.Errors.FirstOrDefault()?.Code;
+            //     _logger.LogError($"{DateTime.Now}: {errorCode}. {errorDescription}");
+            //     throw new NotImplementedExceptionHandler($"{errorCode}. {errorDescription}");
+            // }
+            //     _logger.LogInformation($"{DateTime.Now}: {user.UserName} is created");
+            //     await transaction.CommitAsync();
+            //     return user;
+            // }
+            // await transaction.RollbackAsync();
+            // errorDescription = userCreate.Errors.FirstOrDefault()?.Description;
+            // errorCode = userCreate.Errors.FirstOrDefault()?.Code;
+            // _logger.LogError($"{DateTime.Now}: {errorCode}. {errorDescription}");
+            // throw new NotImplementedExceptionHandler($"{errorCode}. {errorDescription}");
         }
 
-        public async Task<bool> UpdatePassword(User user, string oldPassword, string newPassword)
+        public async Task<IdentityResult> UpdatePassword(User user, string oldPassword, string newPassword)
         {
             var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
-            if (result.Succeeded)
-            {
-                _logger.LogInformation($"{DateTime.Now}: {user.UserName} 's Password Updated ");
-                return true;
-            }
-            _logger.LogError($"{DateTime.Now}: Password Update Failed for {user.UserName} due to {result.Errors}. {result.Errors.FirstOrDefault()?.Description}");
-
-            return false;
+            return result;
         }
 
         public async Task<IdentityResult> UpdateUserProfile(User user)
@@ -104,49 +91,73 @@ namespace MicroFinance.Repository.UserManagement
 
         public async Task<List<User>> GetUsers()
         {
-            return await _userManager.Users.Include(u => u.Employee).ToListAsync();
+            return await _userManager.Users
+            .Include(u => u.Employee)
+            .Include(usr=>usr.Role)
+            .Where(usr=>usr.Role.RoleCode!= (int) RoleEnum.SuperAdmin)
+            .AsNoTracking()
+            .ToListAsync();
         }
 
         public async Task<User> GetUserDetailsById(string id)
         {
             return await _userManager.Users
                     .Include(u => u.Employee)
-                    .FirstOrDefaultAsync(u => u.Id == id);
+                    .Include(u=>u.Role)
+                    .Where(u=>u.Id==id && u.Role.RoleCode!= (int) RoleEnum.SuperAdmin)
+                    .AsNoTracking()
+                    .SingleOrDefaultAsync();
         }
         public async Task<User> GetUserDetailsByUsername(string userName)
         {
             return await _userManager.Users
                  .Include(u => u.Employee)
-                 .FirstOrDefaultAsync(u => u.UserName == userName);
+                 .Include(u=>u.Role)
+                 .Where(u => u.UserName == userName &&  u.Role.RoleCode!= (int) RoleEnum.SuperAdmin)
+                 .AsNoTracking()
+                 .FirstOrDefaultAsync();
 
         }
 
         public async Task<User> GetUserById(string id)
         {
-            return await _userManager.FindByIdAsync(id);
+            return await _userManager.Users.Include(usr=>usr.Employee).Include(usr=>usr.Role)
+            .Where(usr=>usr.Id==id &&  usr.Role.RoleCode!= (int) RoleEnum.SuperAdmin)
+            .AsNoTracking()
+            .SingleOrDefaultAsync();
         }
         public async Task<User> GetUserByUsername(string userName)
         {
             //return await _userManager.FindByNameAsync(userName);
             return await _userManager.Users
             .Include(usr => usr.Employee)
-            .Where(usr => usr.UserName == userName)
+            .Include(usr=>usr.Role)
+            .Where(usr => usr.UserName == userName &&  usr.Role.RoleCode!= (int) RoleEnum.SuperAdmin)
+            .AsNoTracking()
             .FirstOrDefaultAsync();
         }
 
         public async Task<User> GetUserByEmail(string email)
         {
-            return await _userManager.FindByEmailAsync(email);
+            return await _userManager.Users.Include(usr=>usr.Employee).Include(usr=>usr.Role)
+            .Where(usr=>usr.Email==email && usr.Role.RoleCode!= (int) RoleEnum.SuperAdmin)
+            .AsNoTracking()
+            .SingleOrDefaultAsync();
         }
 
-        public async Task<IdentityResult> AssignRole(User user, string role)
+        public async Task<int> AssignRoleToUser(User user)
         {
-            return await _userManager.AddToRoleAsync(user, role);
+            _dbContext.Entry(user).State = EntityState.Modified;
+            return await _dbContext.SaveChangesAsync();
+            // return await _userManager.AddToRoleAsync(user, role);
         }
 
-        public async Task<string> GetRole(User user)
+        public async Task<UserRole> GetRole(int roleCode)
         {
-            return (await _userManager.GetRolesAsync(user))[0];
+            var role = await _dbContext.UserRoles
+            .Where(rl=>rl.RoleCode==roleCode)
+            .SingleOrDefaultAsync();
+            return role;
         }
 
         // END
@@ -193,7 +204,7 @@ namespace MicroFinance.Repository.UserManagement
 
         public async Task<List<Employee>> GetEmployees()
         {
-            return await _dbContext.Employees.ToListAsync();
+            return await _dbContext.Employees.AsNoTracking().ToListAsync();
         }
         public async Task<Employee> GetEmployeeById(int id)
         {

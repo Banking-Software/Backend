@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using MicroFinance.Enums;
 using MicroFinance.Role;
 using MicroFinance.Services.UserManagement;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +19,10 @@ namespace MicroFinance.Services
         {
             string currentUserId = context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             string role = context.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-            if(role==UserRole.Officer.ToString())
+            if(role==RoleEnum.Officer.ToString())
             {
                 var user = await _employeeService.GetUserByIdService(currentUserId);
-                if(
-                    user.Message!="Success"
-                    || 
-                    user.IsActive==false || 
-                    await _employeeService.GetRole(currentUserId)!=UserRole.Officer.ToString()
-                    )
+                if(user.IsActive==false || user.Role!=RoleEnum.Officer.ToString())
                 {
                     context.Result=new UnauthorizedResult();
                 }

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using AutoMapper;
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.UserManagement;
+using MicroFinance.Enums;
 using MicroFinance.ErrorManage;
 using MicroFinance.Exceptions;
 using MicroFinance.Role;
@@ -51,8 +52,8 @@ namespace MicroFinance.Controllers.UserManagement
         [HttpPost("createLoginCredential")]
         public async Task<ActionResult<ResponseDto>> CreateLoginCredential(UserRegisterDto userRegisterDto)
         {
-            if (userRegisterDto.IsActive)
-                throw new UnAuthorizedExceptionHandler("You are not authorized to activate User");
+            if (userRegisterDto.IsActive || userRegisterDto.Role==RoleEnum.Officer || userRegisterDto.Role==RoleEnum.SuperAdmin)
+                throw new UnAuthorizedExceptionHandler("You are authorized to create user with provided information");
             var decodedToken = GetDecodedToken();
             return Ok(await _employeeService.RegisterService(userRegisterDto, decodedToken.UserName));
         }
@@ -96,7 +97,9 @@ namespace MicroFinance.Controllers.UserManagement
 
             var role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
             var currentUserName = HttpContext.User.FindFirst(ClaimTypes.GivenName).Value;
-            if (role != UserRole.Officer.ToString() && currentUserName != userName)
+
+            //if (role != RoleEnum.Officer.ToString() && currentUserName != userName)
+            if (role != RoleEnum.Officer.ToString() && currentUserName != userName)
                 throw new UnAuthorizedExceptionHandler("Not Authorized to view");
             var user = await _employeeService.GetUserDetailsByUserNameService(userName);
             if (user.Message.ToString() != "Success")
@@ -113,7 +116,7 @@ namespace MicroFinance.Controllers.UserManagement
             var role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
             var currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            if (role != UserRole.Officer.ToString() && currentUserId != id)
+            if (role != RoleEnum.Officer.ToString() && currentUserId != id)
                 throw new UnAuthorizedExceptionHandler("Not Authorized to view");
             var user = await _employeeService.GetUserDetailsByIdService(id);
             if (user.Message.ToString() != "Success")
@@ -160,10 +163,10 @@ namespace MicroFinance.Controllers.UserManagement
         [HttpPost("assignRoleToUser")]
         public async Task<ActionResult<ResponseDto>> AssignRole(AssignRoleDto assignRoleDto)
         {
-
-            var response = await _employeeService.AssignRoleService(assignRoleDto.UserName, assignRoleDto.Role.ToString());
+            if(assignRoleDto.Role==RoleEnum.SuperAdmin)
+                throw new UnauthorizedAccessException("You are not authorized to assign user to superadmin");
+            var response = await _employeeService.AssignRoleService(assignRoleDto.UserName, assignRoleDto.Role);
             return response;
-
         }
 
         // END // 
@@ -195,7 +198,7 @@ namespace MicroFinance.Controllers.UserManagement
         {
             var decodedToken = GetDecodedToken();
 
-            if (decodedToken.Role != UserRole.Officer.ToString() && decodedToken.Email != email)
+            if (decodedToken.Role != RoleEnum.Officer.ToString() && decodedToken.Email != email)
                 throw new UnAuthorizedExceptionHandler("Not Authorized to view");
 
             var employee = await _employeeService.GetEmployeeByEmail(email);
@@ -217,7 +220,7 @@ namespace MicroFinance.Controllers.UserManagement
             if (employee.Message != "Success")
                 throw new NotFoundExceptionHandler(employee.Message);
 
-            if (role != UserRole.Officer.ToString())
+            if (role != RoleEnum.Officer.ToString())
             {
                 var user = await _employeeService.GetUserByEmailService(employee.Email);
                 if (currentUserId != user.UserId) throw new UnAuthorizedExceptionHandler("Not Authorized to view");
