@@ -1,12 +1,16 @@
+using MicroFinance.Services.CompanyProfile;
+
 namespace MicroFinance.Helper;
 
 public class NepaliCalendarFormat : INepaliCalendarFormat
 {
     private readonly ILogger<NepaliCalendarFormat> _logger;
+    private readonly ICompanyProfileService _companyProfileService;
 
-    public NepaliCalendarFormat(ILogger<NepaliCalendarFormat> logger)
+    public NepaliCalendarFormat(ILogger<NepaliCalendarFormat> logger, ICompanyProfileService companyProfileService)
     {
         _logger= logger;
+        _companyProfileService=companyProfileService;
     }
 
     public Task<string> ConvertEnglishDateToNepali(DateTime englishDate)
@@ -80,4 +84,11 @@ public class NepaliCalendarFormat : INepaliCalendarFormat
         return string.Empty;
     }
 
+    public async Task<DateTime> GetCurrentCompanyDate()
+    {
+        var activeCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
+        string companyCalendarNepaliDate = await GetNepaliFormatDate(activeCalendar.Year, activeCalendar.Month, activeCalendar.RunningDay);
+        DateTime companyCalendarEnglishDate = await ConvertNepaliDateToEnglish(companyCalendarNepaliDate);
+        return companyCalendarEnglishDate;
+    }
 }

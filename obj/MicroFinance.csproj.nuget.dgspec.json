@@ -113,6 +113,10 @@
             "Swashbuckle.AspNetCore.Annotations": {
               "target": "Package",
               "version": "[6.5.0, )"
+            },
+            "Z.EntityFramework.Extensions": {
+              "target": "Package",
+              "version": "[7.22.6, )"
             }
           },
           "imports": [

@@ -172,7 +172,7 @@ namespace MicroFinance.Repository.Transaction
                 TransactionType = isDeposit ? TransactionTypeEnum.Credit : TransactionTypeEnum.Debit,
                 Narration = shareAccountTransactionWrapper.Narration,
                 WithDrawalType = !isDeposit ? WithDrawalTypeEnum.ByShare : null,
-                Source = "FROM SHARE TRANSACTION"
+                Source = "FROM SHARE TRANSACTION",
             };
             int depositAccountId;
             int depositSchemeId;

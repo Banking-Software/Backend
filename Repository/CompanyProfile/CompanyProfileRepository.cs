@@ -69,6 +69,7 @@ namespace MicroFinance.Repository.CompanyProfile
 
         public async Task<int> CreateCalender(List<Calendar> calendars)
         {
+            
             await _companyProfileDbContex.Calendars.AddRangeAsync(calendars);
             return await _companyProfileDbContex.SaveChangesAsync();
         }
@@ -99,7 +100,7 @@ namespace MicroFinance.Repository.CompanyProfile
 
         public async Task<Calendar> GetActiveCalender()
         {
-            return await _companyProfileDbContex.Calendars.Where(c=>c.IsActive==true).FirstOrDefaultAsync();
+            return await _companyProfileDbContex.Calendars.Where(c=>c.IsActive==true).SingleOrDefaultAsync();
         }
 
         public async Task<int> GetActiveYear()

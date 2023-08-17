@@ -8,4 +8,5 @@ public interface INepaliCalendarFormat
     Task<string> ConvertEnglishDateToNepali(DateTime englishDate);
     Task<string> GetNepaliFormatDate(int year, int month, int day);
     Task<string> GetNepaliFormatDate(string nepaliDate);
+    Task<DateTime> GetCurrentCompanyDate();
 }

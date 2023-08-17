@@ -9,9 +9,10 @@ namespace MicroFinance.Helper
         private readonly Dictionary<int, SemaphoreSlim> subLedgerLocks = new Dictionary<int, SemaphoreSlim>();
         private readonly object accountGlobalLock = new object();
         private readonly object shareAccountGlobalLock = new object();
-         private readonly object shareKittaGlobalLock = new object();
+        private readonly object shareKittaGlobalLock = new object();
         private readonly object ledgerGlobalLock = new object();
         private readonly object subLedgerGlobalLock = new object();
+        private static SemaphoreSlim _calendarMutex = new SemaphoreSlim(1, 1);
         private static readonly LockManager instance = new LockManager();
         public static LockManager Instance => instance;
 
@@ -19,6 +20,8 @@ namespace MicroFinance.Helper
         {
 
         }
+
+
         public SemaphoreSlim GetAccountLock(int accountId)
         {
             lock (accountGlobalLock)
@@ -77,6 +80,20 @@ namespace MicroFinance.Helper
                     subLedgerLocks[subLedgerId] = subLedgerLock;
                 }
                 return subLedgerLock;
+            }
+        }
+
+        public static async Task<IDisposable> LockCalendarAsync()
+        {
+            await _calendarMutex.WaitAsync();
+            return new LockReleaser();
+        }
+
+        private class LockReleaser : IDisposable
+        {
+            public void Dispose()
+            {
+                _calendarMutex.Release();
             }
         }
     }

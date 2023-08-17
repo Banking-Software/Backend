@@ -15,7 +15,7 @@ namespace MicroFinance.Services.CompanyProfile
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
         private readonly INepaliCalendarFormat _nepaliCalendarFormat;
-
+        private static SemaphoreSlim _createCalendarMutex = new SemaphoreSlim(1, 1);
         public CompanyProfileService
         (
             ICompanyProfileRepository companyProfile, 
@@ -29,8 +29,7 @@ namespace MicroFinance.Services.CompanyProfile
             _config=config;
             _nepaliCalendarFormat=nepaliCalendarFormat;
         }
-
-
+        
         private Task<CompanyDetail> UploadImage(CompanyDetail companyDetail, IFormFile? companyLogo)
         {
             if(companyLogo==null)
@@ -173,7 +172,6 @@ namespace MicroFinance.Services.CompanyProfile
             var calendarForCurrentYear = await _companyProfile.GetCalendarByYear(createCalenderDtos[0].Year);
             if(calendarForCurrentYear.Count>=1)
                 throw new UnAuthorizedExceptionHandler("Calendar already exist for the given year");
-        
             var activeCalendar = await _companyProfile.GetActiveCalender();
             List<Calendar> calendars = new List<Calendar>();
             int activeMonth=0;
