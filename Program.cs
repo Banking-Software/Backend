@@ -35,9 +35,6 @@ builder.Services.AddSwaggerGen();
 
 // DB CONTEXT REGISTRY
 builder.Services.AddDbServiceExtension(builder.Configuration);
-
-// Identity Service /////////////////////////////////////////////////////
-// builder.Services.AddSuperAdminIdentityServiceAsync(builder.Configuration);
 builder.Services.AddApplicationServiceExtension();
 builder.Services.AddUserIdentityServiceAsync(builder.Configuration);
 ////////////////////////////////////////////////////////////////////////
@@ -98,13 +95,6 @@ using (var scope = app.Services.CreateScope())
     {
         try
         {
-
-            // var superAdminDbContext = services.GetRequiredService<SuperAdminDbContext>();
-            // await superAdminDbContext.Database.MigrateAsync();
-
-            
-            // var userDbContext = services.GetRequiredService<UserDbContext>();
-            // await userDbContext.Database.MigrateAsync();
             var dbContext = services.GetRequiredService<ApplicationDbContext>();
             await dbContext.Database.MigrateAsync();
             var superAdminUserManager = services.GetRequiredService<UserManager<User>>();

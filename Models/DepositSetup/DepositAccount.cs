@@ -40,9 +40,9 @@ namespace MicroFinance.Models.DepositSetup
         public int ClientId { get; set; }
         public virtual Client Client { get; set; }
         public int? InterestPostingAccountNumberId { get; set; }
-        public DepositAccount? InterestPostingAccountNumber { get; set; }
+        public virtual DepositAccount InterestPostingAccountNumber { get; set; }
         public int? MatureInterestPostingAccountNumberId { get; set; }
-        public DepositAccount? MatureInterestPostingAccountNumber { get; set; }
+        public virtual DepositAccount MatureInterestPostingAccountNumber { get; set; }
         public virtual ICollection<JointAccount> JointAccounts { get; set; }
         public virtual ICollection<DepositAccountTransaction> DepositAccountTransactions { get; set; }
         public virtual ICollection<ShareTransaction> TransferToShareTransaction { get; set; }

@@ -8,8 +8,6 @@ using MicroFinance.Models.RecordsWithCode;
 using MicroFinance.Models.Share;
 using MicroFinance.Models.Transactions;
 using MicroFinance.Models.UserManagement;
-
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

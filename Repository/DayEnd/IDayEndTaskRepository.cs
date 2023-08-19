@@ -1,4 +1,4 @@
-namespace MicroFinance.Repository.DayEndTaskRepository;
+namespace MicroFinance.Repository.DayEnd;
 
 public interface IDayEndTaskRepository
 {

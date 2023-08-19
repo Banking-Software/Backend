@@ -147,6 +147,7 @@ namespace MicroFinance.Repository.ClientSetup
             .Include(c => c.ClientGroup)
             .Include(c => c.ClientUnit)
             .Include(c => c.KYMType)
+            .AsNoTracking()
             .SingleOrDefaultAsync();
         }
 

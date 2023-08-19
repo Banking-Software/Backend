@@ -4,7 +4,7 @@ using MicroFinance.Enums.Deposit.Account;
 
 namespace MicroFinance.Dtos.DepositSetup
 {
-    public class CreateDepositAccountDto : IValidatableObject
+    public class CreateDepositAccountDto //: IValidatableObject
     {
         [Required]
         public int DepositSchemeId { get; set; }
@@ -38,13 +38,16 @@ namespace MicroFinance.Dtos.DepositSetup
         public int? ExpectedTotalInterestAmount { get; set; }
         public IFormFile? SignaturePhoto { get; set; }
 
-         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if(AccountType == AccountTypeEnum.Joint && JointClientIds.Count<1)
-            {
-                yield return new ValidationResult("No Joint Client Received. Please provide Client Id if you want to create joint account, otherwise select single account type");
-            }
-            
-        }
+        // public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        // {
+        //     // if(AccountType==AccountTypeEnum.Joint && JointClientIds.Count<1)
+        //     // {
+        //     //     yield return new ValidationResult("Joint Client Id required", new []{nameof(AccountType), nameof(JointClientIds)});
+        //     // }
+        //     // if(AccountType==AccountTypeEnum.Single && JointClientIds!=null && JointClientIds.Count>=1)
+        //     // {
+        //     //     yield return new ValidationResult($"Joint Client not allowed in Single Account",  new[] {nameof(AccountType), nameof(JointClientIds)});
+        //     // }
+        // }
     }
 }

@@ -4,12 +4,13 @@ using MicroFinance.Enums.Deposit.Account;
 
 namespace MicroFinance.Dtos.DepositSetup
 {
-    public class UpdateDepositAccountDto
+    public class UpdateDepositAccountDto : IValidatableObject
     {
         [Required]
         public int Id { get; set; }
         [Required]
         public decimal InterestRate { get; set; }
+        public AccountStatusEnum AccountStatus { get; set; }
         public int? InterestPostingAccountId { get; set; }
         public int? MatureInterestPostingAccountId { get; set; }
         public string? Description { get; set; }
@@ -25,5 +26,17 @@ namespace MicroFinance.Dtos.DepositSetup
         public int? ExpectedTotalDepositAmount { get; set; }
         public int? ExpectedTotalReturnAmount { get; set; }
         public int? ExpectedTotalInterestAmount { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (MatureInterestPostingAccountId!=null && MatureInterestPostingAccountId==Id)
+            {
+                yield return new ValidationResult("Cannot be eqaul to current account", new[] { nameof(MatureInterestPostingAccountId)});
+            }
+            if (InterestPostingAccountId!=null && InterestPostingAccountId==Id)
+            {
+                yield return new ValidationResult("Cannot be eqaul to current account", new[] { nameof(MatureInterestPostingAccountId) });
+            }
+        }
     }
 }

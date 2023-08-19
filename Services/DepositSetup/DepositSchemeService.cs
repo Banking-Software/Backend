@@ -57,7 +57,7 @@ namespace MicroFinance.Services.DepositSetup
             _employeeService = employeeService;
             _config = config;
             _nepaliCalendarFormat = nepaliCalendarFormat;
-            _commonExpression=commonExpression;
+            _commonExpression = commonExpression;
         }
 
         private List<string> GetSubLedgerNameForDepositScheme(CreateDepositSchemeDto createDepositScheme)
@@ -170,31 +170,34 @@ namespace MicroFinance.Services.DepositSetup
         {
 
             DepositAccount newDepositAccount = _mapper.Map<DepositAccount>(createDepositAccountDto);
-            await AddClientInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
-            await AddDepositSchemeInDepositAccount(createDepositAccountDto, newDepositAccount);
-            await AddInterestAndMaturePostingAccountInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
+            await VerifyClient(createDepositAccountDto, newDepositAccount, decodedToken);
+            var depositScheme = await VerifyDepositScheme(createDepositAccountDto, newDepositAccount);
+            await VerfiyPositingAccounts(createDepositAccountDto, newDepositAccount, decodedToken);
             await AddReferredByEmployeeInDepositAccount(createDepositAccountDto, newDepositAccount, decodedToken);
-            await AddBasicDetailsInDepositAccount(newDepositAccount, decodedToken);
+            await AddBasicDetailsInDepositAccount(newDepositAccount, depositScheme ,decodedToken);
             newDepositAccount = await UploadSignatureImages(createDepositAccountDto, newDepositAccount);
-            List<Client> jointClients =
-            createDepositAccountDto.AccountType == AccountTypeEnum.Joint
-            ?
-            await GetAllJointClientDetails(createDepositAccountDto.JointClientIds, decodedToken)
-            :
-            null;
-            var depositAccountId = await _depositSchemeRepository.CreateDepositAccount(newDepositAccount);
-            if (depositAccountId >= 1)
+            if (createDepositAccountDto.AccountType == AccountTypeEnum.Joint && createDepositAccountDto?.JointClientIds?.Count >= 1)
+                await VerifyJointClientId(createDepositAccountDto.JointClientIds, decodedToken);
+
+            var depositAccountId = await _depositSchemeRepository.CreateDepositAccount(newDepositAccount, createDepositAccountDto);
+            // if (depositAccountId >= 1)
+            // {
+            //     if (createDepositAccountDto.AccountType == AccountTypeEnum.Joint)
+            //         await CreateJointAccountService(jointClients, newDepositAccount);
+            //     return new ResponseDto()
+            //     {
+            //         Message = $"Successfully created '{newDepositAccount.AccountNumber}' account number",
+            //         Status = true,
+            //         StatusCode = "200"
+            //     };
+            // }
+            // throw new Exception("Unable to Create Deposit Account");
+            return new ResponseDto()
             {
-                if (createDepositAccountDto.AccountType == AccountTypeEnum.Joint)
-                    await CreateJointAccountService(jointClients, newDepositAccount);
-                return new ResponseDto()
-                {
-                    Message = $"Successfully created '{newDepositAccount.AccountNumber}' account number",
-                    Status = true,
-                    StatusCode = "200"
-                };
-            }
-            throw new Exception("Unable to Create Deposit Account");
+                Message = $"Successfully created '{newDepositAccount.AccountNumber}' account number",
+                Status = true,
+                StatusCode = "200"
+            };
         }
 
         // private async Task<string> GetUpdatedInterestPostingDate(UpdateDepositAccountDto updateDepositAccountDto, DepositAccount existingDepositAccount)
@@ -214,7 +217,6 @@ namespace MicroFinance.Services.DepositSetup
         {
             Expression<Func<DepositAccount, bool>> expressionToQueryDepositAccount =
             depositAcc => depositAcc.Id == updateDepositAccountDto.Id && depositAcc.Status != AccountStatusEnum.Close;
-
             var existingDepositAccount = await _depositSchemeRepository.GetDepositAccount(expressionToQueryDepositAccount);
             if (existingDepositAccount == null)
                 throw new Exception("No Non-close deposit account found");
@@ -360,7 +362,7 @@ namespace MicroFinance.Services.DepositSetup
             return depositAccountWrappersDto;
         }
 
-        private async Task AddClientInDepositAccount(CreateDepositAccountDto createDepositAccountDto, DepositAccount newDepositAccount, TokenDto decodedToken)
+        private async Task VerifyClient(CreateDepositAccountDto createDepositAccountDto, DepositAccount depositAccount, TokenDto decodedToken)
         {
             var client = await _clientRepo.GetClientById(createDepositAccountDto.ClientId);
             if (client == null || !client.IsActive)
@@ -370,10 +372,10 @@ namespace MicroFinance.Services.DepositSetup
             }
             if (client.BranchCode != decodedToken.BranchCode)
                 throw new Exception("Given Client is not found under your branch");
-            newDepositAccount.Client = client;
+            depositAccount.ClientId = client.Id;
         }
 
-        private async Task AddDepositSchemeInDepositAccount(CreateDepositAccountDto createDepositAccountDto, DepositAccount newDepositAccount)
+        private async Task<DepositScheme> VerifyDepositScheme(CreateDepositAccountDto createDepositAccountDto, DepositAccount depositAccount)
         {
             var depositScheme = await _depositSchemeRepository.GetDepositSchemeById(createDepositAccountDto.DepositSchemeId);
             if (depositScheme == null || !depositScheme.IsActive)
@@ -384,26 +386,33 @@ namespace MicroFinance.Services.DepositSetup
             {
                 throw new Exception($"MinimumInterestRate<=InterestRate<=MaximumInterestRate constraint doesnot match. Available minimum Interest Rate is {depositScheme.MinimumInterestRate} and maximum interest rate is {depositScheme.MaximumInterestRate}");
             }
-            newDepositAccount.DepositScheme = depositScheme;
+            depositAccount.DepositSchemeId = depositScheme.Id;
+            return depositScheme;
         }
 
-        private async Task AddInterestAndMaturePostingAccountInDepositAccount(CreateDepositAccountDto createDepositAccountDto, DepositAccount newDepositAccount, TokenDto decodedToken)
+        private async Task VerfiyPositingAccounts(CreateDepositAccountDto createDepositAccountDto, DepositAccount newDepositAccount, TokenDto decodedToken)
         {
             if (createDepositAccountDto.InterestPostingAccountId != null)
             {
-                Expression<Func<DepositAccount, bool>> expressionQuery = da => da.InterestPostingAccountNumberId == (int)createDepositAccountDto.InterestPostingAccountId && da.Status != AccountStatusEnum.Close;
+                Expression<Func<DepositAccount, bool>> expressionQuery
+                = da => da.Id == (int)createDepositAccountDto.InterestPostingAccountId && da.Status != AccountStatusEnum.Close &&
+                da.Client.IsActive && da.DepositScheme.IsActive && da.BranchCode == decodedToken.BranchCode;
+
                 var interestPostingAccountNumber = await _depositSchemeRepository.GetDepositAccount(expressionQuery);
-                if (interestPostingAccountNumber == null || interestPostingAccountNumber.BranchCode != decodedToken.BranchCode)
+                if (interestPostingAccountNumber == null)
                     throw new Exception("InterestPostingAccountNumber: Cannot Find Account Number under your branch");
-                newDepositAccount.InterestPostingAccountNumber = interestPostingAccountNumber;
+                newDepositAccount.InterestPostingAccountNumberId = interestPostingAccountNumber.Id;
             }
             if (createDepositAccountDto.MatureInterestPostingAccountId != null)
             {
-                Expression<Func<DepositAccount, bool>> expressionQuery = da => da.InterestPostingAccountNumberId == (int)createDepositAccountDto.MatureInterestPostingAccountId && da.Status != AccountStatusEnum.Close;
+                Expression<Func<DepositAccount, bool>> expressionQuery
+                = da => da.Id == (int)createDepositAccountDto.MatureInterestPostingAccountId && da.Status != AccountStatusEnum.Close &&
+                da.Client.IsActive && da.DepositScheme.IsActive && da.BranchCode == decodedToken.BranchCode;
+
                 var matureInterestPostingAccountNumber = await _depositSchemeRepository.GetDepositAccount(expressionQuery);
-                if (matureInterestPostingAccountNumber == null || matureInterestPostingAccountNumber.BranchCode != decodedToken.BranchCode)
+                if (matureInterestPostingAccountNumber == null)
                     throw new Exception("MatureInterestPositingAccountNumber: Cannot Find Account Number under your branch");
-                newDepositAccount.MatureInterestPostingAccountNumber = matureInterestPostingAccountNumber;
+                newDepositAccount.MatureInterestPostingAccountNumberId = matureInterestPostingAccountNumber.Id;
             }
         }
         private async Task AddReferredByEmployeeInDepositAccount(CreateDepositAccountDto createDepositAccountDto, DepositAccount newDepositAccount, TokenDto decodedToken)
@@ -417,9 +426,8 @@ namespace MicroFinance.Services.DepositSetup
             }
         }
 
-        private async Task<List<Client>> GetAllJointClientDetails(List<int> jointClientIds, TokenDto decodedToken)
+        private async Task VerifyJointClientId(List<int> jointClientIds, TokenDto decodedToken)
         {
-            List<Client> listOfAllJointClients = new List<Client>();
             foreach (var jointClientId in jointClientIds)
             {
                 var jointClient = await _clientRepo.GetClientById(jointClientId);
@@ -427,9 +435,7 @@ namespace MicroFinance.Services.DepositSetup
                     throw new Exception($"Provided Joint Clients are not found under your branch. Id:{jointClientId}");
                 if (!jointClient.IsActive)
                     throw new Exception($"Joint Client {jointClient.ClientId} is inactive");
-                listOfAllJointClients.Add(jointClient);
             }
-            return listOfAllJointClients;
         }
         private async Task<DateTime> VerifyNepaliDateAndConvertToEnglishDate(string nepaliOpeningDate)
         {
@@ -438,7 +444,7 @@ namespace MicroFinance.Services.DepositSetup
                 throw new BadRequestExceptionHandler("Invalid Opening Date Format. Correct Format is YYYY-MM-DD");
             return await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(nepaliOpeningDate);
         }
-        private async Task AddBasicDetailsInDepositAccount(DepositAccount newDepositAccount, TokenDto decodedToken)
+        private async Task AddBasicDetailsInDepositAccount(DepositAccount newDepositAccount, DepositScheme depositScheme ,TokenDto decodedToken)
         {
             var companyCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
             newDepositAccount.RealWorldCreationDate = DateTime.Now;
@@ -447,8 +453,8 @@ namespace MicroFinance.Services.DepositSetup
             newDepositAccount.BranchCode = decodedToken.BranchCode;
             newDepositAccount.CreatedBy = decodedToken.UserName;
             newDepositAccount.CreatorId = decodedToken.UserId;
-            string nepaliOpeningDate =  await _nepaliCalendarFormat.GetNepaliFormatDate(newDepositAccount.NepaliOpeningDate);
-            if(string.IsNullOrEmpty(nepaliOpeningDate))
+            string nepaliOpeningDate = await _nepaliCalendarFormat.GetNepaliFormatDate(newDepositAccount.NepaliOpeningDate);
+            if (string.IsNullOrEmpty(nepaliOpeningDate))
                 throw new BadRequestExceptionHandler("Invalid Opening Date. Format should be YYYY-MM-DD. And also please enter correct date");
             newDepositAccount.NepaliCreationDate = nepaliOpeningDate;
             newDepositAccount.EnglishOpeningDate = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(newDepositAccount.NepaliOpeningDate);
@@ -462,7 +468,7 @@ namespace MicroFinance.Services.DepositSetup
             MatureDateDto matureDate = await GenerateMatureDateOfDepositAccountService(generateMatureDateDto);
             newDepositAccount.NepaliMatureDate = matureDate.NepaliMatureDate;
             newDepositAccount.EnglishMatureDate = matureDate.EnglishMatureDate;
-            PostingSchemeEnum postingScheme = (PostingSchemeEnum) Enum.ToObject(typeof(PostingSchemeEnum), newDepositAccount.DepositScheme.PostingScheme);
+            PostingSchemeEnum postingScheme = (PostingSchemeEnum)Enum.ToObject(typeof(PostingSchemeEnum), depositScheme.PostingScheme);
             newDepositAccount.NextInterestPostingDate = await GenerateNextInterestPostingDate(newDepositAccount.EnglishOpeningDate, postingScheme, newDepositAccount.EnglishMatureDate);
         }
         public async Task<DateTime> GenerateNextInterestPostingDate(DateTime englishCurrentDate, PostingSchemeEnum postingScheme, DateTime englishMatureDate)
@@ -497,24 +503,7 @@ namespace MicroFinance.Services.DepositSetup
             return nextPostingDateinEnglish;
         }
 
-        private async Task CreateJointAccountService(List<Client> jointClients, DepositAccount depositAccount)
-        {
-            List<JointAccount> jointAccounts = new List<JointAccount>();
-            DateTime RealWorldStartDate = DateTime.Now;
-            string accountCreationDateInNepali = depositAccount.NepaliCreationDate;
-            foreach (var jointClient in jointClients)
-            {
-                var jointAccount = new JointAccount()
-                {
-                    JointClient = jointClient,
-                    DepositAccount = depositAccount,
-                    RealWorldStartDate = RealWorldStartDate,
-                    CompanyCalendarStartDate = accountCreationDateInNepali
-                };
-                jointAccounts.Add(jointAccount);
-            }
-            await _depositSchemeRepository.CreateJointAccount(jointAccounts, depositAccount);
-        }
+        
 
         private Task<DepositAccountWrapperDto> MapDepositAccountWrapperToDepositAccountWrapperDto(DepositAccountWrapper depositAccountWrapper)
         {
@@ -649,10 +638,11 @@ namespace MicroFinance.Services.DepositSetup
                 Expression<Func<DepositAccount, bool>> expression =
                 depositAcc => depositAcc.Id == (int)updateDepositAccountDto.InterestPostingAccountId && depositAcc.Status != AccountStatusEnum.Close;
                 var interestPostingAccount = await _depositSchemeRepository.GetDepositAccount(expression);
-                existingDepositAccount.InterestPostingAccountNumber = (interestPostingAccount != null && interestPostingAccount.BranchCode == decodedToken.BranchCode) ? interestPostingAccount : throw new Exception("No Account Found for Interest Posting");
+                existingDepositAccount.InterestPostingAccountNumberId = (interestPostingAccount != null && interestPostingAccount.BranchCode == decodedToken.BranchCode) ? interestPostingAccount.Id : throw new Exception("No Account Found for Interest Posting");
+
             }
             else if (updateDepositAccountDto.InterestPostingAccountId == null)
-                existingDepositAccount.InterestPostingAccountNumber = null;
+                existingDepositAccount.InterestPostingAccountNumberId = null;
         }
 
         private async Task MatureInterestPostingAccountInDepositAccount(DepositAccount existingDepositAccount, UpdateDepositAccountDto updateDepositAccountDto, TokenDto decodedToken)
@@ -662,10 +652,10 @@ namespace MicroFinance.Services.DepositSetup
                 Expression<Func<DepositAccount, bool>> expression =
                 depositAcc => depositAcc.Id == (int)updateDepositAccountDto.MatureInterestPostingAccountId && depositAcc.Status != AccountStatusEnum.Close;
                 var maturePostingAccount = await _depositSchemeRepository.GetDepositAccount(expression);
-                existingDepositAccount.MatureInterestPostingAccountNumber = (maturePostingAccount != null && maturePostingAccount.BranchCode == decodedToken.BranchCode) ? maturePostingAccount : throw new Exception("No Account Found for mature interest posting");
+                existingDepositAccount.MatureInterestPostingAccountNumberId = (maturePostingAccount != null && maturePostingAccount.BranchCode == decodedToken.BranchCode) ? maturePostingAccount.Id : throw new Exception("No Account Found for mature interest posting");
             }
             else if (updateDepositAccountDto.MatureInterestPostingAccountId == null)
-                existingDepositAccount.MatureInterestPostingAccountNumber = null;
+                existingDepositAccount.MatureInterestPostingAccountNumberId = null;
         }
 
 

@@ -1,8 +1,6 @@
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.UserManagement;
 using MicroFinance.Enums;
-using MicroFinance.Models.UserManagement;
-using Microsoft.AspNetCore.Identity;
 
 namespace MicroFinance.Services.UserManagement
 {

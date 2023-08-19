@@ -33,8 +33,8 @@ namespace MicroFinance.Profiles
 
             // Deposit Account
             CreateMap<DepositAccount, DepositAccountDto>()
-            .ForMember(dest=>dest.InterestPostingAccountNumber, opt=>opt.Ignore())
-            .ForMember(dest=>dest.MatureInterestPostingAccountNumber, opt=>opt.Ignore())
+            .ForMember(dest=>dest.InterestPostingAccountNumber, opt=>opt.MapFrom(src=>src.InterestPostingAccountNumber!=null?src.InterestPostingAccountNumber.AccountNumber:null))
+            .ForMember(dest=>dest.MatureInterestPostingAccountNumber, opt=>opt.MapFrom(src=>src.MatureInterestPostingAccountNumber!=null?src.MatureInterestPostingAccountNumber.AccountNumber:null))
             .ForMember(dest=>dest.SignatureFileData, opt=>opt.MapFrom(src=>(src.SignatureFileData!=null?Convert.ToBase64String(src.SignatureFileData):null)));
 
             CreateMap<JointAccount, JointAccountDto>();

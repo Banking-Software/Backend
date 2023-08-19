@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using MicroFinance.Dtos.DepositSetup;
 using MicroFinance.Models.DepositSetup;
 using MicroFinance.Models.Wrapper;
 
@@ -17,8 +18,7 @@ namespace MicroFinance.Repository.DepositSetup
 
         // // Deposit Account
 
-        Task<int> CreateDepositAccount(DepositAccount depositAccount);
-        Task<int> CreateJointAccount(List<JointAccount> jointAccounts, DepositAccount depositAccount);
+        Task<int> CreateDepositAccount(DepositAccount depositAccount, CreateDepositAccountDto createDepositAccountDto);
         Task<int> UpdateDepositAccount(DepositAccount updateDepositAccount);
         Task<List<DepositAccountWrapper>> GetAllDepositAccountsWrapper(Expression<Func<DepositAccount, bool>> expression);
         Task<DepositAccountWrapper> GetDepositAccountWrapper(Expression<Func<DepositAccount, bool>> expression);

@@ -3,6 +3,7 @@ using MicroFinance.Helper;
 using MicroFinance.Repository.AccountSetup.MainLedger;
 using MicroFinance.Repository.ClientSetup;
 using MicroFinance.Repository.CompanyProfile;
+using MicroFinance.Repository.DayEnd;
 using MicroFinance.Repository.DepositSetup;
 using MicroFinance.Repository.RecordsWithCode;
 using MicroFinance.Repository.Reports;
@@ -12,6 +13,7 @@ using MicroFinance.Repository.UserManagement;
 using MicroFinance.Services.AccountSetup.MainLedger;
 using MicroFinance.Services.ClientSetup;
 using MicroFinance.Services.CompanyProfile;
+using MicroFinance.Services.DayEnd;
 using MicroFinance.Services.DepositSetup;
 using MicroFinance.Services.RecordsWithCode;
 using MicroFinance.Services.Reports;
@@ -60,6 +62,9 @@ namespace MicroFinance.ServiceExtensions.ApplicationService
 
             services.AddTransient<INepaliCalendarFormat, NepaliCalendarFormat>();
             services.AddTransient<ICommonExpression, CommonExpression>();
+
+            services.AddTransient<IDayEndTaskRepository, DayEndTaskRepository>();
+            services.AddTransient<IDayEndTaskService, DayEndTaskService>();
 
             
             

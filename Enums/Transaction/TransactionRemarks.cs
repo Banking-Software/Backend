@@ -7,6 +7,8 @@ namespace MicroFinance.Enums
         ShareIssueTransaction=3,
         ShareRefundTransaction=4,
         ShareTransferTransaction=5,
-        LoanTransaction=6
+        LoanTransaction=6,
+        InterestPosting=7,
+        MatureInterestPosting=8
     }
 }

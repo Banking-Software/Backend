@@ -4,6 +4,7 @@ namespace MicroFinance.Enums.Transaction
     {
         ByCheque=1,
         ByCounter=2,
-        ByShare=3
+        ByShare=3,
+        ByTax=4
     }
 }

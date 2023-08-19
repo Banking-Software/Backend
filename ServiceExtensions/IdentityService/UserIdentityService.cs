@@ -1,6 +1,5 @@
 using System.Text;
 using MicroFinance.DBContext;
-// using MicroFinance.DBContext.UserManagement;
 using MicroFinance.Models.UserManagement;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;

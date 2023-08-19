@@ -1,16 +1,21 @@
+using MicroFinance.DBContext;
 using MicroFinance.Services.CompanyProfile;
+using Microsoft.EntityFrameworkCore;
 
 namespace MicroFinance.Helper;
 
 public class NepaliCalendarFormat : INepaliCalendarFormat
 {
     private readonly ILogger<NepaliCalendarFormat> _logger;
-    private readonly ICompanyProfileService _companyProfileService;
+    private readonly ApplicationDbContext _dbContext;
 
-    public NepaliCalendarFormat(ILogger<NepaliCalendarFormat> logger, ICompanyProfileService companyProfileService)
+    // private readonly ICompanyProfileService _companyProfileService;
+
+    public NepaliCalendarFormat(ILogger<NepaliCalendarFormat> logger, ApplicationDbContext dbContext)
     {
         _logger= logger;
-        _companyProfileService=companyProfileService;
+        _dbContext=dbContext;
+        // _companyProfileService=companyProfileService;
     }
 
     public Task<string> ConvertEnglishDateToNepali(DateTime englishDate)
@@ -86,9 +91,11 @@ public class NepaliCalendarFormat : INepaliCalendarFormat
 
     public async Task<DateTime> GetCurrentCompanyDate()
     {
-        var activeCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
+        var activeCalendar = await _dbContext.Calendars.Where(c=>c.IsActive).SingleOrDefaultAsync();
+        if(activeCalendar==null) throw new Exception("No Active Calendar Found");
         string companyCalendarNepaliDate = await GetNepaliFormatDate(activeCalendar.Year, activeCalendar.Month, activeCalendar.RunningDay);
         DateTime companyCalendarEnglishDate = await ConvertNepaliDateToEnglish(companyCalendarNepaliDate);
         return companyCalendarEnglishDate;
+        
     }
 }

@@ -158,7 +158,7 @@ namespace MicroFinance.Repository.Transaction
         private async Task<DepositAccount> BaseTransactionOnDepositAccount(BaseTransaction baseTransaction, ShareAccountTransactionWrapper shareAccountTransactionWrapper)
         {
             var depositAccountTransactionWrapper = await GetDepositAccountTransactionWrapper(baseTransaction, shareAccountTransactionWrapper);
-            var depositAccount = await _depositAccountTransactionRepository.BaseTransactionOnDepositAccount(depositAccountTransactionWrapper, baseTransaction);
+            var depositAccount = await _depositAccountTransactionRepository.BaseTransactionOnDepositAccount(depositAccountTransactionWrapper, baseTransaction, depositAccountTransactionWrapper.TransactionType);
             return depositAccount;
         }
         private async Task<DepositAccountTransactionWrapper> GetDepositAccountTransactionWrapper(BaseTransaction baseTransaction, ShareAccountTransactionWrapper shareAccountTransactionWrapper)

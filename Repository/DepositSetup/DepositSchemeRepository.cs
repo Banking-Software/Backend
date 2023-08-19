@@ -1,6 +1,8 @@
 using System.Linq.Expressions;
+using System.Runtime;
 using AutoMapper;
 using MicroFinance.DBContext;
+using MicroFinance.Dtos.DepositSetup;
 using MicroFinance.Enums.Deposit.Account;
 using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.ClientSetup;
@@ -41,10 +43,10 @@ namespace MicroFinance.Repository.DepositSetup
             // Ledger depsoitLedgerSchemeType = await _mainLedgerRepository.GetLedger(depositLedgerId);
             SubLedger depositSubledger = new SubLedger() { Name = depositSubledgerName, Ledger = depositLedger, Description = $"Subledger created while creating Deposit Scheme {schemeName}" };
             // Interest SubLedger
-            Ledger interestLedger = await _depositDbContext.Ledgers.Where(l=>l.LedgerCode == 68).SingleOrDefaultAsync(); //Interest Expenses
+            Ledger interestLedger = await _depositDbContext.Ledgers.Where(l => l.LedgerCode == 68).SingleOrDefaultAsync(); //Interest Expenses
             SubLedger interestSubledger = new SubLedger() { Name = interestSubledgerName, Ledger = interestLedger, Description = $"Subledger created while creating Deposit Scheme {schemeName}" };
             // Tax SubLedger
-            Ledger taxLedger = await _depositDbContext.Ledgers.Where(l=>l.LedgerCode == 29).SingleOrDefaultAsync(); // Tax Payable
+            Ledger taxLedger = await _depositDbContext.Ledgers.Where(l => l.LedgerCode == 29).SingleOrDefaultAsync(); // Tax Payable
             SubLedger taxSubledger = new SubLedger() { Name = taxSublegderName, Ledger = taxLedger, Description = $"Subledger created while creating Deposit Scheme {schemeName}" };
             List<SubLedger> allSublegders = new List<SubLedger>() { depositSubledger, interestSubledger, taxSubledger };
             await _depositDbContext.SubLedgers.AddRangeAsync(allSublegders);
@@ -64,7 +66,7 @@ namespace MicroFinance.Repository.DepositSetup
             {
                 try
                 {
-                    depositScheme.SchemeType = await _depositDbContext.Ledgers.Where(l=>l.LedgerCode==depositScheme.SchemeTypeId).SingleOrDefaultAsync();
+                    depositScheme.SchemeType = await _depositDbContext.Ledgers.Where(l => l.LedgerCode == depositScheme.SchemeTypeId).SingleOrDefaultAsync();
                     List<SubLedger> allSubLedger = await CreateSubLedgerForDepositScheme(subLedgerNamesForDepositScheme, depositScheme.SchemeType, depositScheme.SchemeName);
                     depositScheme.DepositSubLedger = allSubLedger[0];
                     depositScheme.InterestSubledger = allSubLedger[1];
@@ -132,6 +134,7 @@ namespace MicroFinance.Repository.DepositSetup
             .Include(ds => ds.TaxSubledger)
             .Include(ds => ds.SchemeType)
             .Where(ds => ds.Id == id)
+            .AsNoTracking()
             .SingleOrDefaultAsync();
             return depositScheme;
 
@@ -139,59 +142,100 @@ namespace MicroFinance.Repository.DepositSetup
 
 
         // DEPOSIT ACCOUNT
-        private async Task<int> CreateDepositAccountNumber(DepositAccount depositAccount)
+        private async Task<DepositAccount> CreateDepositAccountNumber(DepositAccount depositAccount)
         {
-            try
-            {
-                var existingDepositAccount = await _depositDbContext.DepositAccounts.FindAsync(depositAccount.Id);
-                _depositDbContext.Entry(existingDepositAccount).State = EntityState.Detached;
-                _depositDbContext.DepositAccounts.Attach(depositAccount);
-                depositAccount.AccountNumber =
-                depositAccount.DepositScheme.Symbol +
-                depositAccount.BranchCode +
-                depositAccount.Id.ToString().PadLeft(5, '0');
-                _depositDbContext.Entry(depositAccount).State = EntityState.Modified;
-                var updateStatus = await _depositDbContext.SaveChangesAsync();
-                if (updateStatus < 1) throw new Exception("Unable to Create Deposit Account");
-                return depositAccount.Id;
-            }
-            catch (Exception ex)
-            {
-                _depositDbContext.DepositAccounts.Remove(depositAccount);
-                await _depositDbContext.SaveChangesAsync();
-                throw new Exception(ex.Message);
-            }
-        }
-        public async Task<int> CreateDepositAccount(DepositAccount depositAccount)
-        {
-            await _depositDbContext.DepositAccounts.AddAsync(depositAccount);
-            var status = await _depositDbContext.SaveChangesAsync();
-            if (status < 1) throw new Exception("Unable to Create Deposit Account");
-            return await CreateDepositAccountNumber(depositAccount);
+            var existingDepositAccount = await _depositDbContext.DepositAccounts.FindAsync(depositAccount.Id);
+            _depositDbContext.Entry(existingDepositAccount).State = EntityState.Detached;
+
+            _depositDbContext.DepositAccounts.Attach(depositAccount);
+            depositAccount.AccountNumber =
+            depositAccount.DepositScheme.Symbol +
+            depositAccount.BranchCode +
+            depositAccount.Id.ToString().PadLeft(5, '0');
+            _depositDbContext.Entry(depositAccount).State = EntityState.Modified;
+            var updateStatus = await _depositDbContext.SaveChangesAsync();
+            if (updateStatus < 1) throw new Exception("Unable to Create Deposit Account");
+            return depositAccount;
         }
 
-        public async Task<int> CreateJointAccount(List<JointAccount> jointAccounts, DepositAccount depositAccount)
+        private async Task InsertPostingAccounts(DepositAccount depositAccount)
         {
+            if
+            (
+                depositAccount.MatureInterestPostingAccountNumberId != null
+                && depositAccount.InterestPostingAccountNumberId != null
+                && depositAccount.MatureInterestPostingAccountNumberId == depositAccount.InterestPostingAccountNumberId
+            )
+            {
+                var postingAccount = await _depositDbContext.DepositAccounts.FindAsync(depositAccount.MatureInterestPostingAccountNumberId);
+                depositAccount.MatureInterestPostingAccountNumber = postingAccount;
+                depositAccount.InterestPostingAccountNumber = postingAccount;
+            }
+            else if (depositAccount.MatureInterestPostingAccountNumberId != null)
+                depositAccount.MatureInterestPostingAccountNumber = await _depositDbContext.DepositAccounts.FindAsync(depositAccount.MatureInterestPostingAccountNumberId);
+            else if (depositAccount.InterestPostingAccountNumberId != null)
+                depositAccount.InterestPostingAccountNumber = await _depositDbContext.DepositAccounts.FindAsync(depositAccount.InterestPostingAccountNumber);
+        }
+        public async Task<int> CreateDepositAccount(DepositAccount depositAccount, CreateDepositAccountDto createDepositAccountDto)
+        {
+            using var transaction = await _depositDbContext.Database.BeginTransactionAsync();
             try
             {
-                await _depositDbContext.JointAccounts.AddRangeAsync(jointAccounts);
-                var addStatus = await _depositDbContext.SaveChangesAsync();
-                if (addStatus < 1) throw new Exception("Unable to Create Joint Account");
-                return addStatus;
+                _depositDbContext.ChangeTracker.Clear();
+                depositAccount.Client = await _depositDbContext.Clients.FindAsync(depositAccount.ClientId);
+                depositAccount.DepositScheme = await _depositDbContext.DepositSchemes.FindAsync(depositAccount.DepositSchemeId);
+                await InsertPostingAccounts(depositAccount);
+                await _depositDbContext.DepositAccounts.AddAsync(depositAccount);
+                var status = await _depositDbContext.SaveChangesAsync();
+                if (status < 1) throw new Exception("Unable to Create Deposit Account");
+                depositAccount = await CreateDepositAccountNumber(depositAccount);
+                if(createDepositAccountDto.AccountType==AccountTypeEnum.Joint && createDepositAccountDto.JointClientIds.Count>0)
+                    await CreateJointClientForAnAccount(createDepositAccountDto.JointClientIds, depositAccount);
+                await transaction.CommitAsync();
+                return status;
             }
             catch (Exception ex)
             {
-                _depositDbContext.DepositAccounts.Remove(depositAccount);
-                await _depositDbContext.SaveChangesAsync();
+                await transaction.RollbackAsync();
                 throw new Exception(ex.Message);
             }
+
         }
+
+        private async Task CreateJointClientForAnAccount(List<int> jointClientIds, DepositAccount depositAccount)
+        {
+            var jointClients = await _depositDbContext.Clients.Where(client => jointClientIds.Contains(client.Id)).ToListAsync();
+            var jointAccounts = await CreateJointAccount(jointClients, depositAccount);
+            await _depositDbContext.JointAccounts.AddRangeAsync(jointAccounts);
+            var addStatus = await _depositDbContext.SaveChangesAsync();
+            if (addStatus < 1) throw new Exception("Unable to Create Joint Account");
+            return;
+        }
+        private async Task<List<JointAccount>> CreateJointAccount(List<Client> jointClients, DepositAccount depositAccount)
+        {
+            List<JointAccount> jointAccounts = new List<JointAccount>();
+            DateTime RealWorldStartDate = DateTime.Now;
+            string accountCreationDateInNepali = depositAccount.NepaliCreationDate;
+            foreach (var jointClient in jointClients)
+            {
+                var jointAccount = new JointAccount()
+                {
+                    JointClient = jointClient,
+                    DepositAccount = depositAccount,
+                    RealWorldStartDate = RealWorldStartDate,
+                    CompanyCalendarStartDate = accountCreationDateInNepali
+                };
+                jointAccounts.Add(jointAccount);
+            }
+            return jointAccounts;
+        }
+
 
         public async Task<int> UpdateDepositAccount(DepositAccount updateDepositAccount)
         {
-            //  var existingDepositAccount = await _depositDbContext.DepositAccounts.FindAsync(updateDepositAccount.Id);
-            // _depositDbContext.Entry(existingDepositAccount).State = EntityState.Detached;
-            //_depositDbContext.DepositAccounts.Attach(updateDepositAccount);
+            _depositDbContext.ChangeTracker.Clear();
+            _depositDbContext.DepositAccounts.Attach(updateDepositAccount);
+            await InsertPostingAccounts(updateDepositAccount);
             _depositDbContext.Entry(updateDepositAccount).State = EntityState.Modified;
             return await _depositDbContext.SaveChangesAsync();
         }
@@ -221,7 +265,7 @@ namespace MicroFinance.Repository.DepositSetup
              .Include(da => da.Client)
              .Include(da => da.DepositScheme)
              .Include(da => da.InterestPostingAccountNumber)
-             .Include(da => da.InterestPostingAccountNumber)
+             .Include(da => da.MatureInterestPostingAccountNumber)
              .Where(expression)
              .Select(da => new DepositAccountWrapper
              {
@@ -233,8 +277,8 @@ namespace MicroFinance.Repository.DepositSetup
              })
              .AsNoTracking()
              .SingleOrDefaultAsync();
-             return depositAccountWrappers;
-            
+            return depositAccountWrappers;
+
         }
 
         public async Task<DepositAccount> GetDepositAccount(Expression<Func<DepositAccount, bool>> expression)

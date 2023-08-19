@@ -105,7 +105,7 @@ namespace MicroFinance.Repository.Transaction
                         ledgerTransactionType = TransactionTypeEnum.Debit;
                     }
                     BaseTransaction baseTransaction = await MakeBaseTransaction(depositAccountTransactionWrapper);
-                    var depositAccount = await BaseTransactionOnDepositAccount(depositAccountTransactionWrapper, baseTransaction);
+                    var depositAccount = await BaseTransactionOnDepositAccount(depositAccountTransactionWrapper, baseTransaction, depositAccountTransactionWrapper.TransactionType);
                     LedgerTransactionWrapper ledgerTransactionWrapper = new()
                     {
                         BaseTransaction = baseTransaction,
@@ -141,14 +141,14 @@ namespace MicroFinance.Repository.Transaction
         }
       
 
-        public async Task<DepositAccount> BaseTransactionOnDepositAccount(DepositAccountTransactionWrapper depositAccountTransactionWrapper, BaseTransaction baseTransaction)
+        public async Task<DepositAccount> BaseTransactionOnDepositAccount(DepositAccountTransactionWrapper depositAccountTransactionWrapper, BaseTransaction baseTransaction, TransactionTypeEnum subLedgerTransactionType)
         {
             var depositAccount = await TransactionOnDepositAccount(depositAccountTransactionWrapper);
             await CreateDepositAccountTransactionEntry(depositAccountTransactionWrapper, baseTransaction, depositAccount);
             SubLedgerTransactionWrapper subLedgerTransactionWrapper = new()
             {
                 BaseTransaction=baseTransaction,
-                LedgerTransactionType = depositAccountTransactionWrapper.TransactionType,
+                LedgerTransactionType = subLedgerTransactionType,
                 PaymentType = depositAccountTransactionWrapper.PaymentType,
                 IsDeposit = depositAccountTransactionWrapper.TransactionType==TransactionTypeEnum.Credit?true:false,
                 ledgerRemarks = $"{depositAccount.AccountNumber} - {depositAccount.Client.ClientFirstName} {depositAccount.Client.ClientLastName}",
@@ -293,7 +293,7 @@ namespace MicroFinance.Repository.Transaction
             await _transactionDbContext.LedgerTransactions.AddAsync(ledgerTransaction);
         }
 
-        public async Task<BaseTransaction> BaseTransaction(BaseTransaction baseTransaction, PaymentTypeEnum paymentType, int? bankDetailId, string? bankChequeNumber)
+        public async Task<BaseTransaction> BaseTransaction(BaseTransaction baseTransaction, PaymentTypeEnum? paymentType, int? bankDetailId, string? bankChequeNumber)
         {
             // var transactionDate = baseTransaction.CompanyCalendarCreationDate.Split("/");
             // baseTransaction.TransactionYear = Int32.Parse(transactionDate[0]);
