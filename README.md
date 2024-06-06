@@ -1,6 +1,5 @@
-# MicroFinance
+# Banking Software
 
-# TO-DO
+# [!https://drive.google.com/drive/folders/1yjGdrrZCC8MbEl-sCysheDCFVfe0Fe8_?usp=sharing][Requirement Documentation]
 
-1) Deposit Scheme Error: SubLedger Created but not Scheme, so make that in transaction
-2) Make Database Transaction Transient
+# [!https://github.com/Banking-Software/MicroFinance/blob/main/Docs/ER-Diagram-Banking-Software.pdf][ER Diagram]
