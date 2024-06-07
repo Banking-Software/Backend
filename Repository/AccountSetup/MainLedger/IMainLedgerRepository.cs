@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using MicroFinance.Dtos.AccountSetup.MainLedger;
 using MicroFinance.Models.AccountSetup;
 
@@ -17,6 +18,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         Task<List<GroupType>> GetGroupTypes();
         Task<List<GroupType>> GetGroupTypesByAccountType(int accountTypeId);
         Task<GroupType> GetGroupTypeById(int id);
+        Task<GroupType> GetGroupTypeByCharKhataNumber(string charKhataNumber);
         Task<GroupType> GetGroupByName(string name, string accountTypeName);
 
         // Operations related to Group Type Details: Bank
@@ -31,6 +33,7 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
         // Operations related to Ledger
         Task<bool> CheckIfLedgerNameExist(int groupTypeId, string ledgerName);
         Task<int> CreateLedger(Ledger ledger);
+        Task<int> CreateLedgers(List<Ledger> ledgers);
         Task<int> EditLedger(UpdateLedgerDto ledger);
         Task<List<Ledger>> GetLedgersByAccountType(int accountTypeId);
         Task<List<Ledger>> GetLedgerByGroupType(int groupTypeId);

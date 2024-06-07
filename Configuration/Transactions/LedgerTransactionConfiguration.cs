@@ -11,10 +11,10 @@ namespace MicroFinance.Configuration.Transactions
             builder.HasKey(lt=>lt.Id);
             builder.Property(lt=>lt.Id).ValueGeneratedOnAdd();
             builder.Property(lt=>lt.TransactionType).IsRequired(true);
-            builder.Property(lt=>lt.BalanceAfterTransaction).HasPrecision(18,4).IsRequired(true);
+            builder.Property(lt=>lt.BalanceAfterTransaction).HasPrecision(18,2).IsRequired(true);
             builder.HasOne(lt=>lt.Transaction)
-            .WithOne(tsc=>tsc.LedgerTransaction)
-            .HasForeignKey<LedgerTransaction>(lt=>lt.TransactionId)
+            .WithMany(tsc=>tsc.LedgerTransaction)
+            .HasForeignKey(lt=>lt.TransactionId)
             .IsRequired(true)
             .OnDelete(DeleteBehavior.ClientCascade);
 

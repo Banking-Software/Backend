@@ -13,31 +13,25 @@ public class DayEndTaskService : IDayEndTaskService
     }
     public async Task<ResponseDto> CalculateDailyInterestService()
     {
-        int numberAfftectedAccount = await _dayEndTaskRepository.CalculateDailyInterest();
-        if(numberAfftectedAccount<0)
-        {
-            return new ResponseDto(){Message="Operation Failed", Status=false, StatusCode="200"};
-        }
-        return new ResponseDto(){Message=$"Successfully calculated interest of {numberAfftectedAccount} account", Status=true, StatusCode="200"};
+        int numberOfInterestCalculatedAccount = await _dayEndTaskRepository.CalculateDailyInterest();
+        return new ResponseDto(){Message=$"Sucecessfully calculated interest rate of {numberOfInterestCalculatedAccount} account", Status=true, StatusCode="200"};
     }
 
     public async Task<ResponseDto> CheckMaturityOfAccountAndUpdateService()
     {
-        int numberOfAffectedRows = await _dayEndTaskRepository.CheckMaturityOfAccountAndUpdate();
-        if(numberOfAffectedRows<0)
-        {
-            return new ResponseDto(){Message="Operation Failed", Status=false, StatusCode="200"};
-        }
-        return new ResponseDto(){Message=$"Successfully update maturity of {numberOfAffectedRows} account", Status=true, StatusCode="200"};
+        int numberOfMatureAccount = await _dayEndTaskRepository.CheckMaturityOfAccountAndUpdate();
+        return new ResponseDto(){Message=$"Successfully Updated Maturity of {numberOfMatureAccount} account.", Status=true, StatusCode="200"};
     }
 
-    public Task<ResponseDto> InterestPostingService()
+    public async Task<ResponseDto> InterestPostingService()
     {
-        throw new NotImplementedException();
+       int numberOfInterestCalculated = await _dayEndTaskRepository.CheckInterestPositingAndUpdate();
+       return new ResponseDto(){Message=$"Successfully update interest posting of {numberOfInterestCalculated} account", Status=true, StatusCode="200"};
     }
 
-    public Task<ResponseDto> UpdateCalendarService()
+    public async Task<ResponseDto> UpdateCalendarService()
     {
-        throw new NotImplementedException();
+        string newDate = await _dayEndTaskRepository.UpdateCalendar();
+        return new ResponseDto(){Message=$"Calendar Updated to {newDate}", Status=true, StatusCode="200"};
     }
 }

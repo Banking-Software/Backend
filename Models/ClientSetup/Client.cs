@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using MicroFinance.Enums;
 using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.DepositSetup;
+using MicroFinance.Models.LoanSetup;
 using MicroFinance.Models.Share;
 
 namespace MicroFinance.Models.ClientSetup
@@ -69,13 +70,11 @@ namespace MicroFinance.Models.ClientSetup
         public string? ClientNepaliName { get; set; }
         public int? ClientCastCode { get; set; }
         public int? ClientGenderCode { get; set; }
-        [DataType(DataType.Date)]
-        public DateTime? ClientDateOfBirth { get; set; }
+        public string? ClientDateOfBirth { get; set; }
         public string? ClientOccupation { get; set; }
         public string? ClientCitizenshipNumber { get; set; }
         public string? ClientCitizenShipIssueDistrict { get; set; }
-        [DataType(DataType.Date)]
-        public DateTime? ClientCitizenShipIssueDate { get; set; }
+        public string? ClientCitizenShipIssueDate { get; set; }
         public string? ClientNationality { get; set; }
         public string? ClientPanNumber { get; set; }
         public string? ClientEducationStatus { get; set; }
@@ -128,5 +127,7 @@ namespace MicroFinance.Models.ClientSetup
         public virtual ICollection<DepositAccount> DepositAccountSelf { get; set; }
         public virtual ICollection<JointAccount> JointAccounts { get; set; }
         public virtual ShareAccount ShareAccount { get; set; }
+
+        public virtual ICollection<LoanAccount> LoanAccounts { get; set; }
     }
 }

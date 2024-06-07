@@ -63,6 +63,7 @@ namespace MicroFinance.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("InterestRate")
+                        .HasPrecision(5, 2)
                         .HasColumnType("decimal(5,2)");
 
                     b.Property<int>("LedgerId")
@@ -75,8 +76,9 @@ namespace MicroFinance.Migrations
                     b.Property<string>("NepaliName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("TotalInterestBalance")
-                        .HasColumnType("decimal(18,4)");
+                    b.Property<decimal?>("TotalInterestBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -167,9 +169,11 @@ namespace MicroFinance.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("CurrentBalance")
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("DepreciationRate")
+                        .HasPrecision(5, 2)
                         .HasColumnType("decimal(5,2)");
 
                     b.Property<DateTime>("EntryDate")
@@ -218,7 +222,8 @@ namespace MicroFinance.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("CurrentBalance")
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -265,8 +270,8 @@ namespace MicroFinance.Migrations
                     b.Property<int?>("ClientCastCode")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("ClientCitizenShipIssueDate")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("ClientCitizenShipIssueDate")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClientCitizenShipIssueDistrict")
                         .HasColumnType("nvarchar(max)");
@@ -283,8 +288,8 @@ namespace MicroFinance.Migrations
                     b.Property<string>("ClientCitizenshipNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("ClientDateOfBirth")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("ClientDateOfBirth")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClientEducationStatus")
                         .HasColumnType("nvarchar(max)");
@@ -765,8 +770,8 @@ namespace MicroFinance.Migrations
                         .HasPrecision(4, 2)
                         .HasColumnType("decimal(4,2)");
 
-                    b.Property<DateTime?>("EstablishedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("EstablishedDate")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("LogoFileData")
                         .HasColumnType("varbinary(max)");
@@ -832,9 +837,6 @@ namespace MicroFinance.Migrations
                     b.Property<DateTime?>("EnglishModificationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EnglishOpeningDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int?>("ExpectedDailyDepositAmount")
                         .HasColumnType("int");
 
@@ -851,8 +853,8 @@ namespace MicroFinance.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("InterestAmount")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("InterestPostingAccountNumberId")
                         .HasColumnType("int");
@@ -865,6 +867,9 @@ namespace MicroFinance.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsSMSServiceActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsWithDrawalAllowed")
                         .HasColumnType("bit");
 
                     b.Property<int?>("MatureInterestPostingAccountNumberId")
@@ -890,10 +895,6 @@ namespace MicroFinance.Migrations
                     b.Property<string>("NepaliModificationDate")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NepaliOpeningDate")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("NextInterestPostingDate")
                         .HasColumnType("datetime2");
 
@@ -906,9 +907,12 @@ namespace MicroFinance.Migrations
                     b.Property<int>("PeriodType")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("PreviousInterestPostedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("PrincipalAmount")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("RealWorldCreationDate")
                         .HasColumnType("datetime2");
@@ -1200,6 +1204,314 @@ namespace MicroFinance.Migrations
                     b.ToTable("JointAccounts");
                 });
 
+            modelBuilder.Entity("MicroFinance.Models.LoanSetup.LoanAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Amount")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BranchCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ClientId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EnglishCreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EnglishModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExpiryDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("GracePeriod")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("InterestPaymentType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("InterestRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int>("InterestType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Jamani1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Jamani2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("KittaNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LandArea")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("LoanLimit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("LoanSchemeId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("MatureDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifierBranchCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifierId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NepaliCreationDate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NepaliModificationDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OwnerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PanNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Period")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PeriodType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PolicyNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PurjaNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RealWorldCreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RealWorldModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ReferredByEmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RokkaMiti")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RokkaNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ScheduleType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Sector")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecurityType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecurityValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Shakshi1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Shakshi2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StartDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TaxPaidDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("UploadedDocument")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("UploadedDocumentFileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UploadedDocumentType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VatNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VechileNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WithDrawalBlockedDepositAccountIds")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountNumber")
+                        .IsUnique();
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("LoanSchemeId");
+
+                    b.ToTable("LoanAccounts");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.LoanSetup.LoanScheme", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AliasCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("AssetsAccountLedgerId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<string>("BranchCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EnglishCreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EnglishModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("InterestAccountLedgerId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("InterestOnInterest")
+                        .IsRequired()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("InterestRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRevolving")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("LoanInterestReceivable")
+                        .IsRequired()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("MaximumInterestRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("MinimumInterestRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifierBranchCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifierId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("NepaliCreationDate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NepaliModificationDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NepaliName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("OverDueInterest")
+                        .IsRequired()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal?>("PenalInterest")
+                        .IsRequired()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("RealWorldCreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RealWorldModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AliasCode")
+                        .IsUnique();
+
+                    b.HasIndex("AssetsAccountLedgerId")
+                        .IsUnique();
+
+                    b.HasIndex("InterestAccountLedgerId")
+                        .IsUnique();
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("LoanSchemes");
+                });
+
             modelBuilder.Entity("MicroFinance.Models.RecordsWithCode.Cast", b =>
                 {
                     b.Property<int>("Id")
@@ -1322,6 +1634,7 @@ namespace MicroFinance.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("CurrentShareBalance")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsActive")
@@ -1347,12 +1660,14 @@ namespace MicroFinance.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("CurrentKitta")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<int>("PriceOfOneKitta")
+                        .HasPrecision(5, 2)
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -1421,19 +1736,17 @@ namespace MicroFinance.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TransactionAmount")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("VoucherNumber")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("VoucherId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BankDetailId");
 
-                    b.HasIndex("VoucherNumber")
-                        .IsUnique()
-                        .HasFilter("[VoucherNumber] IS NOT NULL");
+                    b.HasIndex("VoucherId");
 
                     b.ToTable("Transactions");
                 });
@@ -1447,8 +1760,8 @@ namespace MicroFinance.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("BalanceAfterTransaction")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("CollectedByEmployeeId")
                         .HasColumnType("int");
@@ -1471,7 +1784,7 @@ namespace MicroFinance.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("TransactionType")
-                        .HasPrecision(18, 4)
+                        .HasPrecision(18, 2)
                         .HasColumnType("int");
 
                     b.Property<string>("WithDrawalChequeNumber")
@@ -1492,6 +1805,43 @@ namespace MicroFinance.Migrations
                     b.ToTable("DepositAccountTransactions");
                 });
 
+            modelBuilder.Entity("MicroFinance.Models.Transactions.InterestTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("CalculatedInterestAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("CalculatedInterestRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int>("DepositAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsInterestPosted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("TransactionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepositAccountId");
+
+                    b.HasIndex("Id");
+
+                    b.HasIndex("TransactionId")
+                        .IsUnique();
+
+                    b.ToTable("InterestTransactions");
+                });
+
             modelBuilder.Entity("MicroFinance.Models.Transactions.LedgerTransaction", b =>
                 {
                     b.Property<int>("Id")
@@ -1501,8 +1851,8 @@ namespace MicroFinance.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("BalanceAfterTransaction")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("LedgerId")
                         .IsRequired()
@@ -1524,8 +1874,7 @@ namespace MicroFinance.Migrations
 
                     b.HasIndex("LedgerId");
 
-                    b.HasIndex("TransactionId")
-                        .IsUnique();
+                    b.HasIndex("TransactionId");
 
                     b.ToTable("LedgerTransactions");
                 });
@@ -1539,8 +1888,8 @@ namespace MicroFinance.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("BalanceAfterTransaction")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Narration")
                         .HasColumnType("nvarchar(max)");
@@ -1593,8 +1942,8 @@ namespace MicroFinance.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("BalanceAfterTransaction")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Narration")
                         .HasColumnType("nvarchar(max)");
@@ -1619,6 +1968,26 @@ namespace MicroFinance.Migrations
                         .IsUnique();
 
                     b.ToTable("SubLedgerTransactions");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.Transactions.TransactionVoucher", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("VoucherNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VoucherNumber")
+                        .IsUnique();
+
+                    b.ToTable("TransactionVouchers");
                 });
 
             modelBuilder.Entity("MicroFinance.Models.UserManagement.Employee", b =>
@@ -1649,8 +2018,8 @@ namespace MicroFinance.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DateOfJoining")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("DateOfJoining")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Designation")
                         .HasColumnType("nvarchar(max)");
@@ -2161,6 +2530,40 @@ namespace MicroFinance.Migrations
                     b.Navigation("JointClient");
                 });
 
+            modelBuilder.Entity("MicroFinance.Models.LoanSetup.LoanAccount", b =>
+                {
+                    b.HasOne("MicroFinance.Models.ClientSetup.Client", "Client")
+                        .WithMany("LoanAccounts")
+                        .HasForeignKey("ClientId")
+                        .IsRequired();
+
+                    b.HasOne("MicroFinance.Models.LoanSetup.LoanScheme", "LoanScheme")
+                        .WithMany("LoanAccounts")
+                        .HasForeignKey("LoanSchemeId")
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("LoanScheme");
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.LoanSetup.LoanScheme", b =>
+                {
+                    b.HasOne("MicroFinance.Models.AccountSetup.Ledger", "AssetsAccountLedger")
+                        .WithOne("AssetsLoanScheme")
+                        .HasForeignKey("MicroFinance.Models.LoanSetup.LoanScheme", "AssetsAccountLedgerId")
+                        .IsRequired();
+
+                    b.HasOne("MicroFinance.Models.AccountSetup.Ledger", "InterestAccountLedger")
+                        .WithOne("InterestLoanSchme")
+                        .HasForeignKey("MicroFinance.Models.LoanSetup.LoanScheme", "InterestAccountLedgerId")
+                        .IsRequired();
+
+                    b.Navigation("AssetsAccountLedger");
+
+                    b.Navigation("InterestAccountLedger");
+                });
+
             modelBuilder.Entity("MicroFinance.Models.Share.ShareAccount", b =>
                 {
                     b.HasOne("MicroFinance.Models.ClientSetup.Client", "Client")
@@ -2177,7 +2580,15 @@ namespace MicroFinance.Migrations
                         .WithMany("BaseTransactions")
                         .HasForeignKey("BankDetailId");
 
+                    b.HasOne("MicroFinance.Models.Transactions.TransactionVoucher", "TransactionVoucher")
+                        .WithMany("BaseTransactions")
+                        .HasForeignKey("VoucherId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
                     b.Navigation("BankDetail");
+
+                    b.Navigation("TransactionVoucher");
                 });
 
             modelBuilder.Entity("MicroFinance.Models.Transactions.DepositAccountTransaction", b =>
@@ -2198,6 +2609,25 @@ namespace MicroFinance.Migrations
                     b.Navigation("Transaction");
                 });
 
+            modelBuilder.Entity("MicroFinance.Models.Transactions.InterestTransaction", b =>
+                {
+                    b.HasOne("MicroFinance.Models.DepositSetup.DepositAccount", "DepositAccount")
+                        .WithMany("InterestTransactions")
+                        .HasForeignKey("DepositAccountId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("MicroFinance.Models.Transactions.BaseTransaction", "Transaction")
+                        .WithOne("InterestTransactions")
+                        .HasForeignKey("MicroFinance.Models.Transactions.InterestTransaction", "TransactionId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("DepositAccount");
+
+                    b.Navigation("Transaction");
+                });
+
             modelBuilder.Entity("MicroFinance.Models.Transactions.LedgerTransaction", b =>
                 {
                     b.HasOne("MicroFinance.Models.AccountSetup.Ledger", "Ledger")
@@ -2206,8 +2636,8 @@ namespace MicroFinance.Migrations
                         .IsRequired();
 
                     b.HasOne("MicroFinance.Models.Transactions.BaseTransaction", "Transaction")
-                        .WithOne("LedgerTransaction")
-                        .HasForeignKey("MicroFinance.Models.Transactions.LedgerTransaction", "TransactionId")
+                        .WithMany("LedgerTransaction")
+                        .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
@@ -2354,12 +2784,18 @@ namespace MicroFinance.Migrations
 
             modelBuilder.Entity("MicroFinance.Models.AccountSetup.Ledger", b =>
                 {
+                    b.Navigation("AssetsLoanScheme")
+                        .IsRequired();
+
                     b.Navigation("BankSetup")
                         .IsRequired();
 
                     b.Navigation("Client");
 
                     b.Navigation("DepositSchemes");
+
+                    b.Navigation("InterestLoanSchme")
+                        .IsRequired();
 
                     b.Navigation("LedgerTransactions");
 
@@ -2385,6 +2821,8 @@ namespace MicroFinance.Migrations
                     b.Navigation("DepositAccountSelf");
 
                     b.Navigation("JointAccounts");
+
+                    b.Navigation("LoanAccounts");
 
                     b.Navigation("ShareAccount")
                         .IsRequired();
@@ -2414,6 +2852,8 @@ namespace MicroFinance.Migrations
                 {
                     b.Navigation("DepositAccountTransactions");
 
+                    b.Navigation("InterestTransactions");
+
                     b.Navigation("JointAccounts");
 
                     b.Navigation("PaymentMethodShareTransaction");
@@ -2428,6 +2868,11 @@ namespace MicroFinance.Migrations
                     b.Navigation("FlexibleInterestRates");
                 });
 
+            modelBuilder.Entity("MicroFinance.Models.LoanSetup.LoanScheme", b =>
+                {
+                    b.Navigation("LoanAccounts");
+                });
+
             modelBuilder.Entity("MicroFinance.Models.Share.ShareAccount", b =>
                 {
                     b.Navigation("ShareTransactions");
@@ -2438,14 +2883,21 @@ namespace MicroFinance.Migrations
                     b.Navigation("DepositAccountTransaction")
                         .IsRequired();
 
-                    b.Navigation("LedgerTransaction")
+                    b.Navigation("InterestTransactions")
                         .IsRequired();
+
+                    b.Navigation("LedgerTransaction");
 
                     b.Navigation("ShareTransaction")
                         .IsRequired();
 
                     b.Navigation("SubLedgerTransaction")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MicroFinance.Models.Transactions.TransactionVoucher", b =>
+                {
+                    b.Navigation("BaseTransactions");
                 });
 
             modelBuilder.Entity("MicroFinance.Models.UserManagement.Employee", b =>

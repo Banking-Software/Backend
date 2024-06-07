@@ -5,6 +5,6 @@ namespace MicroFinance.Services.Transactions
 {
     public interface IShareAccountTransactionService
     {
-        Task<string> MakeShareTransaction(MakeShareTransactionDto makeShareTransactionDto, TokenDto decodedToken);
+        Task<VoucherDto> MakeShareTransaction(MakeShareTransactionDto makeShareTransactionDto, TokenDto decodedToken);
     }
 }

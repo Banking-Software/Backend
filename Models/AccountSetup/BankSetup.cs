@@ -19,16 +19,12 @@ namespace MicroFinance.Models.AccountSetup
         public string BankBranch { get; set; }
         [Required]
         public string AccountNumber { get; set; }
-
         public virtual BankType BankType { get; set; }
         public int BankTypeId { get; set; }
-
-        [Column(TypeName ="decimal(5,2)")]
         public decimal? InterestRate { get; set; }
         [Required]
         public string BranchCode { get; set; }
-        [Column(TypeName ="decimal(18,4)")]
-        public decimal TotalInterestBalance { get; set; }
+        public decimal? TotalInterestBalance { get; set; }
 
         public virtual ICollection<BaseTransaction> BaseTransactions { get; set; }
     }

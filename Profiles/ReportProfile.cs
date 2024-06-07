@@ -10,6 +10,7 @@ public class ReportProfile : Profile
     public ReportProfile()
     {
         CreateMap<DepositAccountTransactionReport, DepositAccountTransactionReportDto>();
+        CreateMap<DepositAccountDetails, DepositAccountDetailsDto>();
         CreateMap<ShareTransactionReport, ShareAccountTransactionReportDto>();
         CreateMap<LedgerTransactionReport, LedgerTransactionReportDto>();
         CreateMap<SubLedgerTransactionReport, SubLedgerTransactionReportDto>();

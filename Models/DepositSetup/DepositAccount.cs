@@ -2,7 +2,6 @@ using MicroFinance.Enums;
 using MicroFinance.Enums.Deposit.Account;
 using MicroFinance.Models.ClientSetup;
 using MicroFinance.Models.Transactions;
-using MicroFinance.Services;
 
 namespace MicroFinance.Models.DepositSetup
 {
@@ -12,14 +11,16 @@ namespace MicroFinance.Models.DepositSetup
         public int DepositSchemeId { get; set; }
         public virtual DepositScheme DepositScheme { get; set; }
         public string? AccountNumber { get; set; }
-        public string NepaliOpeningDate { get; set; }
-        public DateTime EnglishOpeningDate { get; set; }
+        // public string NepaliOpeningDate { get; set; }
+        // public DateTime EnglishOpeningDate { get; set; }
         public int Period { get; set; }
         public PeriodTypeEnum PeriodType { get; set; }
         public AccountTypeEnum AccountType { get; set; }
         public string NepaliMatureDate { get; set; }
         public DateTime EnglishMatureDate { get; set; }
         public DateTime NextInterestPostingDate {get; set;}
+        public DateTime? PreviousInterestPostedDate { get; set; }
+        public bool IsWithDrawalAllowed { get; set; } = true;
         public decimal InterestRate { get; set; }
         public decimal PrincipalAmount { get; set; } = 0;
         public decimal InterestAmount { get; set; } = 0;
@@ -47,5 +48,6 @@ namespace MicroFinance.Models.DepositSetup
         public virtual ICollection<DepositAccountTransaction> DepositAccountTransactions { get; set; }
         public virtual ICollection<ShareTransaction> TransferToShareTransaction { get; set; }
         public virtual ICollection<ShareTransaction> PaymentMethodShareTransaction { get; set; }
+        public virtual ICollection<InterestTransaction> InterestTransactions { get; set; }
     }
 }

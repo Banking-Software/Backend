@@ -10,6 +10,8 @@ namespace MicroFinance.Configuration.ShareSetup
         {
             builder.HasKey(sk=>sk.Id);
             builder.Property(sk=>sk.Id).ValueGeneratedOnAdd();
+            builder.Property(sk=>sk.PriceOfOneKitta).HasPrecision(5,2).IsRequired(true);
+            builder.Property(sk=>sk.CurrentKitta).HasPrecision(18,2).IsRequired(true);
         }
     }
 }

@@ -1,0 +1,234 @@
+2023-09-24 08:59:15.632 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-09-24 08:59:16.508 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-09-24 08:59:16.662 +05:45 [INF] Now listening on: https://localhost:5001
+2023-09-24 08:59:16.662 +05:45 [INF] Now listening on: http://localhost:5000
+2023-09-24 08:59:16.667 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-09-24 08:59:16.668 +05:45 [INF] Hosting environment: Production
+2023-09-24 08:59:16.668 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-09-24 08:59:29.296 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/index.html - -
+2023-09-24 08:59:29.406 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/index.html - - - 401 0 - 116.0831ms
+2023-09-24 08:59:34.139 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/index.html - -
+2023-09-24 08:59:34.557 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/index.html - - - 200 - text/html;charset=utf-8 418.5935ms
+2023-09-24 08:59:35.148 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - -
+2023-09-24 08:59:36.102 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - - - 200 - application/json;charset=utf-8 954.8138ms
+2023-09-24 08:59:59.255 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73
+2023-09-24 08:59:59.268 +05:45 [INF] CORS policy execution successful.
+2023-09-24 08:59:59.520 +05:45 [INF] 9/24/2023 8:59:59 AM: API Got hit
+2023-09-24 08:59:59.521 +05:45 [INF] Request: POST /FinanceCompany/login
+2023-09-24 08:59:59.521 +05:45 [INF] Request Body: {
+  "userName": "admin",
+  "password": "Hello@123",
+  "stayLogin": true
+}
+2023-09-24 08:59:59.554 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-09-24 08:59:59.585 +05:45 [INF] Route matched with {action = "Login", controller = "FinanceCompany"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.UserManagement.TokenResponseDto]] Login(MicroFinance.Dtos.UserManagement.UserLoginDto) on controller MicroFinance.Controllers.UserManagement.FinanceCompanyController (MicroFinance).
+2023-09-24 09:00:02.862 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-09-24 09:00:03.445 +05:45 [INF] Executed action MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance) in 3852.414ms
+2023-09-24 09:00:03.453 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-09-24 09:00:03.529 +05:45 [INF] Response: 401
+2023-09-24 09:00:03.529 +05:45 [INF] Response Body: {"errors":{"Message":["Object reference not set to an instance of an object."]}}
+2023-09-24 09:00:03.538 +05:45 [INF] HTTP POST /FinanceCompany/login responded 401 in 4233.7417 ms
+2023-09-24 09:00:03.558 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73 - 401 - application/json 4302.7673ms
+2023-09-24 09:00:13.109 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73
+2023-09-24 09:00:13.113 +05:45 [INF] CORS policy execution successful.
+2023-09-24 09:00:13.114 +05:45 [INF] 9/24/2023 9:00:13 AM: API Got hit
+2023-09-24 09:00:13.114 +05:45 [INF] Request: POST /FinanceCompany/login
+2023-09-24 09:00:13.114 +05:45 [INF] Request Body: {
+  "userName": "admin",
+  "password": "Hello@123",
+  "stayLogin": true
+}
+2023-09-24 09:00:13.114 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-09-24 09:00:13.114 +05:45 [INF] Route matched with {action = "Login", controller = "FinanceCompany"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.UserManagement.TokenResponseDto]] Login(MicroFinance.Dtos.UserManagement.UserLoginDto) on controller MicroFinance.Controllers.UserManagement.FinanceCompanyController (MicroFinance).
+2023-09-24 09:00:26.735 +05:45 [INF] Executed action MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance) in 13620.5113ms
+2023-09-24 09:00:26.735 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-09-24 09:00:26.787 +05:45 [INF] Response: 401
+2023-09-24 09:00:26.787 +05:45 [INF] Response Body: {"errors":{"Message":["Object reference not set to an instance of an object."]}}
+2023-09-24 09:00:26.788 +05:45 [INF] HTTP POST /FinanceCompany/login responded 401 in 13674.5505 ms
+2023-09-24 09:00:26.788 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73 - 401 - application/json 13678.9694ms
+2023-09-24 09:01:10.321 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-09-24 09:01:11.345 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-09-24 09:01:11.488 +05:45 [INF] Now listening on: https://localhost:5001
+2023-09-24 09:01:11.488 +05:45 [INF] Now listening on: http://localhost:5000
+2023-09-24 09:01:11.492 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-09-24 09:01:11.493 +05:45 [INF] Hosting environment: Production
+2023-09-24 09:01:11.493 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-09-24 09:01:45.803 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - -
+2023-09-24 09:01:45.857 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - - - 401 0 - 60.2458ms
+2023-09-24 09:02:32.383 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-09-24 09:02:33.036 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-09-24 09:02:33.195 +05:45 [INF] Now listening on: https://localhost:5001
+2023-09-24 09:02:33.195 +05:45 [INF] Now listening on: http://localhost:5000
+2023-09-24 09:02:33.199 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-09-24 09:02:33.199 +05:45 [INF] Hosting environment: Development
+2023-09-24 09:02:33.199 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-09-24 09:02:42.687 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - -
+2023-09-24 09:02:43.189 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - - - 200 - application/json;charset=utf-8 504.1892ms
+2023-09-24 09:03:00.766 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73
+2023-09-24 09:03:00.775 +05:45 [INF] CORS policy execution successful.
+2023-09-24 09:03:00.883 +05:45 [INF] 9/24/2023 9:03:00 AM: API Got hit
+2023-09-24 09:03:00.884 +05:45 [INF] Request: POST /FinanceCompany/login
+2023-09-24 09:03:00.884 +05:45 [INF] Request Body: {
+  "userName": "admin",
+  "password": "Hello@123",
+  "stayLogin": true
+}
+2023-09-24 09:03:00.889 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-09-24 09:03:00.921 +05:45 [INF] Route matched with {action = "Login", controller = "FinanceCompany"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.UserManagement.TokenResponseDto]] Login(MicroFinance.Dtos.UserManagement.UserLoginDto) on controller MicroFinance.Controllers.UserManagement.FinanceCompanyController (MicroFinance).
+2023-09-24 09:03:04.270 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-09-24 09:03:04.895 +05:45 [INF] 9/24/2023 9:03:04 AM User 'admin' login to the system
+2023-09-24 09:03:05.066 +05:45 [INF] Executing OkObjectResult, writing value of type 'MicroFinance.Dtos.UserManagement.TokenResponseDto'.
+2023-09-24 09:03:05.094 +05:45 [INF] Executed action MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance) in 4168.247ms
+2023-09-24 09:03:05.098 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-09-24 09:03:05.100 +05:45 [INF] Response: 200
+2023-09-24 09:03:05.107 +05:45 [INF] HTTP POST /FinanceCompany/login responded 200 in 4324.1697 ms
+2023-09-24 09:03:05.125 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73 - 200 - application/json;+charset=utf-8 4358.9497ms
+2023-09-24 09:04:06.046 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit application/json 128
+2023-09-24 09:04:06.070 +05:45 [INF] CORS policy execution successful.
+2023-09-24 09:04:06.071 +05:45 [INF] 9/24/2023 9:04:06 AM: API Got hit
+2023-09-24 09:04:06.071 +05:45 [INF] Request: POST /Transaction/makeDeposit
+2023-09-24 09:04:06.071 +05:45 [INF] Request Body: {
+  "transactionAmount": 150,
+  "depositAccountId": 1,
+  "paymentType": 1,
+  "narration": "Cash Deposit",
+  "source": "Salary"
+}
+2023-09-24 09:04:06.142 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: 1863ff33-a842-4f77-93eb-f958b50a2d9b, role: Officer, IsActive: True, BranchCode: 001, email: admin@gmail.com, nbf: 1695525484, exp: 1696130284, iat: 1695525484, iss: http://localhost:5000
+2023-09-24 09:04:06.142 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-09-24 09:04:06.146 +05:45 [INF] Route matched with {action = "MakeDeposit", controller = "Transaction"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.String]] MakeDeposit(MicroFinance.Dtos.Transactions.MakeDepositTransactionDto) on controller MicroFinance.Controllers.Transactions.TransactionController (MicroFinance).
+2023-09-24 09:04:56.755 +05:45 [INF] Executing OkObjectResult, writing value of type 'System.String'.
+2023-09-24 09:04:56.756 +05:45 [INF] Executed action MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance) in 50610.3985ms
+2023-09-24 09:04:56.756 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-09-24 09:04:56.757 +05:45 [INF] Response: 200
+2023-09-24 09:04:56.757 +05:45 [INF] HTTP POST /Transaction/makeDeposit responded 200 in 50686.8473 ms
+2023-09-24 09:04:56.757 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit application/json 128 - 200 - text/plain;+charset=utf-8 50711.1455ms
+2023-09-24 09:12:03.013 +05:45 [INF] Applying migration '20230924032635_ledgerTransaction'.
+2023-09-24 09:12:20.874 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-09-24 09:12:21.504 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-09-24 09:12:21.671 +05:45 [INF] Now listening on: https://localhost:5001
+2023-09-24 09:12:21.671 +05:45 [INF] Now listening on: http://localhost:5000
+2023-09-24 09:12:21.675 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-09-24 09:12:21.675 +05:45 [INF] Hosting environment: Development
+2023-09-24 09:12:21.675 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-09-24 09:12:36.842 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit application/json 135
+2023-09-24 09:12:36.909 +05:45 [INF] CORS policy execution successful.
+2023-09-24 09:12:36.938 +05:45 [INF] 9/24/2023 9:12:36 AM: API Got hit
+2023-09-24 09:12:36.939 +05:45 [INF] Request: POST /Transaction/makeDeposit
+2023-09-24 09:12:36.939 +05:45 [INF] Request Body: {
+  "transactionAmount": 1500,
+  "depositAccountId": 1,
+  "paymentType": 1,
+  "narration": "Cash Deposit Solve",
+  "source": "Salary"
+}
+2023-09-24 09:12:37.128 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: 1863ff33-a842-4f77-93eb-f958b50a2d9b, role: Officer, IsActive: True, BranchCode: 001, email: admin@gmail.com, nbf: 1695525484, exp: 1696130284, iat: 1695525484, iss: http://localhost:5000
+2023-09-24 09:12:37.133 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-09-24 09:12:37.159 +05:45 [INF] Route matched with {action = "MakeDeposit", controller = "Transaction"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.String]] MakeDeposit(MicroFinance.Dtos.Transactions.MakeDepositTransactionDto) on controller MicroFinance.Controllers.Transactions.TransactionController (MicroFinance).
+2023-09-24 09:12:40.761 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-09-24 09:12:46.097 +05:45 [INF] Executing OkObjectResult, writing value of type 'System.String'.
+2023-09-24 09:12:46.103 +05:45 [INF] Executed action MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance) in 8940.3538ms
+2023-09-24 09:12:46.108 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-09-24 09:12:46.109 +05:45 [INF] Response: 200
+2023-09-24 09:12:46.116 +05:45 [INF] HTTP POST /Transaction/makeDeposit responded 200 in 9200.8337 ms
+2023-09-24 09:12:46.137 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit application/json 135 - 200 - text/plain;+charset=utf-8 9298.0498ms
+2023-09-24 09:17:10.735 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-09-24 09:17:11.308 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-09-24 09:17:11.468 +05:45 [INF] Now listening on: https://localhost:5001
+2023-09-24 09:17:11.468 +05:45 [INF] Now listening on: http://localhost:5000
+2023-09-24 09:17:11.472 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-09-24 09:17:11.493 +05:45 [INF] Hosting environment: Development
+2023-09-24 09:17:11.493 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-09-24 09:17:26.459 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit application/json 141
+2023-09-24 09:17:26.517 +05:45 [INF] CORS policy execution successful.
+2023-09-24 09:17:26.539 +05:45 [INF] 9/24/2023 9:17:26 AM: API Got hit
+2023-09-24 09:17:26.540 +05:45 [INF] Request: POST /Transaction/makeDeposit
+2023-09-24 09:17:26.540 +05:45 [INF] Request Body: {
+  "transactionAmount": 1500,
+  "depositAccountId": 1,
+  "paymentType": 1,
+  "narration": "Cash Deposit Solved",
+  "source": "Salary done"
+}
+2023-09-24 09:17:26.722 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: 1863ff33-a842-4f77-93eb-f958b50a2d9b, role: Officer, IsActive: True, BranchCode: 001, email: admin@gmail.com, nbf: 1695525484, exp: 1696130284, iat: 1695525484, iss: http://localhost:5000
+2023-09-24 09:17:26.727 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-09-24 09:17:26.757 +05:45 [INF] Route matched with {action = "MakeDeposit", controller = "Transaction"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.String]] MakeDeposit(MicroFinance.Dtos.Transactions.MakeDepositTransactionDto) on controller MicroFinance.Controllers.Transactions.TransactionController (MicroFinance).
+2023-09-24 09:17:49.132 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-09-24 09:19:17.654 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-09-24 09:19:18.203 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-09-24 09:19:18.359 +05:45 [INF] Now listening on: https://localhost:5001
+2023-09-24 09:19:18.359 +05:45 [INF] Now listening on: http://localhost:5000
+2023-09-24 09:19:18.363 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-09-24 09:19:18.363 +05:45 [INF] Hosting environment: Development
+2023-09-24 09:19:18.363 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-09-24 09:19:57.285 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit application/json 141
+2023-09-24 09:19:57.388 +05:45 [INF] CORS policy execution successful.
+2023-09-24 09:19:57.408 +05:45 [INF] 9/24/2023 9:19:57 AM: API Got hit
+2023-09-24 09:19:57.409 +05:45 [INF] Request: POST /Transaction/makeDeposit
+2023-09-24 09:19:57.410 +05:45 [INF] Request Body: {
+  "transactionAmount": 1500,
+  "depositAccountId": 1,
+  "paymentType": 1,
+  "narration": "Cash Deposit Solved",
+  "source": "Salary done"
+}
+2023-09-24 09:19:57.596 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: 1863ff33-a842-4f77-93eb-f958b50a2d9b, role: Officer, IsActive: True, BranchCode: 001, email: admin@gmail.com, nbf: 1695525484, exp: 1696130284, iat: 1695525484, iss: http://localhost:5000
+2023-09-24 09:19:57.602 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-09-24 09:19:57.629 +05:45 [INF] Route matched with {action = "MakeDeposit", controller = "Transaction"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.String]] MakeDeposit(MicroFinance.Dtos.Transactions.MakeDepositTransactionDto) on controller MicroFinance.Controllers.Transactions.TransactionController (MicroFinance).
+2023-09-24 09:20:36.659 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-09-24 09:21:44.442 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-09-24 09:21:45.006 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-09-24 09:21:45.168 +05:45 [INF] Now listening on: https://localhost:5001
+2023-09-24 09:21:45.168 +05:45 [INF] Now listening on: http://localhost:5000
+2023-09-24 09:21:45.172 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-09-24 09:21:45.173 +05:45 [INF] Hosting environment: Development
+2023-09-24 09:21:45.173 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-09-24 09:21:52.665 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit application/json 141
+2023-09-24 09:21:52.726 +05:45 [INF] CORS policy execution successful.
+2023-09-24 09:21:52.746 +05:45 [INF] 9/24/2023 9:21:52 AM: API Got hit
+2023-09-24 09:21:52.747 +05:45 [INF] Request: POST /Transaction/makeDeposit
+2023-09-24 09:21:52.747 +05:45 [INF] Request Body: {
+  "transactionAmount": 1500,
+  "depositAccountId": 1,
+  "paymentType": 1,
+  "narration": "Cash Deposit Solved",
+  "source": "Salary done"
+}
+2023-09-24 09:21:52.917 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: 1863ff33-a842-4f77-93eb-f958b50a2d9b, role: Officer, IsActive: True, BranchCode: 001, email: admin@gmail.com, nbf: 1695525484, exp: 1696130284, iat: 1695525484, iss: http://localhost:5000
+2023-09-24 09:21:52.923 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-09-24 09:21:52.956 +05:45 [INF] Route matched with {action = "MakeDeposit", controller = "Transaction"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.String]] MakeDeposit(MicroFinance.Dtos.Transactions.MakeDepositTransactionDto) on controller MicroFinance.Controllers.Transactions.TransactionController (MicroFinance).
+2023-09-24 09:22:16.597 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-09-24 09:23:01.338 +05:45 [INF] Executing OkObjectResult, writing value of type 'System.String'.
+2023-09-24 09:23:01.345 +05:45 [INF] Executed action MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance) in 68384.3409ms
+2023-09-24 09:23:01.350 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-09-24 09:23:01.351 +05:45 [INF] Response: 200
+2023-09-24 09:23:01.358 +05:45 [INF] HTTP POST /Transaction/makeDeposit responded 200 in 68627.0534 ms
+2023-09-24 09:23:01.374 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit application/json 141 - 200 - text/plain;+charset=utf-8 68713.2594ms
+2023-09-24 09:24:00.827 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-09-24 09:24:01.406 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-09-24 09:24:01.559 +05:45 [INF] Now listening on: https://localhost:5001
+2023-09-24 09:24:01.559 +05:45 [INF] Now listening on: http://localhost:5000
+2023-09-24 09:24:01.563 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-09-24 09:24:01.563 +05:45 [INF] Hosting environment: Development
+2023-09-24 09:24:01.563 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-09-24 09:24:06.042 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit application/json 141
+2023-09-24 09:24:06.102 +05:45 [INF] CORS policy execution successful.
+2023-09-24 09:24:06.123 +05:45 [INF] 9/24/2023 9:24:06 AM: API Got hit
+2023-09-24 09:24:06.124 +05:45 [INF] Request: POST /Transaction/makeDeposit
+2023-09-24 09:24:06.124 +05:45 [INF] Request Body: {
+  "transactionAmount": 1500,
+  "depositAccountId": 1,
+  "paymentType": 1,
+  "narration": "Cash Deposit Solved",
+  "source": "Salary done"
+}
+2023-09-24 09:24:06.295 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: 1863ff33-a842-4f77-93eb-f958b50a2d9b, role: Officer, IsActive: True, BranchCode: 001, email: admin@gmail.com, nbf: 1695525484, exp: 1696130284, iat: 1695525484, iss: http://localhost:5000
+2023-09-24 09:24:06.301 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-09-24 09:24:06.330 +05:45 [INF] Route matched with {action = "MakeDeposit", controller = "Transaction"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.String]] MakeDeposit(MicroFinance.Dtos.Transactions.MakeDepositTransactionDto) on controller MicroFinance.Controllers.Transactions.TransactionController (MicroFinance).
+2023-09-24 09:24:35.312 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-09-24 09:24:59.612 +05:45 [INF] Executing OkObjectResult, writing value of type 'System.String'.
+2023-09-24 09:24:59.619 +05:45 [INF] Executed action MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance) in 53283.8448ms
+2023-09-24 09:24:59.626 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.Transactions.TransactionController.MakeDeposit (MicroFinance)'
+2023-09-24 09:24:59.627 +05:45 [INF] Response: 200
+2023-09-24 09:24:59.634 +05:45 [INF] HTTP POST /Transaction/makeDeposit responded 200 in 53526.7909 ms
+2023-09-24 09:24:59.652 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/Transaction/makeDeposit application/json 141 - 200 - text/plain;+charset=utf-8 53614.1690ms

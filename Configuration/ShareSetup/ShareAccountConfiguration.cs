@@ -10,7 +10,7 @@ namespace MicroFinance.Configuration.ShareSetup
         {
             builder.HasKey(sa=>sa.Id);
             builder.Property(sa=>sa.Id).ValueGeneratedOnAdd();
-
+            builder.Property(sk=>sk.CurrentShareBalance).HasPrecision(18,2).IsRequired(true);
             builder.HasOne(sa=>sa.Client)
             .WithOne(c=>c.ShareAccount)
             .HasForeignKey<ShareAccount>(sa=>sa.ClientId)

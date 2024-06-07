@@ -2,12 +2,13 @@ using System.Linq.Expressions;
 using AutoMapper;
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.ClientSetup;
+using MicroFinance.Dtos.CompanyProfile;
 using MicroFinance.Dtos.DepositSetup;
 using MicroFinance.Dtos.DepositSetup.Account;
 using MicroFinance.Enums;
 using MicroFinance.Enums.Deposit.Account;
 using MicroFinance.Exceptions;
-using MicroFinance.Helper;
+using MicroFinance.Helpers;
 using MicroFinance.Models.AccountSetup;
 using MicroFinance.Models.ClientSetup;
 using MicroFinance.Models.DepositSetup;
@@ -31,8 +32,8 @@ namespace MicroFinance.Services.DepositSetup
         private readonly ICompanyProfileService _companyProfileService;
         private readonly IEmployeeService _employeeService;
         private readonly IConfiguration _config;
-        private readonly INepaliCalendarFormat _nepaliCalendarFormat;
         private readonly ICommonExpression _commonExpression;
+        private readonly IHelper _helper;
 
         public DepositSchemeService
         (
@@ -44,9 +45,8 @@ namespace MicroFinance.Services.DepositSetup
         ICompanyProfileService companyProfileService,
         IEmployeeService employeeService,
         IConfiguration config,
-        INepaliCalendarFormat nepaliCalendarFormat,
-        ICommonExpression commonExpression
-        )
+        IHelper helper,
+        ICommonExpression commonExpression)
         {
             _loggger = logger;
             _mapper = mapper;
@@ -56,15 +56,15 @@ namespace MicroFinance.Services.DepositSetup
             _companyProfileService = companyProfileService;
             _employeeService = employeeService;
             _config = config;
-            _nepaliCalendarFormat = nepaliCalendarFormat;
             _commonExpression = commonExpression;
+            _helper =  helper;
         }
 
         private List<string> GetSubLedgerNameForDepositScheme(CreateDepositSchemeDto createDepositScheme)
         {
-            var depositSubledgerName = createDepositScheme.DepositSubledger ?? createDepositScheme.SchemeName + " " + "Deposit";
-            var interestSubledgerName = createDepositScheme.InterestSubledger ?? createDepositScheme.SchemeName + " " + "Interest";
-            var taxSublegderName = createDepositScheme.TaxSubledger ?? createDepositScheme.SchemeName + " " + "Tax";
+            var depositSubledgerName = string.IsNullOrEmpty(createDepositScheme.DepositSubledger) ? $"{createDepositScheme.SchemeName} Deposit": createDepositScheme.DepositSubledger;
+            var interestSubledgerName = string.IsNullOrEmpty(createDepositScheme.InterestSubledger) ? $"{createDepositScheme.SchemeName} Interest": createDepositScheme.InterestSubledger;
+            var taxSublegderName = string.IsNullOrEmpty(createDepositScheme.TaxSubledger) ? $"{createDepositScheme.SchemeName} Tax": createDepositScheme.TaxSubledger;
 
             return new List<string>() { depositSubledgerName, interestSubledgerName, taxSublegderName };
         }
@@ -85,8 +85,8 @@ namespace MicroFinance.Services.DepositSetup
             depositScheme.CreatorId = decodedToken.UserId;
             depositScheme.BranchCode = decodedToken.BranchCode;
             depositScheme.RealWorldCreationDate = DateTime.Now;
-            depositScheme.NepaliCreationDate = await _nepaliCalendarFormat.GetNepaliFormatDate(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
-            depositScheme.EnglishCreationDate = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(depositScheme.NepaliCreationDate);
+            depositScheme.NepaliCreationDate = await _helper.GetNepaliFormatDate(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            depositScheme.EnglishCreationDate = await _helper.ConvertNepaliDateToEnglish(depositScheme.NepaliCreationDate);
             await _depositSchemeRepository.CreateDepositScheme(depositScheme, subLedgerNamesForDepositScheme);
             return new ResponseDto()
             {
@@ -124,8 +124,8 @@ namespace MicroFinance.Services.DepositSetup
             existingDepositScheme.ModifierId = decodedToken.UserId;
             existingDepositScheme.ModifierBranchCode = decodedToken.BranchCode;
             existingDepositScheme.RealWorldModificationDate = DateTime.Now;
-            existingDepositScheme.NepaliModificationDate = await _nepaliCalendarFormat.GetNepaliFormatDate(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
-            existingDepositScheme.EnglishModificationDate = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(existingDepositScheme.NepaliModificationDate);
+            existingDepositScheme.NepaliModificationDate = await _helper.GetNepaliFormatDate(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            existingDepositScheme.EnglishModificationDate = await _helper.ConvertNepaliDateToEnglish(existingDepositScheme.NepaliModificationDate);
             var updateStatus = await _depositSchemeRepository.UpdateDepositScheme(existingDepositScheme);
             if (updateStatus < 1)
                 throw new Exception("Failed to update the Deposit Scheme");
@@ -206,8 +206,8 @@ namespace MicroFinance.Services.DepositSetup
         //     if(updateDepositAccountDto.Status!=existingDepositAccount.Status)
         //     {
         //         var activeCompanyCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
-        //         DateTime activeCompanyCalendarInEnglish = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish($"{activeCompanyCalendar.Year}-{activeCompanyCalendar.Month}-{activeCompanyCalendar.RunningDay}");
-        //         DateTime nextInteretPostingDateInEnglish = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(existingDepositAccount.NextInterestPostingDate);
+        //         DateTime activeCompanyCalendarInEnglish = await _helper.ConvertNepaliDateToEnglish($"{activeCompanyCalendar.Year}-{activeCompanyCalendar.Month}-{activeCompanyCalendar.RunningDay}");
+        //         DateTime nextInteretPostingDateInEnglish = await _helper.ConvertNepaliDateToEnglish(existingDepositAccount.NextInterestPostingDate);
         //         if(nextInteretPostingDateInEnglish >=  )
         //     }
         // }
@@ -257,38 +257,12 @@ namespace MicroFinance.Services.DepositSetup
 
             else
                 maturePeriodInEnglishFormat = openingDateInEnglish.AddDays(generateMatureDateDto.Period).AddDays(-1);
-            string nepaliMatureDate = await _nepaliCalendarFormat.ConvertEnglishDateToNepali(maturePeriodInEnglishFormat);
+            string nepaliMatureDate = await _helper.ConvertEnglishDateToNepali(maturePeriodInEnglishFormat);
             return new MatureDateDto()
             {
                 NepaliMatureDate = nepaliMatureDate,
                 EnglishMatureDate = maturePeriodInEnglishFormat
             };
-
-
-            // var openingDate = (generateMatureDateDto.OpeningDate).Split("/");
-            // ReceivedCalendarDto receivedCalendarDto = new ReceivedCalendarDto()
-            // {
-            //     CurrentYear=Int32.Parse(openingDate[0]),
-            //     CurrentMonth = Int32.Parse(openingDate[1]),
-            //     CurrentDay = Int32.Parse(openingDate[2])
-            // };
-            // if
-            // (
-            //     receivedCalendarDto.CurrentYear.ToString().Length<4 
-            //     || receivedCalendarDto.CurrentMonth<1 
-            //     || receivedCalendarDto.CurrentMonth>12 
-            //     || receivedCalendarDto.CurrentDay<1 
-            //     || receivedCalendarDto.CurrentDay>32
-            // ) throw new Exception("Invalid Opening Date. Please refer format YYYY/MM/DD as 2080/01/01");
-            // var matureDate = "";
-            // if(generateMatureDateDto.PeriodType == PeriodTypeEnum.Year)
-            //     matureDate = await GenerateMatureDateYearWise(generateMatureDateDto, receivedCalendarDto);
-            // else if(generateMatureDateDto.PeriodType==PeriodTypeEnum.Month)
-            //     matureDate = await GenerateMatureDateMonthWise(generateMatureDateDto, receivedCalendarDto);
-            // else
-            //     matureDate = await GenerateMatureDateDayWise(generateMatureDateDto, receivedCalendarDto);
-            // if(string.IsNullOrEmpty(matureDate)) throw new Exception("Not able to Generate Mature Date");
-            // return matureDate;
         }
 
         public async Task<List<DepositAccountWrapperDto>> GetAllDepositAccountWrapperService(TokenDto decodedToken)
@@ -365,10 +339,12 @@ namespace MicroFinance.Services.DepositSetup
         private async Task VerifyClient(CreateDepositAccountDto createDepositAccountDto, DepositAccount depositAccount, TokenDto decodedToken)
         {
             var client = await _clientRepo.GetClientById(createDepositAccountDto.ClientId);
+            string clientName = client==null?"NONE":client.ClientFirstName;
+            string activeStatus = client==null?"NONE":(client.IsActive?"Active":"InActive");
             if (client == null || !client.IsActive)
             {
                 throw new Exception
-                ($"UnAuthorized to proceed. Client '{client?.ClientFirstName}' has active status '{client?.IsActive}'.");
+                ($"UnAuthorized to proceed. Client '{clientName}' has status '{activeStatus}'.");
             }
             if (client.BranchCode != decodedToken.BranchCode)
                 throw new Exception("Given Client is not found under your branch");
@@ -439,29 +415,30 @@ namespace MicroFinance.Services.DepositSetup
         }
         private async Task<DateTime> VerifyNepaliDateAndConvertToEnglishDate(string nepaliOpeningDate)
         {
-            bool isOpeningDateFormatCorrect = await _nepaliCalendarFormat.VerifyNepaliDateFormat(nepaliOpeningDate);
+            bool isOpeningDateFormatCorrect = await _helper.VerifyNepaliDateFormat(nepaliOpeningDate);
             if (!isOpeningDateFormatCorrect)
                 throw new BadRequestExceptionHandler("Invalid Opening Date Format. Correct Format is YYYY-MM-DD");
-            return await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(nepaliOpeningDate);
+            return await _helper.ConvertNepaliDateToEnglish(nepaliOpeningDate);
         }
         private async Task AddBasicDetailsInDepositAccount(DepositAccount newDepositAccount, DepositScheme depositScheme ,TokenDto decodedToken)
         {
-            var companyCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
-            newDepositAccount.RealWorldCreationDate = DateTime.Now;
-            newDepositAccount.NepaliCreationDate = await _nepaliCalendarFormat.GetNepaliFormatDate(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
-            newDepositAccount.EnglishCreationDate = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(newDepositAccount.NepaliCreationDate);
             newDepositAccount.BranchCode = decodedToken.BranchCode;
             newDepositAccount.CreatedBy = decodedToken.UserName;
             newDepositAccount.CreatorId = decodedToken.UserId;
-            string nepaliOpeningDate = await _nepaliCalendarFormat.GetNepaliFormatDate(newDepositAccount.NepaliOpeningDate);
-            if (string.IsNullOrEmpty(nepaliOpeningDate))
-                throw new BadRequestExceptionHandler("Invalid Opening Date. Format should be YYYY-MM-DD. And also please enter correct date");
-            newDepositAccount.NepaliCreationDate = nepaliOpeningDate;
-            newDepositAccount.EnglishOpeningDate = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(newDepositAccount.NepaliOpeningDate);
-            //newDepositAccount.OpeningDate 
+            // Calendar Service
+            // newDepositAccount.NepaliOpeningDate= await _helper.GetNepaliFormatDate(newDepositAccount.NepaliOpeningDate);
+            //   if (string.IsNullOrEmpty(newDepositAccount.NepaliOpeningDate))
+            //     throw new BadRequestExceptionHandler("Invalid Opening Date. Format should be YYYY-MM-DD. And also please enter correct date");
+            // newDepositAccount.EnglishOpeningDate = await _helper.ConvertNepaliDateToEnglish(newDepositAccount.NepaliOpeningDate);
+            
+            var companyCalendar = await _companyProfileService.GetCurrentActiveCalenderService();
+            newDepositAccount.RealWorldCreationDate = DateTime.Now;
+            newDepositAccount.NepaliCreationDate = await _helper.GetNepaliFormatDate(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            newDepositAccount.EnglishCreationDate = await _helper.ConvertNepaliDateToEnglish(newDepositAccount.NepaliCreationDate);
+          
             GenerateMatureDateDto generateMatureDateDto = new GenerateMatureDateDto()
             {
-                OpeningDate = newDepositAccount.NepaliOpeningDate,
+                OpeningDate = newDepositAccount.NepaliCreationDate,
                 Period = newDepositAccount.Period,
                 PeriodType = newDepositAccount.PeriodType
             };
@@ -469,38 +446,7 @@ namespace MicroFinance.Services.DepositSetup
             newDepositAccount.NepaliMatureDate = matureDate.NepaliMatureDate;
             newDepositAccount.EnglishMatureDate = matureDate.EnglishMatureDate;
             PostingSchemeEnum postingScheme = (PostingSchemeEnum)Enum.ToObject(typeof(PostingSchemeEnum), depositScheme.PostingScheme);
-            newDepositAccount.NextInterestPostingDate = await GenerateNextInterestPostingDate(newDepositAccount.EnglishOpeningDate, postingScheme, newDepositAccount.EnglishMatureDate);
-        }
-        public async Task<DateTime> GenerateNextInterestPostingDate(DateTime englishCurrentDate, PostingSchemeEnum postingScheme, DateTime englishMatureDate)
-        {
-            DateTime nextPostingDateinEnglish;
-
-            if (postingScheme == PostingSchemeEnum.Yearly)
-                nextPostingDateinEnglish = englishCurrentDate.AddYears(1).AddDays(-1);
-            else if (postingScheme == PostingSchemeEnum.HalfYearly)
-                nextPostingDateinEnglish = englishCurrentDate.AddMonths(6).AddDays(-1);
-            else if (postingScheme == PostingSchemeEnum.Quarterly)
-                nextPostingDateinEnglish = englishCurrentDate.AddMonths(3).AddDays(-1);
-            else if (postingScheme == PostingSchemeEnum.Monthly)
-            {
-                nextPostingDateinEnglish = englishCurrentDate.AddMonths(1).AddDays(-1);
-                string nepaliDateOfPosting = await _nepaliCalendarFormat.ConvertEnglishDateToNepali(nextPostingDateinEnglish);
-                var splitedDate = nepaliDateOfPosting.Split("-");
-                int activeYear = await _companyProfileService.GetActiveYearService();
-                var calendar = await _companyProfileService.GetCalendarByYearAndMonthService(activeYear, int.Parse(splitedDate[1]));
-                try
-                {
-                    nextPostingDateinEnglish = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish($"{splitedDate[0]}-{splitedDate[1]}-{calendar.NumberOfDay - 1}");
-                }
-                catch (Exception ex)
-                {
-                    nextPostingDateinEnglish = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish($"{splitedDate[0]}-{splitedDate[1]}-{calendar.NumberOfDay - 2}");
-                }
-            }
-
-            else
-                nextPostingDateinEnglish = englishMatureDate;
-            return nextPostingDateinEnglish;
+            newDepositAccount.NextInterestPostingDate = await _helper.GenerateNextInterestPostingDate(newDepositAccount.EnglishCreationDate, newDepositAccount.EnglishMatureDate, companyCalendar, postingScheme, false);
         }
 
         
@@ -594,8 +540,8 @@ namespace MicroFinance.Services.DepositSetup
             existingDepositAccount.ModifierBranchCode = decodedToken.BranchCode;
             existingDepositAccount.ModifiedBy = decodedToken.UserName;
             existingDepositAccount.ModifierId = decodedToken.UserId;
-            existingDepositAccount.NepaliModificationDate = await _nepaliCalendarFormat.GetNepaliFormatDate(currentCompanyActiveCalendar.Year, currentCompanyActiveCalendar.Month, currentCompanyActiveCalendar.RunningDay);
-            existingDepositAccount.EnglishModificationDate = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(existingDepositAccount.NepaliModificationDate);
+            existingDepositAccount.NepaliModificationDate = await _helper.GetNepaliFormatDate(currentCompanyActiveCalendar.Year, currentCompanyActiveCalendar.Month, currentCompanyActiveCalendar.RunningDay);
+            existingDepositAccount.EnglishModificationDate = await _helper.ConvertNepaliDateToEnglish(existingDepositAccount.NepaliModificationDate);
             existingDepositAccount.RealWorldModificationDate = DateTime.Now;
         }
 

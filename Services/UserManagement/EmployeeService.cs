@@ -44,12 +44,13 @@ namespace MicroFinance.Services.UserManagement
         public async Task<TokenResponseDto> LoginService(UserLoginDto userLoginDto)
         {
             var user = await _employeeRepo.GetUserByUsername(userLoginDto.UserName);
-            var branchCode = await _companyProfile.GetBranchServiceByBranchCodeService(user.Employee.BranchCode);
-            if (user == null)
+            if (user == null || !user.IsActive)
             {
-                _logger.LogError($"{DateTime.Now} Attempting to login with invalid user > {userLoginDto.UserName}");
+                _logger.LogError($"{DateTime.Now} Attempting to login with invalid user or inactive > {userLoginDto.UserName}");
                 throw new UnAuthorizedExceptionHandler("UnAuthorized");
             }
+            var branchCode = await _companyProfile.GetBranchServiceByBranchCodeService(user.Employee.BranchCode);
+            
             if (!branchCode.IsActive) throw new BadRequestExceptionHandler("Your Branch is inactive at the moment");
             var loginResult = await _employeeRepo.Login(user, userLoginDto.Password, userLoginDto.StayLogin);
             if (loginResult.Succeeded)

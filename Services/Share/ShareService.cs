@@ -3,7 +3,7 @@ using AutoMapper;
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.Share;
 using MicroFinance.Exceptions;
-using MicroFinance.Helper;
+using MicroFinance.Helpers;
 using MicroFinance.Models.Share;
 using MicroFinance.Repository.Share;
 

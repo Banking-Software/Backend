@@ -4,14 +4,14 @@ using MicroFinance.Enums.Deposit.Account;
 
 namespace MicroFinance.Dtos.DepositSetup
 {
-    public class CreateDepositAccountDto //: IValidatableObject
+    public class CreateDepositAccountDto : IValidatableObject
     {
         [Required]
         public int DepositSchemeId { get; set; }
         [Required]
         public int ClientId { get; set; }
-        [Required]
-        public string NepaliOpeningDate { get; set; }
+        // [Required]
+        // public string NepaliOpeningDate { get; set; }
         [Required]
         public int Period { get; set; }
         [Required]
@@ -29,7 +29,9 @@ namespace MicroFinance.Dtos.DepositSetup
         public int? InterestPostingAccountId { get; set; }
         public int? MatureInterestPostingAccountId { get; set; }
         public string? Description { get; set; }
+        [Required]
         public AccountStatusEnum Status { get; set; }
+        [Required]
         public bool IsSMSServiceActive { get; set; }
         public int? ExpectedDailyDepositAmount { get; set; }
         public int? ExpectedTotalDepositDay { get; set; }
@@ -38,16 +40,13 @@ namespace MicroFinance.Dtos.DepositSetup
         public int? ExpectedTotalInterestAmount { get; set; }
         public IFormFile? SignaturePhoto { get; set; }
 
-        // public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        // {
-        //     // if(AccountType==AccountTypeEnum.Joint && JointClientIds.Count<1)
-        //     // {
-        //     //     yield return new ValidationResult("Joint Client Id required", new []{nameof(AccountType), nameof(JointClientIds)});
-        //     // }
-        //     // if(AccountType==AccountTypeEnum.Single && JointClientIds!=null && JointClientIds.Count>=1)
-        //     // {
-        //     //     yield return new ValidationResult($"Joint Client not allowed in Single Account",  new[] {nameof(AccountType), nameof(JointClientIds)});
-        //     // }
-        // }
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if(Status==null)
+            {
+                yield return new ValidationResult("Status is required", new []{nameof(Status)});
+            }
+            
+        }
     }
 }

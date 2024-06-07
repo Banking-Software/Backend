@@ -1,4 +1,4 @@
-using MicroFinance.Enums.Deposit.Account;
+using MicroFinance.Enums;
 
 namespace MicroFinance.Dtos.Reports;
 

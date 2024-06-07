@@ -2,11 +2,9 @@ using System.Linq.Expressions;
 using AutoMapper;
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.Transactions.ShareTransaction;
-using MicroFinance.Enums.Deposit.Account;
 using MicroFinance.Enums.Transaction;
 using MicroFinance.Enums.Transaction.ShareTransaction;
-using MicroFinance.Exceptions;
-using MicroFinance.Helper;
+using MicroFinance.Helpers;
 using MicroFinance.Models.DepositSetup;
 using MicroFinance.Models.Wrapper.TrasactionWrapper;
 using MicroFinance.Repository.Transaction;
@@ -27,8 +25,10 @@ namespace MicroFinance.Services.Transactions
         private readonly IDepositSchemeService _depositSchemeService;
         private readonly ICompanyProfileService _companyProfileService;
         private readonly IMapper _mapper;
-        private readonly INepaliCalendarFormat _nepaliCalendarFormat;
+        private readonly IHelper _helper;
         private readonly ICommonExpression _commonExpression;
+        private readonly IBaseTransactionRepository _shareTransactionRepo;
+        private readonly IBaseTransactionRepository _transactionRepository;
 
         public ShareAccountTransactionService
         (
@@ -39,8 +39,9 @@ namespace MicroFinance.Services.Transactions
             IMainLedgerService mainLedgerService,
             IDepositSchemeService depositSchemeService,
             ICompanyProfileService companyProfileService,
-            INepaliCalendarFormat nepaliCalendarFormat,
-            ICommonExpression commonExpression
+            IHelper helper,
+            ICommonExpression commonExpression,
+            IBaseTransactionRepository shareTransactionRepo
         )
         {
             _shareAccountTransactionRepository=shareAccountTransactionRepository;
@@ -50,8 +51,9 @@ namespace MicroFinance.Services.Transactions
             _depositSchemeService = depositSchemeService;
             _companyProfileService=companyProfileService;
             _mapper=mapper;
-            _nepaliCalendarFormat=nepaliCalendarFormat;
+            _helper=helper;
             _commonExpression=commonExpression;
+            _shareTransactionRepo=shareTransactionRepo;
         }
 
         private async Task AddBasicInfo(ShareAccountTransactionWrapper shareAccountTransactionWrapper, TokenDto decodedToken)
@@ -61,16 +63,17 @@ namespace MicroFinance.Services.Transactions
             shareAccountTransactionWrapper.CreatorId = decodedToken.UserId;
             shareAccountTransactionWrapper.BranchCode = decodedToken.BranchCode;
             shareAccountTransactionWrapper.RealWorldCreationDate = DateTime.Now;
-            string nepaliCreationDate =  await _nepaliCalendarFormat.GetNepaliFormatDate(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            string nepaliCreationDate =  await _helper.GetNepaliFormatDate(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
             if(string.IsNullOrEmpty(nepaliCreationDate)) throw new Exception("Unable to assign the creation date");
             shareAccountTransactionWrapper.NepaliCreationDate = nepaliCreationDate;
-            shareAccountTransactionWrapper.EnglishCreationDate = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(nepaliCreationDate);
+            shareAccountTransactionWrapper.EnglishCreationDate = await _helper.ConvertNepaliDateToEnglish(nepaliCreationDate);
         }
-        public async Task<string> MakeShareTransaction(MakeShareTransactionDto makeShareTransactionDto, TokenDto decodedToken)
+        public async Task<VoucherDto> MakeShareTransaction(MakeShareTransactionDto makeShareTransactionDto, TokenDto decodedToken)
         {
             var shareAccountTransactionWrapper = _mapper.Map<ShareAccountTransactionWrapper>(makeShareTransactionDto);
             var shareAccount = await _shareService.GetShareAccountService(shareId: makeShareTransactionDto.ShareAccountId, null ,decodedToken:decodedToken);
             var client = await _clientService.GetClientByIdService(makeShareTransactionDto.ClientId, decodedToken);
+
             if(!shareAccount.IsActive || !client.IsActive || shareAccount.ClientId!=client.Id)
                 throw new Exception("Transaction Failed and possible reason might be: provided share account might not be of provided client or share account and client is inactive");
             var shareKitta = await _shareService.GetActiveShareKittaService(decodedToken);
@@ -106,8 +109,20 @@ namespace MicroFinance.Services.Transactions
                 shareAccountTransactionWrapper.PaymentDepositSchemeLedgerId = paymentDepositAccountNumber.DepositScheme.SchemeTypeId;
             }
             await AddBasicInfo(shareAccountTransactionWrapper, decodedToken);
-            string voucherNumber = await _shareAccountTransactionRepository.LockAndMakeShareTransaction(shareAccountTransactionWrapper);
-            return voucherNumber;
+            // string voucherNumber = await _shareAccountTransactionRepository.LockAndMakeShareTransaction(shareAccountTransactionWrapper);
+            string voucherNumber =  await _shareTransactionRepo.ShareAccountTransaction(shareAccountTransactionWrapper);
+            VoucherDto vocherDto=new VoucherDto()
+            {
+                VoucherNumber=voucherNumber,
+                TransactionAmount=shareAccountTransactionWrapper.TransactionAmount,
+                AmountInWords= await _helper.HumanizeAmount(shareAccountTransactionWrapper.TransactionAmount),
+                ModeOfPayment = shareAccountTransactionWrapper.PaymentType.ToString(),
+                TransactionDateBS = shareAccountTransactionWrapper.NepaliCreationDate,
+                TransactionDateAD = shareAccountTransactionWrapper.EnglishCreationDate,
+                RealWorldTransactionDateAD = shareAccountTransactionWrapper.RealWorldCreationDate,
+                RealWorldTransactionDateBS = await _helper.ConvertEnglishDateToNepali(shareAccountTransactionWrapper.RealWorldCreationDate)
+            };
+            return vocherDto;
 
         }
     }

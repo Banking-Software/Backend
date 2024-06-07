@@ -1,0 +1,1427 @@
+2023-10-08 20:30:47.007 +05:45 [WRN] No store type was specified for the decimal property 'InterestOnInterest' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:30:47.052 +05:45 [WRN] No store type was specified for the decimal property 'LoanInterestReceivable' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:30:47.052 +05:45 [WRN] No store type was specified for the decimal property 'OverDueInterest' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:30:47.053 +05:45 [WRN] No store type was specified for the decimal property 'PenalInterest' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:30:47.538 +05:45 [WRN] No store type was specified for the decimal property 'InterestOnInterest' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:30:47.538 +05:45 [WRN] No store type was specified for the decimal property 'LoanInterestReceivable' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:30:47.538 +05:45 [WRN] No store type was specified for the decimal property 'OverDueInterest' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:30:47.539 +05:45 [WRN] No store type was specified for the decimal property 'PenalInterest' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:31:34.073 +05:45 [WRN] No store type was specified for the decimal property 'InterestOnInterest' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:31:34.115 +05:45 [WRN] No store type was specified for the decimal property 'LoanInterestReceivable' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:31:34.116 +05:45 [WRN] No store type was specified for the decimal property 'OverDueInterest' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:31:34.116 +05:45 [WRN] No store type was specified for the decimal property 'PenalInterest' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:31:34.569 +05:45 [WRN] No store type was specified for the decimal property 'InterestOnInterest' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:31:34.570 +05:45 [WRN] No store type was specified for the decimal property 'LoanInterestReceivable' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:31:34.570 +05:45 [WRN] No store type was specified for the decimal property 'OverDueInterest' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:31:34.570 +05:45 [WRN] No store type was specified for the decimal property 'PenalInterest' on entity type 'LoanScheme'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2023-10-08 20:33:14.658 +05:45 [INF] Applying migration '20231008144744_loanInitial'.
+2023-10-08 20:34:39.762 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-10-08 20:34:40.458 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-08 20:34:40.827 +05:45 [INF] Now listening on: https://localhost:5001
+2023-10-08 20:34:40.827 +05:45 [INF] Now listening on: http://localhost:5000
+2023-10-08 20:34:40.832 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-10-08 20:34:40.832 +05:45 [INF] Hosting environment: Development
+2023-10-08 20:34:40.833 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-10-08 20:35:27.559 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/index.html - -
+2023-10-08 20:35:27.640 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/index.html - - - 401 0 - 88.9097ms
+2023-10-08 20:35:33.116 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/index.html - -
+2023-10-08 20:35:33.411 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/index.html - - - 200 - text/html;charset=utf-8 294.5502ms
+2023-10-08 20:35:33.447 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui.css - -
+2023-10-08 20:35:33.450 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-bundle.js - -
+2023-10-08 20:35:33.450 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-standalone-preset.js - -
+2023-10-08 20:35:33.587 +05:45 [INF] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A'
+2023-10-08 20:35:33.587 +05:45 [INF] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A'
+2023-10-08 20:35:33.587 +05:45 [INF] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A'
+2023-10-08 20:35:33.590 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-bundle.js - - - 200 1092889 application/javascript 140.3188ms
+2023-10-08 20:35:33.590 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui.css - - - 200 143632 text/css 143.3884ms
+2023-10-08 20:35:33.590 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-standalone-preset.js - - - 200 337162 application/javascript 140.3223ms
+2023-10-08 20:35:33.735 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - -
+2023-10-08 20:35:34.114 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - - - 200 - application/json;charset=utf-8 378.5003ms
+2023-10-08 20:36:35.682 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/SuperAdmin/login application/json 54
+2023-10-08 20:36:35.685 +05:45 [INF] CORS policy execution successful.
+2023-10-08 20:36:35.862 +05:45 [INF] 10/8/2023 8:36:35 PM: API Got hit
+2023-10-08 20:36:35.863 +05:45 [INF] Request: POST /SuperAdmin/login
+2023-10-08 20:36:35.864 +05:45 [INF] Request Body: {
+  "userName": "Fintex",
+  "password": "Fintex@123"
+}
+2023-10-08 20:36:35.868 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.UserManagement.SuperAdminController.Login (MicroFinance)'
+2023-10-08 20:36:35.901 +05:45 [INF] Route matched with {action = "Login", controller = "SuperAdmin"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.UserManagement.TokenResponseDto]] Login(MicroFinance.Dtos.UserManagement.SuperAdminLoginDto) on controller MicroFinance.Controllers.UserManagement.SuperAdminController (MicroFinance).
+2023-10-08 20:36:36.872 +05:45 [INF] 10/8/2023 8:36:36 PM: SuperAdmin Logged In > Fintex
+2023-10-08 20:36:37.044 +05:45 [INF] Executing OkObjectResult, writing value of type 'MicroFinance.Dtos.UserManagement.TokenResponseDto'.
+2023-10-08 20:36:37.060 +05:45 [INF] Executed action MicroFinance.Controllers.UserManagement.SuperAdminController.Login (MicroFinance) in 1153.6758ms
+2023-10-08 20:36:37.064 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.UserManagement.SuperAdminController.Login (MicroFinance)'
+2023-10-08 20:36:37.065 +05:45 [INF] Response: 200
+2023-10-08 20:36:37.074 +05:45 [INF] HTTP POST /SuperAdmin/login responded 200 in 1360.3314 ms
+2023-10-08 20:36:37.087 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/SuperAdmin/login application/json 54 - 200 - application/json;+charset=utf-8 1405.0299ms
+2023-10-08 20:37:14.274 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/CompanyProfile/createBranch application/json 74
+2023-10-08 20:37:14.278 +05:45 [INF] CORS policy execution successful.
+2023-10-08 20:37:14.361 +05:45 [INF] 10/8/2023 8:37:14 PM: API Got hit
+2023-10-08 20:37:14.361 +05:45 [INF] Request: POST /CompanyProfile/createBranch
+2023-10-08 20:37:14.361 +05:45 [INF] Request Body: {
+  "branchCode": "001",
+  "branchName": "Kathmandu",
+  "isActive": true
+}
+2023-10-08 20:37:14.362 +05:45 [INF] JWT Token Claims: given_name: Fintex, nameid: 3e955742-1cbd-4501-b224-912f770ddf81, role: SuperAdmin, IsActive: True, BranchCode: -100, email: iconichostnep@gmail.com, nbf: 1696776696, exp: 1697381496, iat: 1696776696, iss: M4sXMqgmVF82owi34kxDw76JBn8ar26FTmxgDi02p5B3PzaL3K5/1KqcW7LRuW6pT7r92iErojKsqP+Q7qDyug==
+2023-10-08 20:37:14.362 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateBranch (MicroFinance)'
+2023-10-08 20:37:14.368 +05:45 [INF] Route matched with {action = "CreateBranch", controller = "CompanyProfile"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.ResponseDto]] CreateBranch(MicroFinance.Dtos.CompanyProfile.CreateBranchDto) on controller MicroFinance.Controllers.CompanyProfile.CompanyProfileController (MicroFinance).
+2023-10-08 20:37:14.682 +05:45 [INF] Executing ObjectResult, writing value of type 'MicroFinance.Dtos.ResponseDto'.
+2023-10-08 20:37:14.684 +05:45 [INF] Executed action MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateBranch (MicroFinance) in 315.1393ms
+2023-10-08 20:37:14.684 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateBranch (MicroFinance)'
+2023-10-08 20:37:14.684 +05:45 [INF] Response: 200
+2023-10-08 20:37:14.685 +05:45 [INF] HTTP POST /CompanyProfile/createBranch responded 200 in 405.2964 ms
+2023-10-08 20:37:14.686 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/CompanyProfile/createBranch application/json 74 - 200 - application/json;+charset=utf-8 411.5401ms
+2023-10-08 20:38:07.791 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/CompanyProfile/createCompanyProfile multipart/form-data;+boundary=----WebKitFormBoundaryv1zCGF79ASfmEJKb 1411
+2023-10-08 20:38:07.798 +05:45 [INF] CORS policy execution successful.
+2023-10-08 20:38:07.813 +05:45 [INF] 10/8/2023 8:38:07 PM: API Got hit
+2023-10-08 20:38:07.813 +05:45 [INF] Request: POST /CompanyProfile/createCompanyProfile
+2023-10-08 20:38:07.813 +05:45 [INF] Request Body: ------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="CompanyValidityStartDate"
+
+2023-01-01
+------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="EstablishedDate"
+
+
+------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="CompanyName"
+
+Fintex Company
+------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="CompanyLogo"
+
+
+------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="CompanyNameNepali"
+
+
+------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="PhoneNo"
+
+
+------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="CurrentTax"
+
+6
+------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="CurrentFiscalYear"
+
+2021-2022
+------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="CompanyEmailAddress"
+
+
+------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="CompanyAddress"
+
+
+------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="CompanyValidityEndDate"
+
+2023-12-12
+------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="CompanyAddressNepali"
+
+
+------WebKitFormBoundaryv1zCGF79ASfmEJKb
+Content-Disposition: form-data; name="PANNo"
+
+
+------WebKitFormBoundaryv1zCGF79ASfmEJKb--
+
+2023-10-08 20:38:07.814 +05:45 [INF] JWT Token Claims: given_name: Fintex, nameid: 3e955742-1cbd-4501-b224-912f770ddf81, role: SuperAdmin, IsActive: True, BranchCode: -100, email: iconichostnep@gmail.com, nbf: 1696776696, exp: 1697381496, iat: 1696776696, iss: M4sXMqgmVF82owi34kxDw76JBn8ar26FTmxgDi02p5B3PzaL3K5/1KqcW7LRuW6pT7r92iErojKsqP+Q7qDyug==
+2023-10-08 20:38:07.814 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateCompanyProfile (MicroFinance)'
+2023-10-08 20:38:07.825 +05:45 [INF] Route matched with {action = "CreateCompanyProfile", controller = "CompanyProfile"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.ResponseDto]] CreateCompanyProfile(MicroFinance.Dtos.CompanyProfile.CreateCompanyProfileDto) on controller MicroFinance.Controllers.CompanyProfile.CompanyProfileController (MicroFinance).
+2023-10-08 20:38:07.892 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-10-08 20:38:07.985 +05:45 [INF] Executing ObjectResult, writing value of type 'MicroFinance.Dtos.ResponseDto'.
+2023-10-08 20:38:07.985 +05:45 [INF] Executed action MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateCompanyProfile (MicroFinance) in 159.9721ms
+2023-10-08 20:38:07.986 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateCompanyProfile (MicroFinance)'
+2023-10-08 20:38:07.986 +05:45 [INF] Response: 200
+2023-10-08 20:38:07.986 +05:45 [INF] HTTP POST /CompanyProfile/createCompanyProfile responded 200 in 185.7344 ms
+2023-10-08 20:38:07.987 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/CompanyProfile/createCompanyProfile multipart/form-data;+boundary=----WebKitFormBoundaryv1zCGF79ASfmEJKb 1411 - 200 - application/json;+charset=utf-8 217.0215ms
+2023-10-08 20:39:10.517 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/SuperAdmin/createAdmin application/json 224
+2023-10-08 20:39:10.526 +05:45 [INF] CORS policy execution successful.
+2023-10-08 20:39:10.528 +05:45 [INF] 10/8/2023 8:39:10 PM: API Got hit
+2023-10-08 20:39:10.528 +05:45 [INF] Request: POST /SuperAdmin/createAdmin
+2023-10-08 20:39:10.529 +05:45 [INF] Request Body: {
+  "userName": "admin",
+  "branchCode": "001",
+  "email": "ashish@gmail.com",
+  "name": "Ashish",
+  "password": "Hello@123",
+  "confirmPassword": "Hello@123",
+  "phoneNumber": "9840382936",
+  "isActive": true,
+  "role": 4
+}
+2023-10-08 20:39:10.529 +05:45 [INF] JWT Token Claims: given_name: Fintex, nameid: 3e955742-1cbd-4501-b224-912f770ddf81, role: SuperAdmin, IsActive: True, BranchCode: -100, email: iconichostnep@gmail.com, nbf: 1696776696, exp: 1697381496, iat: 1696776696, iss: M4sXMqgmVF82owi34kxDw76JBn8ar26FTmxgDi02p5B3PzaL3K5/1KqcW7LRuW6pT7r92iErojKsqP+Q7qDyug==
+2023-10-08 20:39:10.529 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.UserManagement.SuperAdminController.CreateAdmin (MicroFinance)'
+2023-10-08 20:39:10.537 +05:45 [INF] Route matched with {action = "CreateAdmin", controller = "SuperAdmin"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.ResponseDto]] CreateAdmin(MicroFinance.Dtos.UserManagement.CreateAdminBySuperAdminDto) on controller MicroFinance.Controllers.UserManagement.SuperAdminController (MicroFinance).
+2023-10-08 20:39:10.946 +05:45 [INF] Executing OkObjectResult, writing value of type 'MicroFinance.Dtos.ResponseDto'.
+2023-10-08 20:39:10.946 +05:45 [INF] Executed action MicroFinance.Controllers.UserManagement.SuperAdminController.CreateAdmin (MicroFinance) in 409.0357ms
+2023-10-08 20:39:10.946 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.UserManagement.SuperAdminController.CreateAdmin (MicroFinance)'
+2023-10-08 20:39:10.947 +05:45 [INF] Response: 200
+2023-10-08 20:39:10.947 +05:45 [INF] HTTP POST /SuperAdmin/createAdmin responded 200 in 419.6172 ms
+2023-10-08 20:39:10.947 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/SuperAdmin/createAdmin application/json 224 - 200 - application/json;+charset=utf-8 435.5219ms
+2023-10-08 20:40:07.771 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73
+2023-10-08 20:40:07.788 +05:45 [INF] CORS policy execution successful.
+2023-10-08 20:40:07.791 +05:45 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenInvalidIssuerException: IDX10205: Issuer validation failed. Issuer: '[PII of type 'System.String' is hidden. For more details, see https://aka.ms/IdentityModel/PII.]'. Did not match: validationParameters.ValidIssuer: '[PII of type 'System.String' is hidden. For more details, see https://aka.ms/IdentityModel/PII.]' or validationParameters.ValidIssuers: '[PII of type 'System.String' is hidden. For more details, see https://aka.ms/IdentityModel/PII.]'. For more details, see https://aka.ms/IdentityModel/issuer-validation. 
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateIssuer(String issuer, SecurityToken securityToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ValidateTokenPayload(JwtSecurityToken jwtToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ValidateJWS(String token, TokenValidationParameters validationParameters, BaseConfiguration currentConfiguration, SecurityToken& signatureValidatedToken, ExceptionDispatchInfo& exceptionThrown)
+--- End of stack trace from previous location ---
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ValidateToken(String token, JwtSecurityToken outerToken, TokenValidationParameters validationParameters, SecurityToken& signatureValidatedToken)
+   at Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerHandler.HandleAuthenticateAsync()
+2023-10-08 20:40:07.823 +05:45 [INF] UserToken was not authenticated. Failure message: IDX10205: Issuer validation failed. Issuer: '[PII of type 'System.String' is hidden. For more details, see https://aka.ms/IdentityModel/PII.]'. Did not match: validationParameters.ValidIssuer: '[PII of type 'System.String' is hidden. For more details, see https://aka.ms/IdentityModel/PII.]' or validationParameters.ValidIssuers: '[PII of type 'System.String' is hidden. For more details, see https://aka.ms/IdentityModel/PII.]'. For more details, see https://aka.ms/IdentityModel/issuer-validation. 
+2023-10-08 20:40:07.823 +05:45 [INF] 10/8/2023 8:40:07 PM: API Got hit
+2023-10-08 20:40:07.823 +05:45 [INF] Request: POST /FinanceCompany/login
+2023-10-08 20:40:07.823 +05:45 [INF] Request Body: {
+  "userName": "admin",
+  "password": "Hello@123",
+  "stayLogin": true
+}
+2023-10-08 20:40:07.823 +05:45 [INF] JWT Token Claims: given_name: Fintex, nameid: 3e955742-1cbd-4501-b224-912f770ddf81, role: SuperAdmin, IsActive: True, BranchCode: -100, email: iconichostnep@gmail.com, nbf: 1696776696, exp: 1697381496, iat: 1696776696, iss: M4sXMqgmVF82owi34kxDw76JBn8ar26FTmxgDi02p5B3PzaL3K5/1KqcW7LRuW6pT7r92iErojKsqP+Q7qDyug==
+2023-10-08 20:40:07.823 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-10-08 20:40:07.826 +05:45 [INF] Route matched with {action = "Login", controller = "FinanceCompany"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.UserManagement.TokenResponseDto]] Login(MicroFinance.Dtos.UserManagement.UserLoginDto) on controller MicroFinance.Controllers.UserManagement.FinanceCompanyController (MicroFinance).
+2023-10-08 20:40:12.868 +05:45 [INF] 10/8/2023 8:40:12 PM User 'admin' login to the system
+2023-10-08 20:40:12.868 +05:45 [INF] Executing OkObjectResult, writing value of type 'MicroFinance.Dtos.UserManagement.TokenResponseDto'.
+2023-10-08 20:40:12.868 +05:45 [INF] Executed action MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance) in 5041.903ms
+2023-10-08 20:40:12.868 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-10-08 20:40:12.868 +05:45 [INF] Response: 200
+2023-10-08 20:40:12.868 +05:45 [INF] HTTP POST /FinanceCompany/login responded 200 in 5080.1530 ms
+2023-10-08 20:40:12.869 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73 - 200 - application/json;+charset=utf-8 5097.9115ms
+2023-10-08 20:41:30.695 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/ClientSetup/createNewClient multipart/form-data;+boundary=----WebKitFormBoundaryCAJ00DNLaPiBdRKH 8217
+2023-10-08 20:41:30.696 +05:45 [INF] CORS policy execution successful.
+2023-10-08 20:41:30.696 +05:45 [INF] 10/8/2023 8:41:30 PM: API Got hit
+2023-10-08 20:41:30.696 +05:45 [INF] Request: POST /ClientSetup/createNewClient
+2023-10-08 20:41:30.696 +05:45 [INF] Request Body: ------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="TemporaryVdcMunicipality"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="NomineeNepaliName"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="NomineePhoto"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientAccountPurposeNepali"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientCitizenshipNumber"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="NomineeAddress"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="PermanentVdcMunicipality"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientSignaturePhoto"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientType"
+
+1
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="TemporaryVdcMunicipalityNepali"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="IsKYMUpdated"
+
+true
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="RegistrationDate"
+
+20280-01-01
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientPhoto"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="TemporaryToleVillage"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientGrandFatherName"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="PermanentVdcMunicipalityNepali"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="PermanentDistrictCode"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientUnitId"
+
+1
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="PermanentToleVillage"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientMiddleName"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientSpouseName"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientSpouseOccupation"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="TemporaryToleVillageNepali"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientLastName"
+
+Adhikari
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="TemporaryDistrictCode"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientGrandFatherNameNepali"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientVotingId"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="NomineeIntroducedBy"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="NomineeRelation"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="TemporaryStateCode"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientNameOfSons"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientCitizenShipIssueDistrict"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientCitizenShipIssueDate"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientMotherInLaw"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientDateOfBirth"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="PermanentToleVillageNepali"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientGroupId"
+
+1
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientEducationStatus"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientIncomeSource"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientIfMemberOfOtherParty"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientTelephoneNumber1"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="IsActive"
+
+true
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="PermanentStateCode"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientFirstName"
+
+Ashish
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientWebsite"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientTelephoneNumber2"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientNationality"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientEmail"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientFatherName"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="NomineeNepaliRelation"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientMartialStatusCode"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="PermanentWardNumber"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientOtherInfo"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="IsShareAllowed"
+
+true
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientFatherInLaw"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="TemporaryWardNumber"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientOccupation"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientFatherNameNepali"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientCastCode"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="NomineeContactNumber"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="PermanentWardNumberNepali"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="KYMType"
+
+1
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientCitizenshipPhoto"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientMotherName"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientGenderCode"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ShareType"
+
+16
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientMobileNumber1"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientPanNumber"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="TemporaryWardNumberNepali"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientNepaliName"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="NomineeCitizenshipNumber"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientMobileNumber2"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="NomineeName"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientNationalityIdStatus"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientMotherNameNepali"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientNameOfDaughters"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH
+Content-Disposition: form-data; name="ClientOtherInfo2"
+
+
+------WebKitFormBoundaryCAJ00DNLaPiBdRKH--
+
+2023-10-08 20:41:30.697 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: b6683deb-3265-4583-a00f-4724cfb5d345, role: Officer, IsActive: True, BranchCode: 001, email: ashish@gmail.com, nbf: 1696776912, exp: 1697381712, iat: 1696776912, iss: http://localhost:5000
+2023-10-08 20:41:30.697 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.ClientSetup.ClientSetupController.CreateClient (MicroFinance)'
+2023-10-08 20:41:30.702 +05:45 [INF] Route matched with {action = "CreateClient", controller = "ClientSetup"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.ResponseDto]] CreateClient(MicroFinance.Dtos.ClientSetup.CreateClientDto) on controller MicroFinance.Controllers.ClientSetup.ClientSetupController (MicroFinance).
+2023-10-08 20:41:31.005 +05:45 [INF] Executed action MicroFinance.Controllers.ClientSetup.ClientSetupController.CreateClient (MicroFinance) in 302.4642ms
+2023-10-08 20:41:31.005 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.ClientSetup.ClientSetupController.CreateClient (MicroFinance)'
+2023-10-08 20:41:31.068 +05:45 [INF] Response: 401
+2023-10-08 20:41:31.068 +05:45 [INF] Response Body: {"errors":{"Message":["Error mapping types.\n\nMapping types:\nCreateClientDto -\u003E Client\nMicroFinance.Dtos.ClientSetup.CreateClientDto -\u003E MicroFinance.Models.ClientSetup.Client\n\nType Map configuration:\nCreateClientDto -\u003E Client\nMicroFinance.Dtos.ClientSetup.CreateClientDto -\u003E MicroFinance.Models.ClientSetup.Client\n\nDestination Member:\nRegistrationDate\nString \u002720280-01-01\u0027 was not recognized as a valid DateTime."]}}
+2023-10-08 20:41:31.069 +05:45 [INF] HTTP POST /ClientSetup/createNewClient responded 401 in 372.9043 ms
+2023-10-08 20:41:31.069 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/ClientSetup/createNewClient multipart/form-data;+boundary=----WebKitFormBoundaryCAJ00DNLaPiBdRKH 8217 - 401 - application/json 373.8856ms
+2023-10-08 20:42:04.628 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/ClientSetup/createNewClient multipart/form-data;+boundary=----WebKitFormBoundarynOQGhfzdBYMUuN2a 8216
+2023-10-08 20:42:04.673 +05:45 [INF] CORS policy execution successful.
+2023-10-08 20:42:04.673 +05:45 [INF] 10/8/2023 8:42:04 PM: API Got hit
+2023-10-08 20:42:04.673 +05:45 [INF] Request: POST /ClientSetup/createNewClient
+2023-10-08 20:42:04.674 +05:45 [INF] Request Body: ------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="TemporaryVdcMunicipality"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="NomineeNepaliName"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="NomineePhoto"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientAccountPurposeNepali"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientCitizenshipNumber"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="NomineeAddress"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="PermanentVdcMunicipality"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientSignaturePhoto"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientType"
+
+1
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="TemporaryVdcMunicipalityNepali"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="IsKYMUpdated"
+
+true
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="RegistrationDate"
+
+2080-01-01
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientPhoto"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="TemporaryToleVillage"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientGrandFatherName"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="PermanentVdcMunicipalityNepali"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="PermanentDistrictCode"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientUnitId"
+
+1
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="PermanentToleVillage"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientMiddleName"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientSpouseName"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientSpouseOccupation"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="TemporaryToleVillageNepali"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientLastName"
+
+Adhikari
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="TemporaryDistrictCode"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientGrandFatherNameNepali"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientVotingId"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="NomineeIntroducedBy"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="NomineeRelation"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="TemporaryStateCode"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientNameOfSons"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientCitizenShipIssueDistrict"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientCitizenShipIssueDate"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientMotherInLaw"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientDateOfBirth"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="PermanentToleVillageNepali"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientGroupId"
+
+1
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientEducationStatus"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientIncomeSource"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientIfMemberOfOtherParty"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientTelephoneNumber1"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="IsActive"
+
+true
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="PermanentStateCode"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientFirstName"
+
+Ashish
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientWebsite"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientTelephoneNumber2"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientNationality"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientEmail"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientFatherName"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="NomineeNepaliRelation"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientMartialStatusCode"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="PermanentWardNumber"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientOtherInfo"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="IsShareAllowed"
+
+true
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientFatherInLaw"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="TemporaryWardNumber"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientOccupation"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientFatherNameNepali"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientCastCode"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="NomineeContactNumber"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="PermanentWardNumberNepali"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="KYMType"
+
+1
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientCitizenshipPhoto"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientMotherName"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientGenderCode"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ShareType"
+
+16
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientMobileNumber1"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientPanNumber"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="TemporaryWardNumberNepali"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientNepaliName"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="NomineeCitizenshipNumber"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientMobileNumber2"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="NomineeName"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientNationalityIdStatus"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientMotherNameNepali"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientNameOfDaughters"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a
+Content-Disposition: form-data; name="ClientOtherInfo2"
+
+
+------WebKitFormBoundarynOQGhfzdBYMUuN2a--
+
+2023-10-08 20:42:04.674 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: b6683deb-3265-4583-a00f-4724cfb5d345, role: Officer, IsActive: True, BranchCode: 001, email: ashish@gmail.com, nbf: 1696776912, exp: 1697381712, iat: 1696776912, iss: http://localhost:5000
+2023-10-08 20:42:04.674 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.ClientSetup.ClientSetupController.CreateClient (MicroFinance)'
+2023-10-08 20:42:04.674 +05:45 [INF] Route matched with {action = "CreateClient", controller = "ClientSetup"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.ResponseDto]] CreateClient(MicroFinance.Dtos.ClientSetup.CreateClientDto) on controller MicroFinance.Controllers.ClientSetup.ClientSetupController (MicroFinance).
+2023-10-08 20:42:04.834 +05:45 [INF] 10/8/2023 8:42:04 PM Creating new Client Ashish Adhikari
+2023-10-08 20:42:05.267 +05:45 [INF] 10/8/2023 8:42:05 PM: New Client has been created by employee admin. Sending to assign unique client number...
+2023-10-08 20:42:05.345 +05:45 [INF] 10/8/2023 8:42:05 PM: 00001 number has been assiged to newly created client
+2023-10-08 20:42:05.382 +05:45 [INF] Executing ObjectResult, writing value of type 'MicroFinance.Dtos.ResponseDto'.
+2023-10-08 20:42:05.383 +05:45 [INF] Executed action MicroFinance.Controllers.ClientSetup.ClientSetupController.CreateClient (MicroFinance) in 708.2922ms
+2023-10-08 20:42:05.383 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.ClientSetup.ClientSetupController.CreateClient (MicroFinance)'
+2023-10-08 20:42:05.384 +05:45 [INF] Response: 200
+2023-10-08 20:42:05.384 +05:45 [INF] HTTP POST /ClientSetup/createNewClient responded 200 in 711.0950 ms
+2023-10-08 20:42:05.385 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/ClientSetup/createNewClient multipart/form-data;+boundary=----WebKitFormBoundarynOQGhfzdBYMUuN2a 8216 - 200 - application/json;+charset=utf-8 756.9882ms
+2023-10-08 21:59:54.141 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-10-08 21:59:54.709 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-08 21:59:54.866 +05:45 [INF] Now listening on: https://localhost:5001
+2023-10-08 21:59:54.866 +05:45 [INF] Now listening on: http://localhost:5000
+2023-10-08 21:59:54.870 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-10-08 21:59:54.870 +05:45 [INF] Hosting environment: Development
+2023-10-08 21:59:54.870 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-10-08 22:01:14.862 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/LoanSetup/createScheme application/json 293
+2023-10-08 22:01:14.926 +05:45 [INF] CORS policy execution successful.
+2023-10-08 22:01:14.950 +05:45 [INF] 10/8/2023 10:01:14 PM: API Got hit
+2023-10-08 22:01:14.952 +05:45 [INF] Request: POST /LoanSetup/createScheme
+2023-10-08 22:01:14.952 +05:45 [INF] Request Body: {
+  "name": "Loan Scheme 1",
+  "nepaliName": "Loan Nepali",
+  "aliasCode": "1234",
+  "interestRate": 2.3,
+  "minimumInterestRate": 5,
+  "maximumInterestRate": 6,
+  "isRevolving": true,
+  "penalInterest": 1.3,
+  "interestOnInterest": 1.5,
+  "loanInterestReceivable": 6,
+  "overDueInterest": 7
+}
+2023-10-08 22:01:15.198 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: b6683deb-3265-4583-a00f-4724cfb5d345, role: Officer, IsActive: True, BranchCode: 001, email: ashish@gmail.com, nbf: 1696776912, exp: 1697381712, iat: 1696776912, iss: http://localhost:5000
+2023-10-08 22:01:15.203 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance)'
+2023-10-08 22:01:15.234 +05:45 [INF] Route matched with {action = "CreateLoanScheme", controller = "LoanSetup"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.String]] CreateLoanScheme(MicroFinance.Dtos.LoanSetup.CreateLoanSchemeDto) on controller MicroFinance.Controllers.LoanSetup.LoanSetupController (MicroFinance).
+2023-10-08 22:01:15.242 +05:45 [INF] Executed action MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance) in 2.2599ms
+2023-10-08 22:01:15.247 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance)'
+2023-10-08 22:01:15.429 +05:45 [INF] Response: 401
+2023-10-08 22:01:15.429 +05:45 [INF] Response Body: {"errors":{"Message":["Unable to resolve service for type \u0027MicroFinance.Services.LoanSetup.ILoanSetupServices\u0027 while attempting to activate \u0027MicroFinance.Controllers.LoanSetup.LoanSetupController\u0027."]}}
+2023-10-08 22:01:15.434 +05:45 [INF] HTTP POST /LoanSetup/createScheme responded 401 in 501.1820 ms
+2023-10-08 22:01:15.437 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/LoanSetup/createScheme application/json 293 - 401 - application/json 579.8934ms
+2023-10-08 22:03:49.617 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-10-08 22:03:50.255 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-08 22:03:50.419 +05:45 [INF] Now listening on: https://localhost:5001
+2023-10-08 22:03:50.419 +05:45 [INF] Now listening on: http://localhost:5000
+2023-10-08 22:03:50.423 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-10-08 22:03:50.423 +05:45 [INF] Hosting environment: Development
+2023-10-08 22:03:50.424 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-10-08 22:04:01.317 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/LoanSetup/createScheme application/json 293
+2023-10-08 22:04:01.388 +05:45 [INF] CORS policy execution successful.
+2023-10-08 22:04:01.414 +05:45 [INF] 10/8/2023 10:04:01 PM: API Got hit
+2023-10-08 22:04:01.415 +05:45 [INF] Request: POST /LoanSetup/createScheme
+2023-10-08 22:04:01.415 +05:45 [INF] Request Body: {
+  "name": "Loan Scheme 1",
+  "nepaliName": "Loan Nepali",
+  "aliasCode": "1234",
+  "interestRate": 2.3,
+  "minimumInterestRate": 5,
+  "maximumInterestRate": 6,
+  "isRevolving": true,
+  "penalInterest": 1.3,
+  "interestOnInterest": 1.5,
+  "loanInterestReceivable": 6,
+  "overDueInterest": 7
+}
+2023-10-08 22:04:01.605 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: b6683deb-3265-4583-a00f-4724cfb5d345, role: Officer, IsActive: True, BranchCode: 001, email: ashish@gmail.com, nbf: 1696776912, exp: 1697381712, iat: 1696776912, iss: http://localhost:5000
+2023-10-08 22:04:01.609 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance)'
+2023-10-08 22:04:01.641 +05:45 [INF] Route matched with {action = "CreateLoanScheme", controller = "LoanSetup"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.String]] CreateLoanScheme(MicroFinance.Dtos.LoanSetup.CreateLoanSchemeDto) on controller MicroFinance.Controllers.LoanSetup.LoanSetupController (MicroFinance).
+2023-10-08 22:04:26.832 +05:45 [INF] Executed action MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance) in 25181.2755ms
+2023-10-08 22:04:26.845 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance)'
+2023-10-08 22:04:30.698 +05:45 [INF] Response: 401
+2023-10-08 22:04:30.699 +05:45 [INF] Response Body: {"errors":{"Message":["Interest Rate not accepted. Interest Rate should lie in between Minimum and Maximum interest Rate"]}}
+2023-10-08 22:04:30.707 +05:45 [INF] HTTP POST /LoanSetup/createScheme responded 401 in 29309.7162 ms
+2023-10-08 22:04:30.717 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/LoanSetup/createScheme application/json 293 - 401 - application/json 29402.8325ms
+2023-10-08 22:04:49.587 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/LoanSetup/createScheme application/json 293
+2023-10-08 22:04:49.590 +05:45 [INF] CORS policy execution successful.
+2023-10-08 22:04:49.615 +05:45 [INF] 10/8/2023 10:04:49 PM: API Got hit
+2023-10-08 22:04:49.615 +05:45 [INF] Request: POST /LoanSetup/createScheme
+2023-10-08 22:04:49.615 +05:45 [INF] Request Body: {
+  "name": "Loan Scheme 1",
+  "nepaliName": "Loan Nepali",
+  "aliasCode": "1234",
+  "interestRate": 2.3,
+  "minimumInterestRate": 2,
+  "maximumInterestRate": 6,
+  "isRevolving": true,
+  "penalInterest": 1.3,
+  "interestOnInterest": 1.5,
+  "loanInterestReceivable": 6,
+  "overDueInterest": 7
+}
+2023-10-08 22:04:49.615 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: b6683deb-3265-4583-a00f-4724cfb5d345, role: Officer, IsActive: True, BranchCode: 001, email: ashish@gmail.com, nbf: 1696776912, exp: 1697381712, iat: 1696776912, iss: http://localhost:5000
+2023-10-08 22:04:49.615 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance)'
+2023-10-08 22:04:49.615 +05:45 [INF] Route matched with {action = "CreateLoanScheme", controller = "LoanSetup"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.String]] CreateLoanScheme(MicroFinance.Dtos.LoanSetup.CreateLoanSchemeDto) on controller MicroFinance.Controllers.LoanSetup.LoanSetupController (MicroFinance).
+2023-10-08 22:05:06.407 +05:45 [INF] Executed action MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance) in 16791.5202ms
+2023-10-08 22:05:06.408 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance)'
+2023-10-08 22:05:06.483 +05:45 [INF] Response: 401
+2023-10-08 22:05:06.483 +05:45 [INF] Response Body: {"errors":{"Message":["Missing type map configuration or unsupported mapping.\n\nMapping types:\nCreateLoanSchemeDto -\u003E LoanScheme\nMicroFinance.Dtos.LoanSetup.CreateLoanSchemeDto -\u003E MicroFinance.Models.LoanSetup.LoanScheme"]}}
+2023-10-08 22:05:06.486 +05:45 [INF] HTTP POST /LoanSetup/createScheme responded 401 in 16895.5744 ms
+2023-10-08 22:05:06.499 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/LoanSetup/createScheme application/json 293 - 401 - application/json 16912.2767ms
+2023-10-08 22:05:42.689 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-10-08 22:05:43.311 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-08 22:05:43.486 +05:45 [INF] Now listening on: https://localhost:5001
+2023-10-08 22:05:43.486 +05:45 [INF] Now listening on: http://localhost:5000
+2023-10-08 22:05:43.492 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-10-08 22:05:43.514 +05:45 [INF] Hosting environment: Development
+2023-10-08 22:05:43.514 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-10-08 22:05:51.459 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/LoanSetup/createScheme application/json 293
+2023-10-08 22:05:51.528 +05:45 [INF] CORS policy execution successful.
+2023-10-08 22:05:51.551 +05:45 [INF] 10/8/2023 10:05:51 PM: API Got hit
+2023-10-08 22:05:51.552 +05:45 [INF] Request: POST /LoanSetup/createScheme
+2023-10-08 22:05:51.552 +05:45 [INF] Request Body: {
+  "name": "Loan Scheme 1",
+  "nepaliName": "Loan Nepali",
+  "aliasCode": "1234",
+  "interestRate": 2.3,
+  "minimumInterestRate": 2,
+  "maximumInterestRate": 6,
+  "isRevolving": true,
+  "penalInterest": 1.3,
+  "interestOnInterest": 1.5,
+  "loanInterestReceivable": 6,
+  "overDueInterest": 7
+}
+2023-10-08 22:05:51.757 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: b6683deb-3265-4583-a00f-4724cfb5d345, role: Officer, IsActive: True, BranchCode: 001, email: ashish@gmail.com, nbf: 1696776912, exp: 1697381712, iat: 1696776912, iss: http://localhost:5000
+2023-10-08 22:05:51.761 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance)'
+2023-10-08 22:05:51.796 +05:45 [INF] Route matched with {action = "CreateLoanScheme", controller = "LoanSetup"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.String]] CreateLoanScheme(MicroFinance.Dtos.LoanSetup.CreateLoanSchemeDto) on controller MicroFinance.Controllers.LoanSetup.LoanSetupController (MicroFinance).
+2023-10-08 22:06:05.780 +05:45 [INF] Executed action MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance) in 13978.7156ms
+2023-10-08 22:06:05.786 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance)'
+2023-10-08 22:06:05.898 +05:45 [INF] Response: 401
+2023-10-08 22:06:05.899 +05:45 [INF] Response Body: {"errors":{"Message":["No Active Calender Exist"]}}
+2023-10-08 22:06:05.909 +05:45 [INF] HTTP POST /LoanSetup/createScheme responded 401 in 14376.0024 ms
+2023-10-08 22:06:05.928 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/LoanSetup/createScheme application/json 293 - 401 - application/json 14476.1656ms
+2023-10-08 22:12:58.791 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/CompanyProfile/createCalendars application/json 3275
+2023-10-08 22:12:58.816 +05:45 [INF] CORS policy execution successful.
+2023-10-08 22:12:59.090 +05:45 [INF] 10/8/2023 10:12:59 PM: API Got hit
+2023-10-08 22:12:59.090 +05:45 [INF] Request: POST /CompanyProfile/createCalendars
+2023-10-08 22:12:59.090 +05:45 [INF] Request Body: [
+  {
+    "Year": 2080,
+    "Month": 1,
+    "MonthName": "Baishakh",
+    "NumberOfDay": 30,
+    "RunningDay": 1,
+    "IsActive": true
+  },
+  {
+    "Year": 2080,
+    "Month": 2,
+    "MonthName": "Jestha",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2080,
+    "Month": 3,
+    "MonthName": "Ashadh",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2080,
+    "Month": 4,
+    "MonthName": "Shrawan",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2080,
+    "Month": 5,
+    "MonthName": "Bhadra",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2080,
+    "Month": 6,
+    "MonthName": "Ashwin",
+    "NumberOfDay": 30,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2080,
+    "Month": 7,
+    "MonthName": "Kartik",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2080,
+    "Month": 8,
+    "MonthName": "Mangsir",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2080,
+    "Month": 9,
+    "MonthName": "Poush",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2080,
+    "Month": 10,
+    "MonthName": "Magh",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2080,
+    "Month": 11,
+    "MonthName": "Falgun",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2080,
+    "Month": 12,
+    "MonthName": "Chaitra",
+    "NumberOfDay": 30,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+ {
+    "Year": 2081,
+    "Month": 1,
+    "MonthName": "Baishakh",
+    "NumberOfDay": 30,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 2,
+    "MonthName": "Jestha",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 3,
+    "MonthName": "Ashadh",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 4,
+    "MonthName": "Shrawan",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 5,
+    "MonthName": "Bhadra",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 6,
+    "MonthName": "Ashwin",
+    "NumberOfDay": 30,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 7,
+    "MonthName": "Kartik",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 8,
+    "MonthName": "Mangsir",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 9,
+    "MonthName": "Poush",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 10,
+    "MonthName": "Magh",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 11,
+    "MonthName": "Falgun",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 12,
+    "MonthName": "Chaitra",
+    "NumberOfDay": 30,
+    "RunningDay": 1,
+    "IsActive": false
+  }
+]
+
+2023-10-08 22:12:59.090 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: b6683deb-3265-4583-a00f-4724cfb5d345, role: Officer, IsActive: True, BranchCode: 001, email: ashish@gmail.com, nbf: 1696776912, exp: 1697381712, iat: 1696776912, iss: http://localhost:5000
+2023-10-08 22:12:59.090 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateCalendars (MicroFinance)'
+2023-10-08 22:12:59.098 +05:45 [INF] Route matched with {action = "CreateCalendars", controller = "CompanyProfile"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.ResponseDto]] CreateCalendars(System.Collections.Generic.List`1[MicroFinance.Dtos.CompanyProfile.CreateCalenderDto]) on controller MicroFinance.Controllers.CompanyProfile.CompanyProfileController (MicroFinance).
+2023-10-08 22:12:59.151 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-10-08 22:12:59.758 +05:45 [INF] Executed action MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateCalendars (MicroFinance) in 659.6683ms
+2023-10-08 22:12:59.759 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateCalendars (MicroFinance)'
+2023-10-08 22:12:59.794 +05:45 [INF] Response: 401
+2023-10-08 22:12:59.794 +05:45 [INF] Response Body: {"errors":{"Message":[" 24 calender is requested to create but exact 12 months calender need to requested."]}}
+2023-10-08 22:12:59.796 +05:45 [INF] HTTP POST /CompanyProfile/createCalendars responded 401 in 978.9232 ms
+2023-10-08 22:12:59.796 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/CompanyProfile/createCalendars application/json 3275 - 401 - application/json 1004.8671ms
+2023-10-08 22:13:29.184 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/CompanyProfile/createCalendars application/json 1640
+2023-10-08 22:13:29.188 +05:45 [INF] CORS policy execution successful.
+2023-10-08 22:13:29.192 +05:45 [INF] 10/8/2023 10:13:29 PM: API Got hit
+2023-10-08 22:13:29.192 +05:45 [INF] Request: POST /CompanyProfile/createCalendars
+2023-10-08 22:13:29.192 +05:45 [INF] Request Body: [
+  {
+    "Year": 2081,
+    "Month": 1,
+    "MonthName": "Baishakh",
+    "NumberOfDay": 30,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 2,
+    "MonthName": "Jestha",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 3,
+    "MonthName": "Ashadh",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 4,
+    "MonthName": "Shrawan",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 5,
+    "MonthName": "Bhadra",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 6,
+    "MonthName": "Ashwin",
+    "NumberOfDay": 30,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 7,
+    "MonthName": "Kartik",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 8,
+    "MonthName": "Mangsir",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 9,
+    "MonthName": "Poush",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 10,
+    "MonthName": "Magh",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 11,
+    "MonthName": "Falgun",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 12,
+    "MonthName": "Chaitra",
+    "NumberOfDay": 30,
+    "RunningDay": 1,
+    "IsActive": false
+  }
+]
+
+2023-10-08 22:13:29.192 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: b6683deb-3265-4583-a00f-4724cfb5d345, role: Officer, IsActive: True, BranchCode: 001, email: ashish@gmail.com, nbf: 1696776912, exp: 1697381712, iat: 1696776912, iss: http://localhost:5000
+2023-10-08 22:13:29.192 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateCalendars (MicroFinance)'
+2023-10-08 22:13:29.194 +05:45 [INF] Route matched with {action = "CreateCalendars", controller = "CompanyProfile"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.ResponseDto]] CreateCalendars(System.Collections.Generic.List`1[MicroFinance.Dtos.CompanyProfile.CreateCalenderDto]) on controller MicroFinance.Controllers.CompanyProfile.CompanyProfileController (MicroFinance).
+2023-10-08 22:13:29.460 +05:45 [INF] Executed action MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateCalendars (MicroFinance) in 265.4529ms
+2023-10-08 22:13:29.460 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateCalendars (MicroFinance)'
+2023-10-08 22:13:29.504 +05:45 [INF] Response: 401
+2023-10-08 22:13:29.505 +05:45 [INF] Response Body: {"errors":{"Message":["You need to make exactly one month as active. 0 active month received!"]}}
+2023-10-08 22:13:29.505 +05:45 [INF] HTTP POST /CompanyProfile/createCalendars responded 401 in 316.2465 ms
+2023-10-08 22:13:29.505 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/CompanyProfile/createCalendars application/json 1640 - 401 - application/json 321.4801ms
+2023-10-08 22:13:46.603 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/CompanyProfile/createCalendars application/json 1639
+2023-10-08 22:13:46.611 +05:45 [INF] CORS policy execution successful.
+2023-10-08 22:13:46.636 +05:45 [INF] 10/8/2023 10:13:46 PM: API Got hit
+2023-10-08 22:13:46.636 +05:45 [INF] Request: POST /CompanyProfile/createCalendars
+2023-10-08 22:13:46.636 +05:45 [INF] Request Body: [
+  {
+    "Year": 2081,
+    "Month": 1,
+    "MonthName": "Baishakh",
+    "NumberOfDay": 30,
+    "RunningDay": 1,
+    "IsActive": true
+  },
+  {
+    "Year": 2081,
+    "Month": 2,
+    "MonthName": "Jestha",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 3,
+    "MonthName": "Ashadh",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 4,
+    "MonthName": "Shrawan",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 5,
+    "MonthName": "Bhadra",
+    "NumberOfDay": 31,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 6,
+    "MonthName": "Ashwin",
+    "NumberOfDay": 30,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 7,
+    "MonthName": "Kartik",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 8,
+    "MonthName": "Mangsir",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 9,
+    "MonthName": "Poush",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 10,
+    "MonthName": "Magh",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 11,
+    "MonthName": "Falgun",
+    "NumberOfDay": 29,
+    "RunningDay": 1,
+    "IsActive": false
+  },
+  {
+    "Year": 2081,
+    "Month": 12,
+    "MonthName": "Chaitra",
+    "NumberOfDay": 30,
+    "RunningDay": 1,
+    "IsActive": false
+  }
+]
+
+2023-10-08 22:13:46.636 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: b6683deb-3265-4583-a00f-4724cfb5d345, role: Officer, IsActive: True, BranchCode: 001, email: ashish@gmail.com, nbf: 1696776912, exp: 1697381712, iat: 1696776912, iss: http://localhost:5000
+2023-10-08 22:13:46.637 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateCalendars (MicroFinance)'
+2023-10-08 22:13:46.657 +05:45 [INF] Route matched with {action = "CreateCalendars", controller = "CompanyProfile"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.ResponseDto]] CreateCalendars(System.Collections.Generic.List`1[MicroFinance.Dtos.CompanyProfile.CreateCalenderDto]) on controller MicroFinance.Controllers.CompanyProfile.CompanyProfileController (MicroFinance).
+2023-10-08 22:13:47.109 +05:45 [INF] Executing ObjectResult, writing value of type 'MicroFinance.Dtos.ResponseDto'.
+2023-10-08 22:13:47.125 +05:45 [INF] Executed action MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateCalendars (MicroFinance) in 467.5154ms
+2023-10-08 22:13:47.125 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.CompanyProfile.CompanyProfileController.CreateCalendars (MicroFinance)'
+2023-10-08 22:13:47.125 +05:45 [INF] Response: 200
+2023-10-08 22:13:47.125 +05:45 [INF] HTTP POST /CompanyProfile/createCalendars responded 200 in 492.9222 ms
+2023-10-08 22:13:47.126 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/CompanyProfile/createCalendars application/json 1639 - 200 - application/json;+charset=utf-8 522.4933ms
+2023-10-08 22:14:40.686 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/LoanSetup/createScheme application/json 293
+2023-10-08 22:14:40.690 +05:45 [INF] CORS policy execution successful.
+2023-10-08 22:14:40.690 +05:45 [INF] 10/8/2023 10:14:40 PM: API Got hit
+2023-10-08 22:14:40.690 +05:45 [INF] Request: POST /LoanSetup/createScheme
+2023-10-08 22:14:40.690 +05:45 [INF] Request Body: {
+  "name": "Loan Scheme 1",
+  "nepaliName": "Loan Nepali",
+  "aliasCode": "1234",
+  "interestRate": 2.3,
+  "minimumInterestRate": 2,
+  "maximumInterestRate": 6,
+  "isRevolving": true,
+  "penalInterest": 1.3,
+  "interestOnInterest": 1.5,
+  "loanInterestReceivable": 6,
+  "overDueInterest": 7
+}
+2023-10-08 22:14:40.691 +05:45 [INF] JWT Token Claims: given_name: admin, nameid: b6683deb-3265-4583-a00f-4724cfb5d345, role: Officer, IsActive: True, BranchCode: 001, email: ashish@gmail.com, nbf: 1696776912, exp: 1697381712, iat: 1696776912, iss: http://localhost:5000
+2023-10-08 22:14:40.691 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance)'
+2023-10-08 22:14:40.691 +05:45 [INF] Route matched with {action = "CreateLoanScheme", controller = "LoanSetup"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.String]] CreateLoanScheme(MicroFinance.Dtos.LoanSetup.CreateLoanSchemeDto) on controller MicroFinance.Controllers.LoanSetup.LoanSetupController (MicroFinance).
+2023-10-08 22:17:14.588 +05:45 [INF] Executing OkObjectResult, writing value of type 'MicroFinance.Dtos.ResponseDto'.
+2023-10-08 22:17:16.639 +05:45 [INF] Executed action MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance) in 155948.5732ms
+2023-10-08 22:17:16.640 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.CreateLoanScheme (MicroFinance)'
+2023-10-08 22:17:16.640 +05:45 [INF] Response: 200
+2023-10-08 22:17:16.640 +05:45 [INF] HTTP POST /LoanSetup/createScheme responded 200 in 155949.5515 ms
+2023-10-08 22:17:16.640 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/LoanSetup/createScheme application/json 293 - 200 - application/json;+charset=utf-8 155954.1955ms

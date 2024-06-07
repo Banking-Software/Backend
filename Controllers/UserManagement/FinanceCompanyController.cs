@@ -62,10 +62,7 @@ namespace MicroFinance.Controllers.UserManagement
         [AllowAnonymous]
         public async Task<ActionResult<TokenResponseDto>> Login(UserLoginDto userLoginDto)
         {
-            var user = await _employeeService.GetUserByUserNameService(userLoginDto.UserName);
             var companyProfile = await _companyProfileService.GetCompanyProfileService();
-            if (user.IsActive == false)
-                throw new UnAuthorizedExceptionHandler("Unauthorized Access. Contact Officer");
             if(companyProfile.CompanyValidityEndDate < DateTime.Now)
                 throw new UnAuthorizedExceptionHandler($"Software Validity Ended on {companyProfile.CompanyValidityEndDate}. Please Contact Software Provider");
             var tokenResponseDto = await _employeeService.LoginService(userLoginDto);

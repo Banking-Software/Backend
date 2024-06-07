@@ -11,7 +11,7 @@ namespace MicroFinance.Configuration.Transactions
             builder.HasKey(st=>st.Id);
             builder.Property(st=>st.Id).ValueGeneratedOnAdd();
             builder.Property(st=>st.TransactionType).IsRequired(true);
-            builder.Property(st=>st.BalanceAfterTransaction).HasPrecision(18,4).IsRequired(true);
+            builder.Property(st=>st.BalanceAfterTransaction).HasPrecision(18,2).IsRequired(true);
             
             builder.HasOne(st=>st.Transaction)
             .WithOne(tsc=>tsc.ShareTransaction)

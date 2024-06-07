@@ -3,7 +3,7 @@ namespace MicroFinance.Repository.DayEnd;
 public interface IDayEndTaskRepository
 {
     Task<int> CalculateDailyInterest();
-    Task<int> InterestPositing();
+    Task<int> CheckInterestPositingAndUpdate();
     Task<int> CheckMaturityOfAccountAndUpdate();
-    Task<int> UpdateCalendar();
+    Task<string> UpdateCalendar();
 }

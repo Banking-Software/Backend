@@ -5,8 +5,8 @@ namespace MicroFinance.Services.Transactions
 {
     public interface IDepositAccountTransactionService
     {
-        Task<string> MakeDepositTransactionService(MakeDepositTransactionDto makeDepositTransactionDto, TokenDto decodedToken);
-        Task<string> MakeWithDrawalTransactionService(MakeWithDrawalTransactionDto makeWithDrawalTransactionDto, TokenDto decodedToken);
+        Task<VoucherDto> MakeDepositTransactionService(MakeDepositTransactionDto makeDepositTransactionDto, TokenDto decodedToken);
+        Task<VoucherDto> MakeWithDrawalTransactionService(MakeWithDrawalTransactionDto makeWithDrawalTransactionDto, TokenDto decodedToken);
 
     }
 }

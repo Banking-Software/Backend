@@ -85,11 +85,11 @@ namespace MicroFinance.Controllers.DepositSetup
             var decodedToken = GetDecodedToken();
             return Ok(await _depositService.GetDepositAccountWrapperByAccountNumberService(accountNumber, null,decodedToken));
         }
-        [HttpPost("getMatureDate")]
-        public async Task<ActionResult<string>> GetMatureDate(GenerateMatureDateDto generateMatureDateDto)
-        {
-            return Ok(await _depositService.GenerateMatureDateOfDepositAccountService(generateMatureDateDto));
-        }
+        // [HttpPost("getMatureDate")]
+        // public async Task<ActionResult<string>> GetMatureDate(GenerateMatureDateDto generateMatureDateDto)
+        // {
+        //     return Ok(await _depositService.GenerateMatureDateOfDepositAccountService(generateMatureDateDto));
+        // }
         // [HttpPost("flexibleInterestRate")]
         // public async Task<ActionResult<ResponseDto>> UpdateInterestRateAccordingToFlexibleInterestRate(FlexibleInterestRateSetupDto flexibleInterestRateSetupDto)
         // {

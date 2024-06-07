@@ -10,7 +10,7 @@ namespace MicroFinance.Configuration.LedgerSetup
         {
             builder.HasKey(sl=>sl.Id);
             builder.Property(sl=>sl.Id).ValueGeneratedOnAdd();
-            
+            builder.Property(sl=>sl.CurrentBalance).HasPrecision(18,2).IsRequired(true);
             builder.HasIndex(sl=>sl.SubLedgerCode).IsUnique();
             builder.Property(sl=>sl.Name).HasConversion(name=>name.ToUpper(), name=>name);
             builder.HasIndex(sl => new {sl.Name, sl.LedgerId}).IsUnique();

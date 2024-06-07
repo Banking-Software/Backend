@@ -3,7 +3,7 @@ using MicroFinance.Dtos;
 using MicroFinance.Dtos.CompanyProfile;
 using MicroFinance.Enums;
 using MicroFinance.Exceptions;
-using MicroFinance.Helper;
+using MicroFinance.Helpers;
 using MicroFinance.Models.CompanyProfile;
 using MicroFinance.Repository.CompanyProfile;
 
@@ -14,20 +14,20 @@ namespace MicroFinance.Services.CompanyProfile
         private readonly ICompanyProfileRepository _companyProfile;
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
-        private readonly INepaliCalendarFormat _nepaliCalendarFormat;
+        private readonly IHelper _helper;
         private static SemaphoreSlim _createCalendarMutex = new SemaphoreSlim(1, 1);
         public CompanyProfileService
         (
             ICompanyProfileRepository companyProfile, 
             IMapper mapper, 
             IConfiguration config,
-            INepaliCalendarFormat nepaliCalendarFormat
+            IHelper helper
         )
         {
             _companyProfile = companyProfile;
             _mapper = mapper;
             _config=config;
-            _nepaliCalendarFormat=nepaliCalendarFormat;
+            _helper=helper;
         }
         
         private Task<CompanyDetail> UploadImage(CompanyDetail companyDetail, IFormFile? companyLogo)
@@ -178,8 +178,8 @@ namespace MicroFinance.Services.CompanyProfile
             foreach (var calenderDto in createCalenderDtos)
             {
                 var calendar = _mapper.Map<Calendar>(calenderDto);
-                string lastDateOfTheMonth = await _nepaliCalendarFormat.GetNepaliFormatDate(calendar.Year, calendar.Month, calendar.NumberOfDay);
-                bool isRightFormat = await _nepaliCalendarFormat.VerifyNepaliDate(lastDateOfTheMonth);
+                string lastDateOfTheMonth = await _helper.GetNepaliFormatDate(calendar.Year, calendar.Month, calendar.NumberOfDay);
+                bool isRightFormat = await _helper.VerifyNepaliDate(lastDateOfTheMonth);
                 if(!isRightFormat)
                     throw new Exception($"Invalid Date: {calendar.MonthName} doesnot content day {calendar.NumberOfDay}");
                 
@@ -210,7 +210,7 @@ namespace MicroFinance.Services.CompanyProfile
                 throw new Exception("Calender is locked, not allowed to edit. Please Contact Software Provider");
             }
             string lastDateOfTheMonth = $"{updateCalenderDto.Year}-{updateCalenderDto.Month}-{updateCalenderDto.NumberOfDay}";
-            bool isRightFormat = await _nepaliCalendarFormat.VerifyNepaliDateFormat(lastDateOfTheMonth);
+            bool isRightFormat = await _helper.VerifyNepaliDateFormat(lastDateOfTheMonth);
             if(!isRightFormat)
                 throw new Exception($"Invalid Date: {updateCalenderDto.MonthName} doesnot content day {updateCalenderDto.NumberOfDay}");
 

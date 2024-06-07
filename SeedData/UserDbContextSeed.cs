@@ -1,5 +1,6 @@
 using MicroFinance.DBContext;
 using MicroFinance.Enums;
+using MicroFinance.Models.CompanyProfile;
 // using MicroFinance.DBContext.UserManagement;
 using MicroFinance.Models.UserManagement;
 using MicroFinance.Role;

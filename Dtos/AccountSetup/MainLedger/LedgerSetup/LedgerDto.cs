@@ -11,6 +11,7 @@ namespace MicroFinance.Dtos.AccountSetup.MainLedger
         public string GroupTypeName { get; set; }
         public string AccountTypeName { get; set; }
         public string Schedule { get; set; }
+        public decimal CurrentBalance { get; set; }
         [Required]
         public string Name { get; set; }
         public string? NepaliName { get; set; }

@@ -5500,11 +5500,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/media/ashish/New Volume/FinTechProject/MicroFinance/MicroFinance.csproj",
+      "projectUniqueName": "/media/ashish/New Volume1/Projects/Banking-Software/Backend/MicroFinance.csproj",
       "projectName": "MicroFinance",
-      "projectPath": "/media/ashish/New Volume/FinTechProject/MicroFinance/MicroFinance.csproj",
+      "projectPath": "/media/ashish/New Volume1/Projects/Banking-Software/Backend/MicroFinance.csproj",
       "packagesPath": "/home/ashish/.nuget/packages/",
-      "outputPath": "/media/ashish/New Volume/FinTechProject/MicroFinance/obj/",
+      "outputPath": "/media/ashish/New Volume1/Projects/Banking-Software/Backend/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/ashish/.nuget/NuGet/NuGet.Config"
@@ -5631,7 +5631,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.413/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.423/RuntimeIdentifierGraph.json"
       }
     }
   }

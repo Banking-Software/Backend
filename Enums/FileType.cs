@@ -4,6 +4,7 @@ namespace MicroFinance.Enums
     {
         JPG = 1,
         JPEG = 2,
-        PNG = 3
+        PNG = 3,
+        PDF = 4
     }
 }

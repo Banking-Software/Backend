@@ -18,9 +18,7 @@ namespace MicroFinance.Dtos.UserManagement
 
         //START: Optional Fields
         public string? Designation { get; set; } // Post with in company
-
-        [DataType(DataType.Date)]
-        public DateTime? DateOfJoining { get; set; } // Employee Date of joining in the company
+        public string? DateOfJoining { get; set; } // Employee Date of joining in the company
         [RegularExpression(@"^[1-2]", ErrorMessage = "Please enter correct code for Gender")]
         public int? GenderCode { get; set; } 
         public bool? PFAllowed { get; set; } 

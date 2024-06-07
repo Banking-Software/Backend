@@ -19,6 +19,9 @@ namespace MicroFinance.Configuration.LedgerSetup
             builder.HasIndex(l=>l.LedgerCode).IsUnique();
             builder.Property(l=>l.Name).HasConversion(name=>name.ToUpper(), name=>name);
 
+            builder.Property(l=>l.DepreciationRate).HasPrecision(5,2);
+            builder.Property(l=>l.CurrentBalance).HasPrecision(18,2).IsRequired(true);
+
             builder.HasOne(l => l.GroupType)
              .WithMany(gt => gt.Ledgers)
              .HasForeignKey(l=>l.GroupTypeId)

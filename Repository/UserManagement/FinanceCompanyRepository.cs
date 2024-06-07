@@ -35,6 +35,7 @@ namespace MicroFinance.Repository.UserManagement
         // START: User
         public async Task<SignInResult> Login(User user, string password, bool stayLogin)
         {
+            _dbContext.Users.Attach(user);
             return await _signInManager.CheckPasswordSignInAsync(user, password, stayLogin);
         }
 
@@ -132,7 +133,7 @@ namespace MicroFinance.Repository.UserManagement
             return await _userManager.Users
             .Include(usr => usr.Employee)
             .Include(usr=>usr.Role)
-            .Where(usr => usr.UserName == userName &&  usr.Role.RoleCode!= (int) RoleEnum.SuperAdmin)
+            .Where(usr => usr.UserName == userName &&  usr.Role.RoleCode!= (int)RoleEnum.SuperAdmin)
             .AsNoTracking()
             .FirstOrDefaultAsync();
         }

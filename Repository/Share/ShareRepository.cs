@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using MicroFinance.DBContext;
 using MicroFinance.Enums.Client;
-using MicroFinance.Helper;
+using MicroFinance.Helpers;
 using MicroFinance.Models.ClientSetup;
 using MicroFinance.Models.Share;
 using MicroFinance.Models.Wrapper;
@@ -55,7 +55,8 @@ namespace MicroFinance.Repository.Share
                 ClientName = $"{sa.Client.ClientFirstName} {sa.Client.ClientLastName}",
                 CurrentShareBalance = sa.CurrentShareBalance,
                 IsActive = sa.IsActive,
-                ShareType = (ShareTypeEnum) sa.Client.ClientShareTypeInfoId
+                ShareType = (ShareTypeEnum) sa.Client.ClientShareTypeInfoId,
+                ClientMemberId = sa.Client.ClientId
             })
             .AsNoTracking().ToListAsync();
             return allActiveShareAccounts;
@@ -73,7 +74,8 @@ namespace MicroFinance.Repository.Share
                 ClientName = $"{sa.Client.ClientFirstName} {sa.Client.ClientLastName}",
                 CurrentShareBalance = sa.CurrentShareBalance,
                 IsActive = sa.IsActive,
-                ShareType = (ShareTypeEnum) sa.Client.ClientShareTypeInfoId
+                ShareType = (ShareTypeEnum) sa.Client.ClientShareTypeInfoId,
+                ClientMemberId = sa.Client.ClientId
             })
            .AsNoTracking()
            .FirstOrDefaultAsync();

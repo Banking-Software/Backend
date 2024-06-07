@@ -45,6 +45,10 @@ namespace MicroFinance.Exceptions
 
             switch (ex)
             {
+                case NegativeBalanceExceptionHandler exception:
+                    errorResponse =
+                    GetErrorResponse(exception.Message, HttpStatusCode.BadRequest);
+                    break;
                 case NotFoundExceptionHandler exception:
                     errorResponse =
                     GetErrorResponse(exception.Message + exception.InnerException?.Message, HttpStatusCode.NotFound);

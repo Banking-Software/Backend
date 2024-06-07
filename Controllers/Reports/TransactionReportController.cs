@@ -1,6 +1,7 @@
 using MicroFinance.Dtos;
 using MicroFinance.Dtos.Reports;
 using MicroFinance.Models.Wrapper.Reports;
+using MicroFinance.Models.Wrapper.Reports.TrailBalance;
 using MicroFinance.Services.Reports;
 using MicroFinance.Token;
 using Microsoft.AspNetCore.Mvc;
@@ -48,5 +49,12 @@ public class TransactionReportController : BaseApiController
     {
         var decodedToken = GetDecodedToken();
         return Ok(await _transactionReportService.GetSubLedgerTransactionReportService(subLedgerTransactionReportParams, decodedToken));
+    }
+
+    [HttpGet("trailbalance")]
+    public async Task<ActionResult<TrailBalance>> GetTrailBalance([FromQuery] string fromDate, [FromQuery] string toDate)
+    {
+        var decodedToken = GetDecodedToken();
+        return Ok(await _transactionReportService.GetTrailBalanceService(fromDate, toDate));
     }
 }

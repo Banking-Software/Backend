@@ -16,7 +16,7 @@ namespace MicroFinance.Dtos.ClientSetup
         [Required]
         public bool IsShareAllowed { get; set; }
         [Required]
-        public DateTime RegistrationDate { get; set; }
+        public string RegistrationDate { get; set; }
         // Foreign Key
         [Required]
         public ClientTypeEnum ClientType { get; set; }
@@ -84,12 +84,12 @@ namespace MicroFinance.Dtos.ClientSetup
         [Range(1, 2, ErrorMessage = "Invalid Gender Code")]
         public int? ClientGenderCode { get; set; }
         [DataType(DataType.Date)]
-        public DateTime? ClientDateOfBirth { get; set; }
+        public string? ClientDateOfBirth { get; set; }
         public string? ClientOccupation { get; set; }
         public string? ClientCitizenshipNumber { get; set; }
         public string? ClientCitizenShipIssueDistrict { get; set; }
         [DataType(DataType.Date)]
-        public DateTime? ClientCitizenShipIssueDate { get; set; }
+        public string? ClientCitizenShipIssueDate { get; set; }
         public string? ClientNationality { get; set; }
         public string? ClientPanNumber { get; set; }
         public string? ClientEducationStatus { get; set; }

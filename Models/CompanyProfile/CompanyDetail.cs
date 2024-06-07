@@ -12,7 +12,7 @@ namespace MicroFinance.Models.CompanyProfile
         public string? CompanyAddress { get; set; }
         public string? CompanyAddressNepali { get; set; }
         public string? PANNo { get; set; }
-        public DateTime? EstablishedDate { get; set; }
+        public string? EstablishedDate { get; set; }
         public string? PhoneNo { get; set; }
         public string? CompanyEmailAddress { get; set; }
         public DateTime CompanyValidityStartDate { get; set; } = DateTime.Now;

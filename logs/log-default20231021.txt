@@ -1,0 +1,303 @@
+2023-10-21 17:46:54.649 +05:45 [WRN] The property 'LoanAccount.WithDrawalBlockedDepositAccountIds' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2023-10-21 17:46:58.083 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-10-21 17:47:00.240 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-21 17:47:00.612 +05:45 [INF] Now listening on: https://localhost:5001
+2023-10-21 17:47:00.634 +05:45 [INF] Now listening on: http://localhost:5000
+2023-10-21 17:47:00.640 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-10-21 17:47:00.644 +05:45 [INF] Hosting environment: Production
+2023-10-21 17:47:00.647 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-10-21 18:41:58.511 +05:45 [WRN] The property 'LoanAccount.WithDrawalBlockedDepositAccountIds' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2023-10-21 18:42:14.499 +05:45 [ERR] 10/21/2023 6:42:14 PM: Microsoft.Data.SqlClient.SqlException (0x80131904): A network-related or instance-specific error occurred while establishing a connection to SQL Server. The server was not found or was not accessible. Verify that the instance name is correct and that SQL Server is configured to allow remote connections. (provider: TCP Provider, error: 40 - Could not open a connection to SQL Server: Could not open a connection to SQL Server)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.Connect(ServerInfo serverInfo, SqlInternalConnectionTds connHandler, Boolean ignoreSniOpenTimeout, Int64 timerExpire, SqlConnectionString connectionOptions, Boolean withFailover)
+   at Microsoft.Data.SqlClient.SqlInternalConnectionTds.AttemptOneLogin(ServerInfo serverInfo, String newPassword, SecureString newSecurePassword, Boolean ignoreSniOpenTimeout, TimeoutTimer timeout, Boolean withFailover)
+   at Microsoft.Data.SqlClient.SqlInternalConnectionTds.LoginNoFailover(ServerInfo serverInfo, String newPassword, SecureString newSecurePassword, Boolean redirectedUserInstance, SqlConnectionString connectionOptions, SqlCredential credential, TimeoutTimer timeout)
+   at Microsoft.Data.SqlClient.SqlInternalConnectionTds.OpenLoginEnlist(TimeoutTimer timeout, SqlConnectionString connectionOptions, SqlCredential credential, String newPassword, SecureString newSecurePassword, Boolean redirectedUserInstance)
+   at Microsoft.Data.SqlClient.SqlInternalConnectionTds..ctor(DbConnectionPoolIdentity identity, SqlConnectionString connectionOptions, SqlCredential credential, Object providerInfo, String newPassword, SecureString newSecurePassword, Boolean redirectedUserInstance, SqlConnectionString userConnectionOptions, SessionData reconnectSessionData, Boolean applyTransientFaultHandling, String accessToken, DbConnectionPool pool)
+   at Microsoft.Data.SqlClient.SqlConnectionFactory.CreateConnection(DbConnectionOptions options, DbConnectionPoolKey poolKey, Object poolGroupProviderInfo, DbConnectionPool pool, DbConnection owningConnection, DbConnectionOptions userOptions)
+   at Microsoft.Data.ProviderBase.DbConnectionFactory.CreatePooledConnection(DbConnectionPool pool, DbConnection owningObject, DbConnectionOptions options, DbConnectionPoolKey poolKey, DbConnectionOptions userOptions)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.CreateObject(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.UserCreateRequest(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.WaitForPendingOpen()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.HistoryRepository.ExistsAsync(CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)
+   at Program.<Main>$(String[] args) in /media/ashish/New Volume/FinTechProject/FintexGit/Backend/Program.cs:line 103
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+2023-10-21 18:42:14.565 +05:45 [ERR] 10/21/2023 6:42:14 PM: Microsoft.Data.SqlClient.SqlException (0x80131904): A network-related or instance-specific error occurred while establishing a connection to SQL Server. The server was not found or was not accessible. Verify that the instance name is correct and that SQL Server is configured to allow remote connections. (provider: TCP Provider, error: 40 - Could not open a connection to SQL Server: Could not open a connection to SQL Server)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   at Microsoft.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry, SqlConnectionOverrides overrides)
+   at Microsoft.Data.SqlClient.SqlConnection.InternalOpenAsync(CancellationToken cancellationToken)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.HistoryRepository.ExistsAsync(CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)
+   at Program.<Main>$(String[] args) in /media/ashish/New Volume/FinTechProject/FintexGit/Backend/Program.cs:line 103
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+2023-10-21 18:42:14.624 +05:45 [ERR] 10/21/2023 6:42:14 PM: Microsoft.Data.SqlClient.SqlException (0x80131904): A network-related or instance-specific error occurred while establishing a connection to SQL Server. The server was not found or was not accessible. Verify that the instance name is correct and that SQL Server is configured to allow remote connections. (provider: TCP Provider, error: 40 - Could not open a connection to SQL Server: Could not open a connection to SQL Server)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   at Microsoft.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry, SqlConnectionOverrides overrides)
+   at Microsoft.Data.SqlClient.SqlConnection.InternalOpenAsync(CancellationToken cancellationToken)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.HistoryRepository.ExistsAsync(CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)
+   at Program.<Main>$(String[] args) in /media/ashish/New Volume/FinTechProject/FintexGit/Backend/Program.cs:line 103
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+2023-10-21 18:42:14.729 +05:45 [ERR] 10/21/2023 6:42:14 PM: Microsoft.Data.SqlClient.SqlException (0x80131904): A network-related or instance-specific error occurred while establishing a connection to SQL Server. The server was not found or was not accessible. Verify that the instance name is correct and that SQL Server is configured to allow remote connections. (provider: TCP Provider, error: 40 - Could not open a connection to SQL Server: Could not open a connection to SQL Server)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   at Microsoft.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   at Microsoft.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry, SqlConnectionOverrides overrides)
+   at Microsoft.Data.SqlClient.SqlConnection.InternalOpenAsync(CancellationToken cancellationToken)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerDatabaseCreator.<>c__DisplayClass20_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.HistoryRepository.ExistsAsync(CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)
+   at Program.<Main>$(String[] args) in /media/ashish/New Volume/FinTechProject/FintexGit/Backend/Program.cs:line 103
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+2023-10-21 18:42:14.938 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-21 18:42:15.584 +05:45 [INF] Now listening on: https://localhost:5001
+2023-10-21 18:42:15.585 +05:45 [INF] Now listening on: http://localhost:5000
+2023-10-21 18:42:15.585 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-10-21 18:42:15.586 +05:45 [INF] Hosting environment: Production
+2023-10-21 18:42:15.586 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-10-21 21:30:04.708 +05:45 [WRN] The property 'LoanAccount.WithDrawalBlockedDepositAccountIds' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2023-10-21 23:43:10.581 +05:45 [WRN] The property 'LoanAccount.WithDrawalBlockedDepositAccountIds' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2023-10-21 23:43:13.000 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-10-21 23:43:14.136 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-21 23:43:14.366 +05:45 [INF] Now listening on: https://localhost:5001
+2023-10-21 23:43:14.366 +05:45 [INF] Now listening on: http://localhost:5000
+2023-10-21 23:43:14.371 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-10-21 23:43:14.373 +05:45 [INF] Hosting environment: Production
+2023-10-21 23:43:14.373 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-10-21 23:43:21.147 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/index.html - -
+2023-10-21 23:43:21.225 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/index.html - - - 401 0 - 84.6528ms
+2023-10-21 23:43:26.472 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/index.html - -
+2023-10-21 23:43:26.897 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/index.html - - - 200 - text/html;charset=utf-8 424.6684ms
+2023-10-21 23:43:26.990 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui.css - -
+2023-10-21 23:43:27.027 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-standalone-preset.js - -
+2023-10-21 23:43:27.027 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-bundle.js - -
+2023-10-21 23:43:27.121 +05:45 [INF] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A'
+2023-10-21 23:43:27.121 +05:45 [INF] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A'
+2023-10-21 23:43:27.184 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-standalone-preset.js - - - 200 337162 application/javascript 156.7424ms
+2023-10-21 23:43:27.233 +05:45 [INF] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A'
+2023-10-21 23:43:27.237 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-bundle.js - - - 200 1092889 application/javascript 209.2229ms
+2023-10-21 23:43:27.237 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui.css - - - 200 143632 text/css 246.5693ms
+2023-10-21 23:43:27.498 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - -
+2023-10-21 23:43:28.303 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - - - 200 - application/json;charset=utf-8 805.1064ms
+2023-10-21 23:44:34.673 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73
+2023-10-21 23:44:34.713 +05:45 [INF] CORS policy execution successful.
+2023-10-21 23:44:35.145 +05:45 [INF] 10/21/2023 11:44:35 PM: API Got hit
+2023-10-21 23:44:35.148 +05:45 [INF] Request: POST /FinanceCompany/login
+2023-10-21 23:44:35.148 +05:45 [INF] Request Body: {
+  "userName": "admin",
+  "password": "Hello@123",
+  "stayLogin": true
+}
+2023-10-21 23:44:35.161 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-10-21 23:44:35.250 +05:45 [INF] Route matched with {action = "Login", controller = "FinanceCompany"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.UserManagement.TokenResponseDto]] Login(MicroFinance.Dtos.UserManagement.UserLoginDto) on controller MicroFinance.Controllers.UserManagement.FinanceCompanyController (MicroFinance).
+2023-10-21 23:44:40.188 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-10-21 23:44:41.991 +05:45 [ERR] 10/21/2023 11:44:41 PM Attempting to login with invalid user or inactive > admin
+2023-10-21 23:44:42.366 +05:45 [INF] Executed action MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance) in 7094.2541ms
+2023-10-21 23:44:42.388 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-10-21 23:44:42.693 +05:45 [INF] Response: 401
+2023-10-21 23:44:42.694 +05:45 [INF] Response Body: {"errors":{"Message":["UnAuthorized"]}}
+2023-10-21 23:44:42.719 +05:45 [INF] HTTP POST /FinanceCompany/login responded 401 in 7981.0053 ms
+2023-10-21 23:44:42.764 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73 - 401 - application/json 8091.1358ms
+2023-10-21 23:44:51.655 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 74
+2023-10-21 23:44:51.660 +05:45 [INF] CORS policy execution successful.
+2023-10-21 23:44:51.661 +05:45 [INF] 10/21/2023 11:44:51 PM: API Got hit
+2023-10-21 23:44:51.661 +05:45 [INF] Request: POST /FinanceCompany/login
+2023-10-21 23:44:51.661 +05:45 [INF] Request Body: {
+  "userName": "admin",
+  "password": "Hello@1234",
+  "stayLogin": true
+}
+2023-10-21 23:44:51.661 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-10-21 23:44:51.663 +05:45 [INF] Route matched with {action = "Login", controller = "FinanceCompany"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.UserManagement.TokenResponseDto]] Login(MicroFinance.Dtos.UserManagement.UserLoginDto) on controller MicroFinance.Controllers.UserManagement.FinanceCompanyController (MicroFinance).
+2023-10-21 23:44:54.216 +05:45 [ERR] 10/21/2023 11:44:54 PM Attempting to login with invalid user or inactive > admin
+2023-10-21 23:44:54.373 +05:45 [INF] Executed action MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance) in 2709.933ms
+2023-10-21 23:44:54.374 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-10-21 23:44:54.488 +05:45 [INF] Response: 401
+2023-10-21 23:44:54.488 +05:45 [INF] Response Body: {"errors":{"Message":["UnAuthorized"]}}
+2023-10-21 23:44:54.488 +05:45 [INF] HTTP POST /FinanceCompany/login responded 401 in 2828.5187 ms
+2023-10-21 23:44:54.489 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 74 - 401 - application/json 2833.7351ms
+2023-10-21 23:45:30.719 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73
+2023-10-21 23:45:30.799 +05:45 [INF] CORS policy execution successful.
+2023-10-21 23:45:30.809 +05:45 [INF] 10/21/2023 11:45:30 PM: API Got hit
+2023-10-21 23:45:30.809 +05:45 [INF] Request: POST /FinanceCompany/login
+2023-10-21 23:45:30.809 +05:45 [INF] Request Body: {
+  "userName": "Ayush",
+  "password": "Ayush@123",
+  "stayLogin": true
+}
+2023-10-21 23:45:30.809 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-10-21 23:45:30.809 +05:45 [INF] Route matched with {action = "Login", controller = "FinanceCompany"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.UserManagement.TokenResponseDto]] Login(MicroFinance.Dtos.UserManagement.UserLoginDto) on controller MicroFinance.Controllers.UserManagement.FinanceCompanyController (MicroFinance).
+2023-10-21 23:45:33.600 +05:45 [INF] 10/21/2023 11:45:33 PM User 'Ayush' login to the system
+2023-10-21 23:45:33.978 +05:45 [INF] Executing OkObjectResult, writing value of type 'MicroFinance.Dtos.UserManagement.TokenResponseDto'.
+2023-10-21 23:45:34.002 +05:45 [INF] Executed action MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance) in 3193.0176ms
+2023-10-21 23:45:34.003 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.UserManagement.FinanceCompanyController.Login (MicroFinance)'
+2023-10-21 23:45:34.003 +05:45 [INF] Response: 200
+2023-10-21 23:45:34.003 +05:45 [INF] HTTP POST /FinanceCompany/login responded 200 in 3197.8597 ms
+2023-10-21 23:45:34.003 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/FinanceCompany/login application/json 73 - 200 - application/json;+charset=utf-8 3284.5065ms
+2023-10-21 23:47:01.414 +05:45 [WRN] The property 'LoanAccount.WithDrawalBlockedDepositAccountIds' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2023-10-21 23:47:03.854 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-10-21 23:47:05.310 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-21 23:47:05.547 +05:45 [INF] Now listening on: https://localhost:5001
+2023-10-21 23:47:05.547 +05:45 [INF] Now listening on: http://localhost:5000
+2023-10-21 23:47:05.575 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-10-21 23:47:05.575 +05:45 [INF] Hosting environment: Production
+2023-10-21 23:47:05.576 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-10-21 23:47:11.665 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/index.html - -
+2023-10-21 23:47:12.154 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/index.html - - - 200 - text/html;charset=utf-8 493.8810ms
+2023-10-21 23:47:12.690 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - -
+2023-10-21 23:47:13.532 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - - - 200 - application/json;charset=utf-8 842.1803ms
+2023-10-21 23:49:08.408 +05:45 [WRN] The property 'LoanAccount.WithDrawalBlockedDepositAccountIds' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2023-10-21 23:49:10.462 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-10-21 23:49:11.652 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-21 23:49:11.866 +05:45 [INF] Now listening on: https://localhost:5001
+2023-10-21 23:49:11.866 +05:45 [INF] Now listening on: http://localhost:5000
+2023-10-21 23:49:11.892 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-10-21 23:49:11.893 +05:45 [INF] Hosting environment: Production
+2023-10-21 23:49:11.894 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-10-21 23:51:09.100 +05:45 [WRN] The property 'LoanAccount.WithDrawalBlockedDepositAccountIds' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2023-10-21 23:51:11.042 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-10-21 23:51:12.293 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-21 23:51:12.585 +05:45 [INF] Now listening on: https://localhost:5001
+2023-10-21 23:51:12.585 +05:45 [INF] Now listening on: http://localhost:5000
+2023-10-21 23:51:12.613 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-10-21 23:51:12.615 +05:45 [INF] Hosting environment: Production
+2023-10-21 23:51:12.658 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-10-21 23:51:21.751 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/index.html - -
+2023-10-21 23:51:22.211 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/index.html - - - 200 - text/html;charset=utf-8 465.2043ms
+2023-10-21 23:51:22.530 +05:45 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - -
+2023-10-21 23:51:23.289 +05:45 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - - - 200 - application/json;charset=utf-8 758.6249ms
+2023-10-21 23:52:14.922 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/LoanSetup/generateLoanSchedule application/json 147
+2023-10-21 23:52:14.930 +05:45 [INF] CORS policy execution successful.
+2023-10-21 23:52:15.499 +05:45 [INF] 10/21/2023 11:52:15 PM: API Got hit
+2023-10-21 23:52:15.500 +05:45 [INF] Request: POST /LoanSetup/generateLoanSchedule
+2023-10-21 23:52:15.501 +05:45 [INF] Request Body: {
+
+  "interestPaymentSchedule": 4,
+  "principalPaymentSchedule": 4,
+  "periodType": 1,
+  "period": 1,
+  "interestRate": 10,
+  "loanLimit": 100000
+}
+2023-10-21 23:52:15.502 +05:45 [INF] JWT Token Claims: given_name: Ayush, nameid: 8d7f07ad-30e7-4d0c-87b0-74c91348dcbd, role: Officer, IsActive: True, BranchCode: 01, email: usha123@gmail.com, nbf: 1697911233, exp: 1698516033, iat: 1697911233, iss: https://demo.fintexcbs.com/
+2023-10-21 23:52:15.511 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.GenerateLoanSchedule (MicroFinance)'
+2023-10-21 23:52:16.009 +05:45 [INF] Route matched with {action = "GenerateLoanSchedule", controller = "LoanSetup"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.LoanSetup.LoanScheduleDtos]] GenerateLoanSchedule(MicroFinance.Dtos.LoanSetup.GenerateLoanScheduleDto) on controller MicroFinance.Controllers.LoanSetup.LoanSetupController (MicroFinance).
+2023-10-21 23:52:16.071 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-10-21 23:52:17.121 +05:45 [INF] Executing BadRequestObjectResult, writing value of type 'Microsoft.AspNetCore.Mvc.ValidationProblemDetails'.
+2023-10-21 23:52:17.167 +05:45 [INF] Executed action MicroFinance.Controllers.LoanSetup.LoanSetupController.GenerateLoanSchedule (MicroFinance) in 1148.7626ms
+2023-10-21 23:52:17.176 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.GenerateLoanSchedule (MicroFinance)'
+2023-10-21 23:52:17.178 +05:45 [INF] Response: 400
+2023-10-21 23:52:17.179 +05:45 [INF] Response Body: {"type":"https://tools.ietf.org/html/rfc7231#section-6.5.1","title":"One or more validation errors occurred.","status":400,"traceId":"00-40064d5f04b178117b1737ed1e0754ef-a3e6a71768164c63-00","errors":{"":["Only Monthly, EMI, None is valid loan interest schedule"]}}
+2023-10-21 23:52:17.195 +05:45 [INF] HTTP POST /LoanSetup/generateLoanSchedule responded 400 in 2246.8913 ms
+2023-10-21 23:52:17.224 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/LoanSetup/generateLoanSchedule application/json 147 - 400 - application/problem+json;+charset=utf-8 2301.9332ms
+2023-10-21 23:54:06.967 +05:45 [WRN] The property 'LoanAccount.WithDrawalBlockedDepositAccountIds' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2023-10-21 23:54:08.940 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-10-21 23:54:10.047 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-21 23:54:10.241 +05:45 [INF] Now listening on: https://localhost:5001
+2023-10-21 23:54:10.241 +05:45 [INF] Now listening on: http://localhost:5000
+2023-10-21 23:54:10.265 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-10-21 23:54:10.266 +05:45 [INF] Hosting environment: Production
+2023-10-21 23:54:10.267 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-10-21 23:54:15.676 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/LoanSetup/generateLoanSchedule application/json 147
+2023-10-21 23:54:15.806 +05:45 [INF] CORS policy execution successful.
+2023-10-21 23:54:16.342 +05:45 [INF] 10/21/2023 11:54:16 PM: API Got hit
+2023-10-21 23:54:16.343 +05:45 [INF] Request: POST /LoanSetup/generateLoanSchedule
+2023-10-21 23:54:16.344 +05:45 [INF] Request Body: {
+
+  "interestPaymentSchedule": 4,
+  "principalPaymentSchedule": 4,
+  "periodType": 1,
+  "period": 1,
+  "interestRate": 10,
+  "loanLimit": 100000
+}
+2023-10-21 23:54:16.347 +05:45 [INF] JWT Token Claims: given_name: Ayush, nameid: 8d7f07ad-30e7-4d0c-87b0-74c91348dcbd, role: Officer, IsActive: True, BranchCode: 01, email: usha123@gmail.com, nbf: 1697911233, exp: 1698516033, iat: 1697911233, iss: https://demo.fintexcbs.com/
+2023-10-21 23:54:16.357 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.GenerateLoanSchedule (MicroFinance)'
+2023-10-21 23:54:16.857 +05:45 [INF] Route matched with {action = "GenerateLoanSchedule", controller = "LoanSetup"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.LoanSetup.LoanScheduleDtos]] GenerateLoanSchedule(MicroFinance.Dtos.LoanSetup.GenerateLoanScheduleDto) on controller MicroFinance.Controllers.LoanSetup.LoanSetupController (MicroFinance).
+2023-10-21 23:54:16.916 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-10-21 23:55:18.615 +05:45 [WRN] The property 'LoanAccount.WithDrawalBlockedDepositAccountIds' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2023-10-21 23:55:20.529 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-10-21 23:55:21.501 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-21 23:56:42.720 +05:45 [WRN] The property 'LoanAccount.WithDrawalBlockedDepositAccountIds' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2023-10-21 23:56:44.198 +05:45 [INF] No migrations were applied. The database is already up to date.
+2023-10-21 23:56:44.921 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-10-21 23:56:45.057 +05:45 [INF] Now listening on: https://localhost:5001
+2023-10-21 23:56:45.057 +05:45 [INF] Now listening on: http://localhost:5000
+2023-10-21 23:56:45.061 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-10-21 23:56:45.062 +05:45 [INF] Hosting environment: Production
+2023-10-21 23:56:45.062 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-10-21 23:57:18.291 +05:45 [INF] Request starting HTTP/1.1 POST http://localhost:5000/LoanSetup/generateLoanSchedule application/json 147
+2023-10-21 23:57:18.357 +05:45 [INF] CORS policy execution successful.
+2023-10-21 23:57:18.678 +05:45 [INF] 10/21/2023 11:57:18 PM: API Got hit
+2023-10-21 23:57:18.679 +05:45 [INF] Request: POST /LoanSetup/generateLoanSchedule
+2023-10-21 23:57:18.679 +05:45 [INF] Request Body: {
+
+  "interestPaymentSchedule": 4,
+  "principalPaymentSchedule": 4,
+  "periodType": 1,
+  "period": 1,
+  "interestRate": 10,
+  "loanLimit": 100000
+}
+2023-10-21 23:57:18.680 +05:45 [INF] JWT Token Claims: given_name: Ayush, nameid: 8d7f07ad-30e7-4d0c-87b0-74c91348dcbd, role: Officer, IsActive: True, BranchCode: 01, email: usha123@gmail.com, nbf: 1697911233, exp: 1698516033, iat: 1697911233, iss: https://demo.fintexcbs.com/
+2023-10-21 23:57:18.686 +05:45 [INF] Executing endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.GenerateLoanSchedule (MicroFinance)'
+2023-10-21 23:57:18.938 +05:45 [INF] Route matched with {action = "GenerateLoanSchedule", controller = "LoanSetup"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MicroFinance.Dtos.LoanSetup.LoanScheduleDtos]] GenerateLoanSchedule(MicroFinance.Dtos.LoanSetup.GenerateLoanScheduleDto) on controller MicroFinance.Controllers.LoanSetup.LoanSetupController (MicroFinance).
+2023-10-21 23:57:18.969 +05:45 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2023-10-21 23:57:48.617 +05:45 [INF] Executed action MicroFinance.Controllers.LoanSetup.LoanSetupController.GenerateLoanSchedule (MicroFinance) in 29673.4895ms
+2023-10-21 23:57:48.623 +05:45 [INF] Executed endpoint 'MicroFinance.Controllers.LoanSetup.LoanSetupController.GenerateLoanSchedule (MicroFinance)'
+2023-10-21 23:57:48.738 +05:45 [INF] Response: 401
+2023-10-21 23:57:48.739 +05:45 [INF] Response Body: {"errors":{"Message":["Nepali date must be 10 chars and in format YYYY-MM-DD. Date Tested: 2080-7-1"]}}
+2023-10-21 23:57:48.751 +05:45 [INF] HTTP POST /LoanSetup/generateLoanSchedule responded 401 in 30385.8223 ms
+2023-10-21 23:57:48.770 +05:45 [INF] Request finished HTTP/1.1 POST http://localhost:5000/LoanSetup/generateLoanSchedule application/json 147 - 401 - application/json 30481.4521ms

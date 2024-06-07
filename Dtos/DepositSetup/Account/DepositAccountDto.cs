@@ -8,7 +8,9 @@ namespace MicroFinance.Dtos.DepositSetup
     public class DepositAccountDto : BaseDepositDto
     {
         public string AccountNumber { get; set; }
-        public string OpeningDate { get; set; }
+        public string NepaliCreationDate { get; set; }
+        public DateTime EnglishCreationDate { get; set; }
+        // public string NepaliOpeningDate { get; set; }
         public int Period { get; set; }
         public PeriodTypeEnum PeriodType { get; set; }
         public AccountTypeEnum AccountType { get; set; }
@@ -16,6 +18,7 @@ namespace MicroFinance.Dtos.DepositSetup
         public DateTime EnglishMatureDate { get; set; }
         public DateTime NextInterestPostingDate {get; set;}
         public decimal InterestRate { get; set; }
+        public bool IsWithDrawalAllowed { get; set; }
         public decimal PrincipalAmount { get; set; } = 0;
         public decimal InterestAmount { get; set; } = 0;
         public int ReferredByEmployeeId { get; set; }

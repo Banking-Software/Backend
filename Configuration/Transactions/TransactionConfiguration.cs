@@ -10,17 +10,23 @@ namespace MicroFinance.Configuration.Transactions
         {
             builder.HasKey(tsc=>tsc.Id);
             builder.Property(tsc=>tsc.Id).ValueGeneratedOnAdd();
-            builder.HasIndex(tsc=>tsc.VoucherNumber).IsUnique();
-            builder.Property(tsc=>tsc.TransactionAmount).HasPrecision(18,4).IsRequired(true);
+            
+            builder.Property(tsc=>tsc.TransactionAmount).HasPrecision(18,2).IsRequired(true);
             builder.Property(tsc=>tsc.RealWorldCreationDate).IsRequired(true);
             builder.Property(tsc=>tsc.EnglishCreationDate).IsRequired(true);
             builder.Property(tsc=>tsc.NepaliCreationDate).IsRequired(true);
 
-             builder.HasOne(dt=>dt.BankDetail)
+            builder.HasOne(dt=>dt.BankDetail)
             .WithMany(bnk=>bnk.BaseTransactions)
             .HasForeignKey(dt=>dt.BankDetailId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.ClientSetNull);
+
+             builder.HasOne(bt=>bt.TransactionVoucher)
+            .WithMany(tv=>tv.BaseTransactions)
+            .HasForeignKey(bt=>bt.VoucherId)
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }

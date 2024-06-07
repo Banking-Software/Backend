@@ -70,17 +70,21 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-
+string domainName = Environment.GetEnvironmentVariable("clientDomain");
+if (string.IsNullOrEmpty(domainName))
+{
+    domainName = "default"; // Provide a default domain name if not available
+}
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
     .WriteTo.Console()
-    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.File($"logs/log-{domainName}.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 builder.Host.UseSerilog();
 var app = builder.Build();
-
 
 // ADD IMPORTANT DATA
 

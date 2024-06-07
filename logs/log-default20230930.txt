@@ -1,0 +1,23 @@
+2023-09-30 16:55:28.449 +05:45 [INF] Applying migration '20230930111008_initial'.
+2023-09-30 16:55:30.866 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-09-30 16:55:31.105 +05:45 [INF] Now listening on: https://localhost:5001
+2023-09-30 16:55:31.105 +05:45 [INF] Now listening on: http://localhost:5000
+2023-09-30 16:55:31.110 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-09-30 16:55:31.110 +05:45 [INF] Hosting environment: Development
+2023-09-30 16:55:31.110 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-09-30 20:09:06.490 +05:45 [INF] Applying migration '20230930142342_initial'.
+2023-09-30 20:09:09.630 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-09-30 20:09:09.847 +05:45 [INF] Now listening on: https://localhost:5001
+2023-09-30 20:09:09.847 +05:45 [INF] Now listening on: http://localhost:5000
+2023-09-30 20:09:09.852 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-09-30 20:09:09.853 +05:45 [INF] Hosting environment: Development
+2023-09-30 20:09:09.853 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-09-30 20:10:01.976 +05:45 [INF] Application is shutting down...
+2023-09-30 20:11:49.100 +05:45 [INF] Applying migration '20230930142623_initial'.
+2023-09-30 20:11:51.724 +05:45 [INF] User profile is available. Using '/home/ashish/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2023-09-30 20:11:51.930 +05:45 [INF] Now listening on: https://localhost:5001
+2023-09-30 20:11:51.930 +05:45 [INF] Now listening on: http://localhost:5000
+2023-09-30 20:11:51.938 +05:45 [INF] Application started. Press Ctrl+C to shut down.
+2023-09-30 20:11:51.939 +05:45 [INF] Hosting environment: Development
+2023-09-30 20:11:51.939 +05:45 [INF] Content root path: /media/ashish/New Volume/FinTechProject/FintexGit/Backend/
+2023-09-30 20:13:10.637 +05:45 [INF] Application is shutting down...

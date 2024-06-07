@@ -12,8 +12,8 @@ namespace MicroFinance.Configuration.DepositSetup
             builder.Property(da=>da.BranchCode).IsRequired(true);
             builder.Property(da=>da.Id).ValueGeneratedOnAdd();
             builder.Property(da=>da.InterestRate).HasPrecision(5,2).IsRequired(true);
-            builder.Property(da=>da.PrincipalAmount).HasPrecision(18,4);
-            builder.Property(da=>da.InterestAmount).HasPrecision(18, 4);
+            builder.Property(da=>da.PrincipalAmount).HasPrecision(18,2);
+            builder.Property(da=>da.InterestAmount).HasPrecision(18, 2);
             builder.HasOne(da=>da.DepositScheme)
             .WithMany(ds=>ds.DepositAccounts)
             .HasForeignKey(da=>da.DepositSchemeId)

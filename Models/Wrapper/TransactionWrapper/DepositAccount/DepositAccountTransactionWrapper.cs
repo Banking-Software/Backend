@@ -18,6 +18,7 @@ namespace MicroFinance.Models.Wrapper.TrasactionWrapper
         public int? BankDetailId { get; set; }
         public string? BankChequeNumber { get; set; }
         public int? CollectedByEmployeeId { get; set; }
+        public string? CollectedByEmployeeName {get;set;}
         public string? Narration { get; set; }
         public string Source { get; set; }
         // Extra For WithDrawal

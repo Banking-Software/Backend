@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MicroFinance.Controllers.CompanyProfile
 {
+    [TypeFilter(typeof(IsActiveAuthorizationFilter))]
     public class CompanyProfileController : BaseApiController
     {
         private ICompanyProfileService _companyProfile;
@@ -18,7 +19,6 @@ namespace MicroFinance.Controllers.CompanyProfile
         }
 
         [Authorize(AuthenticationSchemes = "SuperAdminToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         [HttpPost("createBranch")]
         public async Task<ActionResult<ResponseDto>> CreateBranch(CreateBranchDto createBranchDto)
         {
@@ -28,7 +28,6 @@ namespace MicroFinance.Controllers.CompanyProfile
         }
 
         [Authorize(AuthenticationSchemes = "SuperAdminToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         [HttpPut("updateBranch")]
         public async Task<ActionResult<ResponseDto>> UpdateBranch(UpdateBranchDto updateBranchDto)
         {
@@ -38,7 +37,7 @@ namespace MicroFinance.Controllers.CompanyProfile
         }
 
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        // [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         [HttpGet("getBranchById")]
         public async Task<ActionResult<BranchDto>> GetBranchById([FromQuery] int id)
         {
@@ -48,7 +47,7 @@ namespace MicroFinance.Controllers.CompanyProfile
         }
 
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        // [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         [HttpGet("getBranchByBranchCode")]
         public async Task<ActionResult<BranchDto>> GetBranchByBranchCode([FromQuery] string branchCode)
         {
@@ -57,7 +56,7 @@ namespace MicroFinance.Controllers.CompanyProfile
             return await _companyProfile.GetBranchServiceByBranchCodeService(branchCode);
         }
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        // [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         [HttpGet("getAllBranch")]
         public async Task<ActionResult<List<BranchDto>>> GetAllbranches()
         {
@@ -68,7 +67,6 @@ namespace MicroFinance.Controllers.CompanyProfile
 
         [HttpPost("createCompanyProfile")]
         [Authorize(AuthenticationSchemes = "SuperAdminToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         public async Task<ActionResult<ResponseDto>> CreateCompanyProfile([FromForm] CreateCompanyProfileDto createCompanyProfileDto)
         {
             return await _companyProfile.CreateCompanyProfileService(createCompanyProfileDto);
@@ -76,7 +74,6 @@ namespace MicroFinance.Controllers.CompanyProfile
 
         [HttpPut("updateCompanyProfile")]
         [Authorize(AuthenticationSchemes = "SuperAdminToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         public async Task<ActionResult<ResponseDto>> UpdateCompanyProfile([FromForm] UpdateCompanyProfileDto updateCompanyProfileDto)
         {
             return await _companyProfile.UpdateCompanyProfileService(updateCompanyProfileDto);
@@ -84,7 +81,7 @@ namespace MicroFinance.Controllers.CompanyProfile
 
         [HttpGet("getCompanyProfile")]
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        // [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         public async Task<ActionResult<CompanyProfileDto>> GetCompanyProfile()
         {
             return await _companyProfile.GetCompanyProfileService();
@@ -92,7 +89,7 @@ namespace MicroFinance.Controllers.CompanyProfile
 
         [HttpPost("createCalendars")]
         [Authorize(AuthenticationSchemes="UserToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        // [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         public async Task<ActionResult<ResponseDto>> CreateCalendars(List<CreateCalenderDto> createCalenderDtos)
         {
             Dictionary<string, string> userClaim = GetClaims();
@@ -101,7 +98,7 @@ namespace MicroFinance.Controllers.CompanyProfile
 
         [HttpPut("updateCalendar")]
         [Authorize(AuthenticationSchemes="UserToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        // [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         public async Task<ActionResult<ResponseDto>> UpdateCalendar(UpdateCalenderDto updateCalenderDto)
         {
             Dictionary<string, string> userClaim = GetClaims();
@@ -110,7 +107,7 @@ namespace MicroFinance.Controllers.CompanyProfile
 
         [HttpGet("getAllCalendars")]
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        // [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         public async Task<ActionResult<List<CalendarDto>>> GetAllCalendars()
         {
             Dictionary<string, string> userClaim = GetClaims();
@@ -119,7 +116,7 @@ namespace MicroFinance.Controllers.CompanyProfile
 
         [HttpGet("getCalendarById")]
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        // [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         public async Task<ActionResult<CalendarDto>> GetCalendarById([FromQuery] int id)
         {
             Dictionary<string, string> userClaim = GetClaims();
@@ -128,7 +125,7 @@ namespace MicroFinance.Controllers.CompanyProfile
 
         [HttpGet("getCalendarByYear")]
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        // [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         public async Task<ActionResult<List<CalendarDto>>> GetCalendarByYear([FromQuery] int year)
         {
             Dictionary<string, string> userClaim = GetClaims();
@@ -137,7 +134,7 @@ namespace MicroFinance.Controllers.CompanyProfile
 
         [HttpGet("getActiveCalendar")]
         [Authorize(AuthenticationSchemes = "UserToken,SuperAdminToken")]
-        [TypeFilter(typeof(IsActiveAuthorizationFilter))]
+        // [TypeFilter(typeof(IsActiveAuthorizationFilter))]
         public async Task<ActionResult<CalendarDto>> GetActiveCalendar()
         {
             Dictionary<string, string> userClaim = GetClaims();

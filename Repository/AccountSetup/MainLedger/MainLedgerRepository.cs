@@ -11,6 +11,9 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<MainLedgerRepository> _logger;
+        private SemaphoreSlim ledgerLock = new SemaphoreSlim(1, 1);
+        
+
 
         public MainLedgerRepository(ApplicationDbContext dbContext, ILogger<MainLedgerRepository> logger)
         {
@@ -72,6 +75,14 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
             .SingleOrDefaultAsync(gt => gt.Id == id);
         }
 
+        public  async Task<GroupType> GetGroupTypeByCharKhataNumber(string charKhataNumber)
+        {
+            return await _dbContext.GroupTypes
+            .Include(gt => gt.AccountType)
+            .AsNoTracking()
+            .SingleOrDefaultAsync(gt => gt.CharKhataNumber == charKhataNumber);
+        }
+
         public async Task<GroupType> GetGroupByName(string name, string accountTypeName)
         {
             var groupTypeForDepositScheme = await _dbContext.GroupTypes
@@ -119,22 +130,55 @@ namespace MicroFinance.Repository.AccountSetup.MainLedger
                 _logger.LogInformation($"{DateTime.Now} Creating Ledger...");
                 try
                 {
-                    ledger.GroupType = await _dbContext.GroupTypes.FindAsync(ledger.GroupTypeId);
-                    await _dbContext.Ledgers.AddAsync(ledger);
-                    var status = await _dbContext.SaveChangesAsync();
-                    if (status <= 0) throw new Exception("Unable to Create Ledger");
-                    var codeUpdate = await UpdateLedgerCode(ledger);
-                    if (codeUpdate <= 0) throw new Exception("Unable to assign the code");
-                    await transaction.CommitAsync();
-                    return ledger.Id;
+                    if(await ledgerLock.WaitAsync(TimeSpan.FromMinutes(1)))
+                    {
+                        ledger.GroupType = await _dbContext.GroupTypes.FindAsync(ledger.GroupTypeId);
+                        await _dbContext.Ledgers.AddAsync(ledger);
+                        var status = await _dbContext.SaveChangesAsync();
+                        if (status <= 0) throw new Exception("Unable to Create Ledger");
+                        var codeUpdate = await UpdateLedgerCode(ledger);
+                        if (codeUpdate <= 0) throw new Exception("Unable to assign the code");
+                        await transaction.CommitAsync();
+                        return ledger.Id;
+                    }
+                    else
+                        throw new TimeoutException("Transaction time out. Please try again...");
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
                     throw new Exception(ex.Message);
                 }
+                finally
+                {
+                    ledgerLock.Release();
+                }
             }
 
+        }
+        public async Task<int> CreateLedgers(List<Ledger> ledgers)
+        {
+            try
+            {
+                if(await ledgerLock.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    int? highedstLedgerCode = await _dbContext.Ledgers.MaxAsync(x=>x.LedgerCode);
+                    int newLedgerCode = highedstLedgerCode==null ? 1 : (int) highedstLedgerCode+1;
+                    foreach (var ledger in ledgers)
+                    {
+                        ledger.LedgerCode = newLedgerCode;
+                        newLedgerCode++;
+                    }
+                    await _dbContext.Ledgers.AddRangeAsync(ledgers);
+                    return await _dbContext.SaveChangesAsync();
+                }
+                else
+                    throw new TimeoutException("Transaction time out. Please try again...");
+            }
+            finally
+            {
+                ledgerLock.Release();
+            }
         }
         private async Task<int> UpdateLedgerCode(Ledger ledger)
         {

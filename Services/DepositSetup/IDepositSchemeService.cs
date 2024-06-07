@@ -20,7 +20,7 @@ namespace MicroFinance.Services.DepositSetup
         // // Deposit Account
         Task<ResponseDto> CreateDepositAccountService(CreateDepositAccountDto createDepositAccountDto, TokenDto decodedToken);
         Task<MatureDateDto> GenerateMatureDateOfDepositAccountService(GenerateMatureDateDto generateMatureDateDto);
-        Task<DateTime> GenerateNextInterestPostingDate(DateTime englishCurrentDate, PostingSchemeEnum postingScheme, DateTime englishMatureDate);
+        // Task<DateTime> GenerateNextInterestPostingDate(DateTime englishCurrentDate, PostingSchemeEnum postingScheme, DateTime englishMatureDate);
         Task<List<DepositAccountWrapperDto>> GetAllDepositAccountWrapperService(TokenDto decodedToken);
         Task<DepositAccountWrapperDto> GetDepositAccountWrapperByIdService(int? depositAccountId, Expression<Func<DepositAccount, bool>>? expression, TokenDto decodedToken);
         Task<ResponseDto> UpdateNonClosedDepositAccountService(UpdateDepositAccountDto updateDepositAccountDto, TokenDto decodedToken);

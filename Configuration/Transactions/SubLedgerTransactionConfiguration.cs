@@ -11,7 +11,7 @@ namespace MicroFinance.Configuration.Transactions
             builder.HasKey(slt=>slt.Id);
             builder.Property(slt=>slt.Id).ValueGeneratedOnAdd();
             builder.Property(slt=>slt.TransactionType).IsRequired(true);
-            builder.Property(slt=>slt.BalanceAfterTransaction).HasPrecision(18,4).IsRequired(true);
+            builder.Property(slt=>slt.BalanceAfterTransaction).HasPrecision(18,2).IsRequired(true);
             builder.HasOne(slt=>slt.Transaction)
             .WithOne(tsc=>tsc.SubLedgerTransaction)
             .HasForeignKey<SubLedgerTransaction>(slt=>slt.TransactionId)

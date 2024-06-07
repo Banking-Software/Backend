@@ -51,7 +51,7 @@ namespace MicroFinance.Services.UserManagement
                         Role=superadmin.Role.Name,
                         IsActive = superadmin.IsActive.ToString(),
                         Email=superadmin.Email,
-                        BranchCode="Fintex"
+                        BranchCode="-100"
                     };
                     var token = _tokenService.CreateToken(tokenDto);
                     return new TokenResponseDto(){Token=token};

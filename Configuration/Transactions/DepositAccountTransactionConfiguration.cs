@@ -10,9 +10,9 @@ namespace MicroFinance.Configuration.Transactions
         {
             builder.HasIndex(dt=>dt.Id);
             builder.Property(dt=>dt.Id).ValueGeneratedOnAdd();
-            builder.Property(dt=>dt.BalanceAfterTransaction).HasPrecision(18,4).IsRequired(true);
+            builder.Property(dt=>dt.BalanceAfterTransaction).HasPrecision(18,2).IsRequired(true);
             builder.Property(dt=>dt.Source).IsRequired(true);
-            builder.Property(dt=>dt.TransactionType).HasPrecision(18,4).IsRequired(true);
+            builder.Property(dt=>dt.TransactionType).HasPrecision(18,2).IsRequired(true);
 
             builder.HasOne(dt=>dt.Transaction)
             .WithOne(tsc=>tsc.DepositAccountTransaction)

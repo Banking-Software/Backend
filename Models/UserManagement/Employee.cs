@@ -25,8 +25,7 @@ namespace MicroFinance.Models.UserManagement
         // Optional Field
         public string? ModifiedBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
-        [DataType(DataType.Date)]
-        public DateTime? DateOfJoining { get; set; }
+        public string? DateOfJoining { get; set; }
         public string? Designation { get; set; }
         public int? GenderCode { get; set; }
         public bool? PFAllowed { get; set; }

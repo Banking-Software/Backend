@@ -7,6 +7,6 @@ namespace MicroFinance.Dtos.Transactions
     {
         [Required]
         public WithDrawalTypeEnum WithDrawalType { get; set; }
-        public string WithDrawalChequeNumber  { get; set; }
+        public string? WithDrawalChequeNumber  { get; set; }
     }
 }

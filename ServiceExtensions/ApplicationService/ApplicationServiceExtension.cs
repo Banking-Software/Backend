@@ -1,10 +1,11 @@
 
-using MicroFinance.Helper;
+using MicroFinance.Helpers;
 using MicroFinance.Repository.AccountSetup.MainLedger;
 using MicroFinance.Repository.ClientSetup;
 using MicroFinance.Repository.CompanyProfile;
 using MicroFinance.Repository.DayEnd;
 using MicroFinance.Repository.DepositSetup;
+using MicroFinance.Repository.LoanSetup;
 using MicroFinance.Repository.RecordsWithCode;
 using MicroFinance.Repository.Reports;
 using MicroFinance.Repository.Share;
@@ -15,6 +16,7 @@ using MicroFinance.Services.ClientSetup;
 using MicroFinance.Services.CompanyProfile;
 using MicroFinance.Services.DayEnd;
 using MicroFinance.Services.DepositSetup;
+using MicroFinance.Services.LoanSetup;
 using MicroFinance.Services.RecordsWithCode;
 using MicroFinance.Services.Reports;
 using MicroFinance.Services.Share;
@@ -54,20 +56,26 @@ namespace MicroFinance.ServiceExtensions.ApplicationService
             services.AddTransient<IShareAccountTransactionRepository, ShareAccountTransactionRepository>();
             services.AddTransient<IShareAccountTransactionService, ShareAccountTransactionService>();
 
+            services.AddTransient<ITransactions, Transactions>();
+
+            services.AddTransient<ITransactionService, TransactionService>();
+            services.AddTransient<IBaseTransactionRepository, BaseTransactionRepository>();
+            services.AddTransient<IManualVoucherTransactionRepository, ManualVoucherTransactionRepository>();
+
             services.AddTransient<IShareRepository, ShareRepository>();
             services.AddTransient<IShareService, ShareService>();
 
             services.AddTransient<ITransactionReportRepository, TransactionReportrepository>();
             services.AddTransient<ITransactionReportService, TransactionReportService>();
 
-            services.AddTransient<INepaliCalendarFormat, NepaliCalendarFormat>();
+            services.AddTransient<IHelper, Helper>();
             services.AddTransient<ICommonExpression, CommonExpression>();
 
-            services.AddTransient<IDayEndTaskRepository, DayEndTaskRepository>();
+            services.AddTransient<IDayEndTaskRepository, DayEndProcessRepository>();
             services.AddTransient<IDayEndTaskService, DayEndTaskService>();
 
-            
-            
+            services.AddTransient<ILoanSetupServices, LoanSetupServices>();
+            services.AddTransient<ILoanSetupRepository, LoanSetupRepository>();
             return services;
         }
     }   

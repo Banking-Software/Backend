@@ -13,14 +13,26 @@ public class DayEndController : BaseApiController
         _dayEndTaskService=dayEndTaskService;
     }
 
-    [HttpGet("maturity")]
+    [HttpGet("checkMaturity")]
     public async  Task<ActionResult<ResponseDto>> CheckMaturityOfAccountAndUpdate()
     {
         return Ok(await _dayEndTaskService.CheckMaturityOfAccountAndUpdateService());
     }
+
     [HttpGet("calculateDailyInterest")]
     public async  Task<ActionResult<ResponseDto>> CalculateDailyInterestRate()
     {
         return Ok(await _dayEndTaskService.CalculateDailyInterestService());
+    }
+    [HttpGet("postInterest")]
+    public async  Task<ActionResult<ResponseDto>> InterestPosting()
+    {
+        return Ok(await _dayEndTaskService.InterestPostingService());
+    }
+
+    [HttpGet("updateCalendar")]
+    public async  Task<ActionResult<ResponseDto>> UpdateCalendar()
+    {
+        return Ok(await _dayEndTaskService.UpdateCalendarService());
     }
 }

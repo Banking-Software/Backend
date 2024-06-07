@@ -4,6 +4,7 @@ using MicroFinance.Models.ClientSetup;
 using MicroFinance.Models.CompanyProfile;
 using MicroFinance.Models.DepositSetup;
 using MicroFinance.Models.DepositSetup.HelperTable;
+using MicroFinance.Models.LoanSetup;
 using MicroFinance.Models.RecordsWithCode;
 using MicroFinance.Models.Share;
 using MicroFinance.Models.Transactions;
@@ -22,29 +23,21 @@ namespace MicroFinance.DBContext
             _logger = logger;
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-            optionsBuilder
-                .UseLoggerFactory(_logger)
-                .EnableSensitiveDataLogging()
-                .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name });
+        // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        // {
+        //     base.OnConfiguring(optionsBuilder);
+        //     optionsBuilder
+        //         .UseLoggerFactory(_logger)
+        //         .EnableSensitiveDataLogging()
+        //         .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name });
             
-        }
+        // }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-            // modelBuilder.Entity<IdentityRole>().HasData(
-            //     new IdentityRole { Name = UserRole.Marketing.ToString(), NormalizedName = UserRole.Marketing.ToString().ToUpper()},
-            //     new IdentityRole { Name = UserRole.Assistant.ToString(), NormalizedName = UserRole.Assistant.ToString().ToUpper()},
-            //     new IdentityRole { Name = UserRole.SeniorAssistant.ToString(), NormalizedName = UserRole.SeniorAssistant.ToString().ToUpper()},
-            //     new IdentityRole { Name = UserRole.Officer.ToString(), NormalizedName = UserRole.Officer.ToString().ToUpper()},
-            //     new IdentityRole {Name = UserRole.SuperAdmin.ToString(), NormalizedName = UserRole.SuperAdmin.ToString().ToUpper()});
-            //Start: Client Setup
-
             modelBuilder.Entity<ClientGroup>()
             .HasIndex(g => g.Code).IsUnique();
 
@@ -106,10 +99,19 @@ namespace MicroFinance.DBContext
 
         // // START: TRANSACTION
         public DbSet<BaseTransaction> Transactions { get; set; }
+        public DbSet<TransactionVoucher> TransactionVouchers { get; set; }
         public DbSet<DepositAccountTransaction> DepositAccountTransactions { get; set; }
         public DbSet<LedgerTransaction> LedgerTransactions { get; set; }
         public DbSet<SubLedgerTransaction> SubLedgerTransactions { get; set; }
         public DbSet<ShareTransaction> ShareTransactions { get; set; }
+        public DbSet<InterestTransaction> InterestTransactions { get; set; }
+
+        // Loan
+        public DbSet<LoanScheme> LoanSchemes { get; set; }
+        public DbSet<LoanAccount> LoanAccounts { get; set; }
+
+
+
 
     }
 }

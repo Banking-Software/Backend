@@ -12,7 +12,7 @@ using MicroFinance.Services.ClientSetup;
 using MicroFinance.Services.CompanyProfile;
 using MicroFinance.Services.DepositSetup;
 using MicroFinance.Services.UserManagement;
-using MicroFinance.Helper;
+using MicroFinance.Helpers;
 using MicroFinance.Models.DepositSetup;
 using System.Linq.Expressions;
 
@@ -28,8 +28,9 @@ namespace MicroFinance.Services.Transactions
         private readonly IMapper _mapper;
         private readonly ICompanyProfileService _companyProfile;
         private readonly IEmployeeService _employeeService;
-        private readonly INepaliCalendarFormat _nepaliCalendarFormat;
+        private readonly IHelper _helper;
         private readonly ICommonExpression _commonExpression;
+        private readonly IBaseTransactionRepository _transactionRepository;
 
         public DepositAccountTransactionService
         (
@@ -41,8 +42,9 @@ namespace MicroFinance.Services.Transactions
             ICompanyProfileService companyProfile,
             IMainLedgerService mainLedgerService,
             IEmployeeService employeeService,
-            INepaliCalendarFormat nepaliCalendarFormat,
-            ICommonExpression commonExpression
+            IHelper helper,
+            ICommonExpression commonExpression,
+            IBaseTransactionRepository transactionRepository
         )
         {
             _logger = logger;
@@ -53,8 +55,9 @@ namespace MicroFinance.Services.Transactions
             _mainLedgerService = mainLedgerService;
             _companyProfile = companyProfile;
             _employeeService = employeeService;
-            _nepaliCalendarFormat=nepaliCalendarFormat;
+            _helper=helper;
             _commonExpression = commonExpression;
+            _transactionRepository=transactionRepository;
         }
         private async Task<BankSetupDto> GetBankDetails(int bankId, TokenDto decodedToken)
         {
@@ -71,18 +74,20 @@ namespace MicroFinance.Services.Transactions
             var depositAccountWrapper = await _depositSchemeService.GetDepositAccountWrapperByIdService(null, expressionToQueryDepositAccount, decodedToken);
             return depositAccountWrapper;
         }
-        private async Task VerifyAmountCollectedEmployee(int employeeId, TokenDto decodedToken)
+        private async Task<string> VerifyAmountCollectedEmployee(int employeeId, TokenDto decodedToken)
         {
             var employee = await _employeeService.GetEmployeeByIdFromUserBranch(employeeId, decodedToken);
+            return employee.Name;
         }
         private async Task<DepositAccountTransactionWrapper> BaseDepositAccountTransactionService(dynamic transactionDto, TokenDto decodedToken, bool isDeposit)
         {
+            string collectedByEmployeeName = "";
             if (!(transactionDto is MakeDepositTransactionDto) && !(transactionDto is MakeWithDrawalTransactionDto))
                 throw new Exception("Invalid Model is Passed");
 
             if (transactionDto.CollectedByEmployeeId != null)
             {
-                await VerifyAmountCollectedEmployee((int)transactionDto.CollectedByEmployeeId, decodedToken);
+                collectedByEmployeeName = await VerifyAmountCollectedEmployee((int)transactionDto.CollectedByEmployeeId, decodedToken);
             }
             var depositAccountWrapper = await GetDepositAccount((int)transactionDto.DepositAccountId, decodedToken, isDeposit);
             var companyCalendar = await _companyProfile.GetCurrentActiveCalenderService();
@@ -100,26 +105,54 @@ namespace MicroFinance.Services.Transactions
             transactionData.CreatorId = decodedToken.UserId;
             transactionData.BranchCode = decodedToken.BranchCode;
             transactionData.RealWorldCreationDate = DateTime.Now;
-            string nepaliCreationDate = await _nepaliCalendarFormat.GetNepaliFormatDate(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
+            string nepaliCreationDate = await _helper.GetNepaliFormatDate(companyCalendar.Year, companyCalendar.Month, companyCalendar.RunningDay);
             if(string.IsNullOrEmpty(nepaliCreationDate)) throw new Exception("Unable to assign the creation date");
             transactionData.NepaliCreationDate = nepaliCreationDate;
-            transactionData.EnglishCreationDate = await _nepaliCalendarFormat.ConvertNepaliDateToEnglish(transactionData.NepaliCreationDate);
+            transactionData.EnglishCreationDate = await _helper.ConvertNepaliDateToEnglish(transactionData.NepaliCreationDate);
+            transactionData.CollectedByEmployeeName = collectedByEmployeeName;
             return transactionData;
             
         }
-        public async Task<string> MakeDepositTransactionService(MakeDepositTransactionDto makeDepositTransactionDto, TokenDto decodedToken)
+        public async Task<VoucherDto> MakeDepositTransactionService(MakeDepositTransactionDto makeDepositTransactionDto, TokenDto decodedToken)
         {
             var depositTransactionData = await BaseDepositAccountTransactionService(makeDepositTransactionDto, decodedToken, true);
             depositTransactionData.TransactionType = TransactionTypeEnum.Credit;
-            return await _depositAccountTransactionRepo.MakeTransaction(depositTransactionData);
-            //return voucherNumber;
+            string voucherNumber= await _transactionRepository.DepositAccountTransaction(depositTransactionData);
+            VoucherDto vocherDto=new VoucherDto()
+            {
+                VoucherNumber=voucherNumber,
+                TransactionAmount=makeDepositTransactionDto.TransactionAmount,
+                AmountInWords= await _helper.HumanizeAmount(makeDepositTransactionDto.TransactionAmount),
+                ModeOfPayment = makeDepositTransactionDto.PaymentType.ToString(),
+                TransactionDateBS = depositTransactionData.NepaliCreationDate,
+                TransactionDateAD = depositTransactionData.EnglishCreationDate,
+                RealWorldTransactionDateAD = depositTransactionData.RealWorldCreationDate,
+                RealWorldTransactionDateBS = await _helper.ConvertEnglishDateToNepali(depositTransactionData.RealWorldCreationDate),
+                CollectedBy = depositTransactionData.CollectedByEmployeeName
+            };
+            return vocherDto;
         }
 
-        public async Task<string> MakeWithDrawalTransactionService(MakeWithDrawalTransactionDto makeWithDrawalTransactionDto, TokenDto decodedToken)
+        public async Task<VoucherDto> MakeWithDrawalTransactionService(MakeWithDrawalTransactionDto makeWithDrawalTransactionDto, TokenDto decodedToken)
         {
+            
             var withDrawalTransactionData = await BaseDepositAccountTransactionService(makeWithDrawalTransactionDto, decodedToken, false);
             withDrawalTransactionData.TransactionType = TransactionTypeEnum.Debit;
-            return await _depositAccountTransactionRepo.MakeTransaction(withDrawalTransactionData);
+            string voucherNumber =  await _transactionRepository.DepositAccountTransaction(withDrawalTransactionData);
+            VoucherDto vocherDto=new VoucherDto()
+            {
+                VoucherNumber=voucherNumber,
+                TransactionAmount=makeWithDrawalTransactionDto.TransactionAmount,
+                AmountInWords= await _helper.HumanizeAmount(makeWithDrawalTransactionDto.TransactionAmount),
+                ModeOfPayment = makeWithDrawalTransactionDto.PaymentType.ToString(),
+                TransactionDateBS = withDrawalTransactionData.NepaliCreationDate,
+                TransactionDateAD = withDrawalTransactionData.EnglishCreationDate,
+                RealWorldTransactionDateAD = withDrawalTransactionData.RealWorldCreationDate,
+                RealWorldTransactionDateBS = await _helper.ConvertEnglishDateToNepali(withDrawalTransactionData.RealWorldCreationDate),
+                CollectedBy = withDrawalTransactionData.CollectedByEmployeeName
+            };
+            return vocherDto;
+            // return await _depositAccountTransactionRepo.MakeTransaction(withDrawalTransactionData);
         }
     }
 }
