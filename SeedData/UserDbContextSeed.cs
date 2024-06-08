@@ -46,13 +46,13 @@ namespace MicroFinance.SeedData
                 User superAdmin = new User()
                 {
                     IsActive = true,
-                    Email = "iconichostnep@gmail.com",
-                    UserName = "Fintex",
+                    Email = "ashish.adhikari727@gmail.com",
+                    UserName = "Admin",
                     CreatedBy = "AshishAdhikari",
                     CreatedOn = DateTime.Now,
                     Role = await superAdminDbContext.UserRoles.Where(rl=>rl.RoleCode==(int) RoleEnum.SuperAdmin).SingleOrDefaultAsync()
                 };
-                string password = "Fintex@123";
+                string password = "Banking@123";
                 var result = await userManager.CreateAsync(superAdmin, password);
                 if (!result.Succeeded) 
                 {
