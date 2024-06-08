@@ -41,6 +41,17 @@ EXPOSE 80
 ENTRYPOINT ["dotnet", "MicroFinance.dll"]
 ```
 
+> Build Docker image out of above configuration
+```bash
+$ docker build -t ashish727/financebackend .
+
+```
+> Run dockerized version of backend code
+```bash
+$ docker run -d -p 5000:80 ashish727/financebackend:latest 
+```
+
+
 > Run SQL Server in docker container
 ```bash
 $ docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=banking@123' -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server:2022-latest
