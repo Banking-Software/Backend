@@ -26,7 +26,7 @@ namespace MicroFinance.Middleware
                     var username = credentials[0];
                     var password = credentials[1];
                     // validate credentials
-                    if (username.Equals("fintex")
+                    if (username.Equals("bank")
                     && password.Equals("access"))
                     {
                         await _next.Invoke(context).ConfigureAwait(false);
