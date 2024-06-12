@@ -1,5 +1,18 @@
 # Banking Software
 
+# Hosting
+ http://134.209.158.129/ 
+
+ User login Creds: 
+ Username: ashish
+ Password: Ashish@123
+ Url: http://134.209.158.129/
+
+ Superadmin login
+ Username: Admin
+ Password: Banking@123
+ Url: http://134.209.158.129/sadminlogin
+
 # [Requirement Documentation](https://drive.google.com/drive/folders/1yjGdrrZCC8MbEl-sCysheDCFVfe0Fe8_?usp=sharing)
 
 # [ER Diagram](https://github.com/Banking-Software/Backend/blob/main/README/E-commerce%20ER-Diagram.pdf)
